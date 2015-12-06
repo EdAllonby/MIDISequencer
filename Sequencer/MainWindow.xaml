@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sequencer"
         mc:Ignorable="d"
-        Title="Sequencer" Height="350" Width="525">
+        Title="Sequencer" Height="500" Width="1200">
     <Grid>
-        <Canvas x:Name="Sequencer" />
+        <Canvas x:Name="SequencerCanvas" MouseMove="SequencerMouseMoved" MouseRightButtonDown="SequencerMouseDown"
+                MouseRightButtonUp="SequencerMouseUp" />
     </Grid>
 </Window>
