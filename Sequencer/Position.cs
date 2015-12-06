@@ -15,9 +15,9 @@
 
         private int Beat { get; }
 
-        public int SummedBeat(int barsPerMeasure, int beatsPerBar)
+        public int SummedBeat(TimeSignature timeSignature)
         {
-            return ((Measure - 1)*barsPerMeasure*beatsPerBar) + ((Bar - 1)*beatsPerBar) + Beat;
+            return ((Measure - 1)* timeSignature.BeatsPerMeasure) + ((Bar - 1)* timeSignature.BeatsPerBar) + Beat;
         }
     }
 }

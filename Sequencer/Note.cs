@@ -18,15 +18,15 @@ namespace Sequencer
 
         public int Id { get; }
 
-        public void DrawNote(double noteHeight, double beatWidth, Canvas sequencer)
+        public void DrawNote(TimeSignature timeSignature, double noteHeight, double beatWidth, Canvas sequencer)
         {
-            noteDrawer.DrawNote(startPosition, endPosition, noteHeight, beatWidth, sequencer, noteHeight*noteValue - noteHeight);
+            noteDrawer.DrawNote(timeSignature, startPosition, endPosition, noteHeight, beatWidth, sequencer, noteHeight*noteValue - noteHeight);
         }
 
-        public void UpdateNoteLength(Position newEndPosition, double beatWidth)
+        public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)
         {
             endPosition = newEndPosition;
-            noteDrawer.UpdateLength(startPosition, newEndPosition, beatWidth);
+            noteDrawer.UpdateLength(timeSignature, startPosition, newEndPosition, beatWidth);
         }
     }
 }

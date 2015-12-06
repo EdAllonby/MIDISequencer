@@ -9,9 +9,7 @@ namespace Sequencer
 {
     public partial class MainWindow
     {
-        public readonly int BarsPerMeasure = 4;
-
-        public readonly int BeatsPerBar = 4;
+        private readonly TimeSignature sequencerTimeSignature = new TimeSignature(4,4);
         public readonly int MeasuresToDisplay = 4;
         private readonly Dictionary<int, Note> notesIndexedById = new Dictionary<int, Note>();
         public readonly double NotesToDisplay = 32;
@@ -28,7 +26,7 @@ namespace Sequencer
 
         private double NoteHeight => SequencerCanvas.ActualHeight/NotesToDisplay;
 
-        private double BeatWidth => SequencerCanvas.ActualWidth/(BeatsPerBar*BarsPerMeasure*MeasuresToDisplay);
+        private double BeatWidth => SequencerCanvas.ActualWidth/(sequencerTimeSignature.BeatsPerMeasure*MeasuresToDisplay);
 
         private void WindowChanged(object sender, RoutedEventArgs e)
         {
@@ -54,26 +52,26 @@ namespace Sequencer
 
         private void DrawNote(Note note)
         {
-            note.DrawNote(NoteHeight, BeatWidth, SequencerCanvas);
+            note.DrawNote(sequencerTimeSignature, NoteHeight, BeatWidth, SequencerCanvas);
         }
 
         private void DrawVerticalSequencerLines()
         {
             double pointsPerMeasure = SequencerCanvas.ActualWidth/MeasuresToDisplay;
-            double pointsPerBar = pointsPerMeasure/BarsPerMeasure;
-            double pointsPerBeat = pointsPerBar/BeatsPerBar;
+            double pointsPerBar = pointsPerMeasure/ sequencerTimeSignature.BarsPerMeasure;
+            double pointsPerBeat = pointsPerBar/ sequencerTimeSignature.BeatsPerBar;
 
             for (int measure = 0; measure < MeasuresToDisplay; measure++)
             {
                 double currentMeasurePosition = (pointsPerMeasure*measure);
                 DrawVerticalSequencerLine(currentMeasurePosition, 2, Colors.Black);
 
-                for (int bar = 0; bar < BarsPerMeasure; bar++)
+                for (int bar = 0; bar < sequencerTimeSignature.BarsPerMeasure; bar++)
                 {
                     double currentBarPosition = currentMeasurePosition + (pointsPerBar*bar);
                     DrawVerticalSequencerLine(currentBarPosition, 1, Colors.Black);
 
-                    for (int beat = 1; beat < BeatsPerBar; beat++)
+                    for (int beat = 1; beat < sequencerTimeSignature.BeatsPerBar; beat++)
                     {
                         double currentBeatPosition = currentBarPosition + (pointsPerBeat*beat);
                         DrawVerticalSequencerLine(currentBeatPosition, 0.5, Colors.Black);
@@ -155,7 +153,7 @@ namespace Sequencer
         {
             Point mousePosition = e.GetPosition(SequencerCanvas);
             Position endPosition = FindNotePosition(mousePosition);
-            notesIndexedById[currentNoteId].UpdateNoteLength(endPosition, BeatWidth);
+            notesIndexedById[currentNoteId].UpdateNoteLength(sequencerTimeSignature, endPosition, BeatWidth);
         }
 
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
@@ -183,13 +181,13 @@ namespace Sequencer
 
             for (int measure = 1; measure <= MeasuresToDisplay; measure++)
             {
-                for (int bar = 1; bar <= BarsPerMeasure; bar++)
+                for (int bar = 1; bar <= sequencerTimeSignature.BarsPerMeasure; bar++)
                 {
-                    for (int beat = 1; beat <= BeatsPerBar; beat++)
+                    for (int beat = 1; beat <= sequencerTimeSignature.BeatsPerBar; beat++)
                     {
                         var possiblePosition = new Position(measure, bar, beat);
 
-                        double currentBeatPosition = possiblePosition.SummedBeat(BarsPerMeasure, BeatsPerBar);
+                        double currentBeatPosition = possiblePosition.SummedBeat(sequencerTimeSignature);
 
                         if (xPosition <= BeatWidth*currentBeatPosition)
                         {
