@@ -1,9 +1,12 @@
 ﻿using System.Windows.Controls;
+using log4net;
 
 namespace Sequencer
 {
     public sealed class Note
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Note));
+
         private readonly NoteDrawer noteDrawer = new NoteDrawer();
         private readonly int noteValue;
         private readonly Position startPosition;
@@ -20,11 +23,13 @@ namespace Sequencer
 
         public void DrawNote(TimeSignature timeSignature, double noteHeight, double beatWidth, Canvas sequencer)
         {
+            Log.InfoFormat("Drawing note with start position {0}", startPosition);   
             noteDrawer.DrawNote(timeSignature, startPosition, endPosition, noteHeight, beatWidth, sequencer, noteHeight*noteValue - noteHeight);
         }
 
         public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)
         {
+            Log.InfoFormat("Updating note length with start position {0} to end position {1}", startPosition, endPosition);
             endPosition = newEndPosition;
             noteDrawer.UpdateLength(timeSignature, startPosition, newEndPosition, beatWidth);
         }

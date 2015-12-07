@@ -4,11 +4,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using log4net;
 
 namespace Sequencer
 {
     public partial class MainWindow
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof (MainWindow));
+
         private readonly TimeSignature sequencerTimeSignature = new TimeSignature(4,4);
         public readonly int MeasuresToDisplay = 4;
         private readonly Dictionary<int, Note> notesIndexedById = new Dictionary<int, Note>();
@@ -22,6 +25,7 @@ namespace Sequencer
             InitializeComponent();
             Loaded += WindowChanged;
             SizeChanged += WindowChanged;
+            Log.Info("Main Window loaded");
         }
 
         private double NoteHeight => SequencerCanvas.ActualHeight/NotesToDisplay;
@@ -30,16 +34,18 @@ namespace Sequencer
 
         private void WindowChanged(object sender, RoutedEventArgs e)
         {
-            DrawEditor();
+            RedrawEditor();
         }
 
-        private void DrawEditor()
+        private void RedrawEditor()
         {
             SequencerCanvas.Children.Clear();
 
             DrawHorizontalSequencerLines();
             DrawVerticalSequencerLines();
             DrawNotes();
+
+            Log.Debug("Sequencer redrawn");
         }
 
         private void DrawNotes()

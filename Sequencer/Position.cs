@@ -19,5 +19,10 @@
         {
             return ((Measure - 1)* timeSignature.BeatsPerMeasure) + ((Bar - 1)* timeSignature.BeatsPerBar) + Beat;
         }
+
+        public override string ToString()
+        {
+            return string.Format("Position at Measure {0}, Bar {1}, Beat {2}", Measure, Bar, Beat);
+        }
     }
 }
