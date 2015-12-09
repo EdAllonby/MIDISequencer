@@ -35,7 +35,7 @@ namespace Sequencer
 
         private double GetPointFromPosition(TimeSignature timeSignature, Position position, double beatWidth)
         {
-            return position.SummedBeat(timeSignature) *beatWidth - beatWidth;
+            return position.SummedBeat(timeSignature)*beatWidth - beatWidth;
         }
 
         public void UpdateLength(TimeSignature timeSignature, Position startPosition, Position endPosition, double beatWidth)
