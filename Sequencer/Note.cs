@@ -12,10 +12,11 @@ namespace Sequencer
         private readonly Position startPosition;
         private Position endPosition;
 
-        public Note(int id, Position startPosition, int noteValue)
+        public Note(int id, Position startPosition, Position endPosition, int noteValue)
         {
             Id = id;
             this.startPosition = startPosition;
+            this.endPosition = endPosition;
             this.noteValue = noteValue;
         }
 
@@ -23,7 +24,7 @@ namespace Sequencer
 
         public void DrawNote(TimeSignature timeSignature, double noteHeight, double beatWidth, Canvas sequencer)
         {
-            Log.InfoFormat("Drawing note with start position {0}", startPosition);   
+            Log.InfoFormat("Drawing note with start position {0} and end position {1}", startPosition, endPosition);   
             noteDrawer.DrawNote(timeSignature, startPosition, endPosition, noteHeight, beatWidth, sequencer, noteHeight*noteValue - noteHeight);
         }
 

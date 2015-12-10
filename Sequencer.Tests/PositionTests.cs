@@ -126,6 +126,51 @@ namespace Sequencer.Tests
             AssertPosition(position, 2, 3, 1);
         }
 
+        [Test]
+        public void Position_1_NextPosition_ShouldBe2()
+        {
+            var position = new Position(1, 1, 1);
+            Position nextPosition = position.NextPosition(standardTimeSignature);
+
+            AssertPosition(nextPosition, 1, 1, 2);
+        }
+
+        [Test]
+        public void Position_1_1_1_NextPosition_ShouldBe_1_1_2()
+        {
+            var position = new Position(1, 1, 1);
+            Position nextPosition = position.NextPosition(standardTimeSignature);
+
+            AssertPosition(nextPosition, 1, 1, 2);
+        }
+
+        [Test]
+        public void Position_3_1_1_NextPosition_ShouldBe_3_1_2()
+        {
+            var position = new Position(3, 1, 1);
+            Position nextPosition = position.NextPosition(standardTimeSignature);
+
+            AssertPosition(nextPosition, 3, 1, 2);
+        }
+
+        [Test]
+        public void Position_4_4_4_NextPosition_ShouldBe_5_1_1()
+        {
+            var position = new Position(4, 4, 4);
+            Position nextPosition = position.NextPosition(standardTimeSignature);
+
+            AssertPosition(nextPosition, 5, 1, 1);
+        }
+
+        [Test]
+        public void Position_2_3_4_NextPosition_ShouldBe_2_4_1()
+        {
+            var position = new Position(2, 3, 4);
+            Position nextPosition = position.NextPosition(standardTimeSignature);
+
+            AssertPosition(nextPosition, 2, 4, 1);
+        }
+
         private static void AssertPosition(Position position, int measure, int bar, int beat)
         {
             Assert.AreEqual(measure, position.Measure);

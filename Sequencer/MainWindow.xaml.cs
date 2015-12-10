@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,8 +18,7 @@ namespace Sequencer
         private readonly TimeSignature sequencerTimeSignature = new TimeSignature(4, 4);
         private int currentNoteId;
         private int noteId = 1;
-
-
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -158,7 +158,7 @@ namespace Sequencer
         {
             Point mousePosition = e.GetPosition(SequencerCanvas);
             Position endPosition = FindNotePosition(mousePosition);
-            notesIndexedById[currentNoteId].UpdateNoteLength(sequencerTimeSignature, endPosition, BeatWidth);
+            notesIndexedById[currentNoteId].UpdateNoteLength(sequencerTimeSignature, endPosition.NextPosition(sequencerTimeSignature), BeatWidth);
         }
 
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
@@ -167,7 +167,7 @@ namespace Sequencer
             Position notePosition = FindNotePosition(mousePosition);
             int noteValue = FindNote(mousePosition);
 
-            var note = new Note(noteId, notePosition, noteValue);
+            var note = new Note(noteId, notePosition, notePosition.NextPosition(sequencerTimeSignature),  noteValue);
             DrawNote(note);
             notesIndexedById.Add(noteId, note);
 
@@ -177,13 +177,8 @@ namespace Sequencer
 
         private Position FindNotePosition(Point mousePosition)
         {
-            for (int beat = 1;; beat++)
-            {
-                if (mousePosition.X <= BeatWidth*beat)
-                {
-                    return Position.PositionFromBeat(beat, sequencerTimeSignature);
-                }
-            }
+            var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
+            return Position.PositionFromBeat(beat, sequencerTimeSignature);
         }
 
         private void SequencerMouseUp(object sender, MouseButtonEventArgs e)
@@ -193,17 +188,7 @@ namespace Sequencer
 
         private int FindNote(Point mousePosition)
         {
-            double yPosition = mousePosition.Y;
-
-            for (var note = 1; note <= NotesToDisplay; note++)
-            {
-                if (yPosition <= NoteHeight*note)
-                {
-                    return note;
-                }
-            }
-
-            return 0;
+            return (int)Math.Ceiling(mousePosition.Y / NoteHeight);
         }
     }
 }

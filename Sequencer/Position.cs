@@ -17,9 +17,26 @@ namespace Sequencer
 
         public int Beat { get; }
 
+        /// <summary>
+        /// Gets the sum of beats for the <see cref="Position" />.
+        /// </summary>
+        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use when calculating the sum of beats.</param>
+        /// <returns></returns>
         public int SummedBeat(TimeSignature timeSignature)
         {
             return ((Measure - 1)*timeSignature.BeatsPerMeasure) + ((Bar - 1)*timeSignature.BeatsPerBar) + Beat;
+        }
+
+        /// <summary>
+        /// Get the next <see cref="Position" />.
+        /// </summary>
+        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the next <see cref="Position" />.</param>
+        /// <returns>The next <see cref="Position" />.</returns>
+        public Position NextPosition(TimeSignature timeSignature)
+        {
+            int totalBeats = SummedBeat(timeSignature);
+            totalBeats++;
+            return PositionFromBeat(totalBeats, timeSignature);
         }
 
         /// <summary>

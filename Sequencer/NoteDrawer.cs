@@ -11,13 +11,7 @@ namespace Sequencer
         public void DrawNote(TimeSignature timeSignature, Position startPosition, Position endPosition, double noteHeight, double beatWidth, Canvas sequencer, double clampedNote)
         {
             double noteStartLocation = GetPointFromPosition(timeSignature, startPosition, beatWidth);
-
-            double noteWidth = 0;
-
-            if (endPosition != null)
-            {
-                noteWidth = ActualWidthBetweenPositions(timeSignature, startPosition, endPosition, beatWidth);
-            }
+            double noteWidth = ActualWidthBetweenPositions(timeSignature, startPosition, endPosition, beatWidth);
 
             noteRectangle = new Rectangle
             {
