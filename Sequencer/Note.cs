@@ -1,38 +1,31 @@
-﻿using System.Windows.Controls;
-using log4net;
-
-namespace Sequencer
+﻿namespace Sequencer
 {
-    public sealed class Note
+    /// <summary>
+    /// Represents an 'atomic' note without duration.
+    /// </summary>
+    public class Note : EnumerableType<Note>
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(Note));
+        public static readonly Note C = new Note(0, "C", false);
+        public static readonly Note CSharp = new Note(1, "C#", true);
+        public static readonly Note D = new Note(2, "D", false);
+        public static readonly Note DSharp = new Note(3, "D#", true);
+        public static readonly Note E = new Note(4, "E", false);
+        public static readonly Note F = new Note(5, "F", false);
+        public static readonly Note FSharp = new Note(6, "F#", true);
+        public static readonly Note G = new Note(7, "G", false);
+        public static readonly Note GSharp = new Note(8, "G#", true);
+        public static readonly Note A = new Note(9, "A", false);
+        public static readonly Note ASharp = new Note(10, "A#", true);
+        public static readonly Note B = new Note(11, "B", false);
 
-        private readonly NoteDrawer noteDrawer = new NoteDrawer();
-        private readonly int noteValue;
-        private readonly Position startPosition;
-        private Position endPosition;
-
-        public Note(int id, Position startPosition, Position endPosition, int noteValue)
+        private Note(int value, string displayName, bool isAccidental) : base(value, displayName)
         {
-            Id = id;
-            this.startPosition = startPosition;
-            this.endPosition = endPosition;
-            this.noteValue = noteValue;
+            IsAccidental = isAccidental;
         }
 
-        public int Id { get; }
-
-        public void DrawNote(TimeSignature timeSignature, double noteHeight, double beatWidth, Canvas sequencer)
-        {
-            Log.InfoFormat("Drawing note with start position {0} and end position {1}", startPosition, endPosition);   
-            noteDrawer.DrawNote(timeSignature, startPosition, endPosition, noteHeight, beatWidth, sequencer, noteHeight*noteValue - noteHeight);
-        }
-
-        public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)
-        {
-            Log.InfoFormat("Updating note length with start position {0} to end position {1}", startPosition, endPosition);
-            endPosition = newEndPosition;
-            noteDrawer.UpdateLength(timeSignature, startPosition, newEndPosition, beatWidth);
-        }
+        /// <summary>
+        /// Whether this note is 'accidental', i.e. is a sharp or flat note.
+        /// </summary>
+        public bool IsAccidental { get; }
     }
 }

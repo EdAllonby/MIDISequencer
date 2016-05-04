@@ -60,6 +60,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ConsoleManager.cs" />
+    <Compile Include="EnumerableType.cs" />
+    <Compile Include="Note.cs" />
+    <Compile Include="Pitch.cs" />
+    <Compile Include="SequencerSettings.cs" />
     <Compile Include="TimeSignature.cs" />
     <Compile Include="UnsafeNativeMethods.cs" />
     <Page Include="MainWindow.xaml">
@@ -76,7 +80,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Note.cs" />
+    <Compile Include="VisualNote.cs" />
     <Compile Include="NoteDrawer.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -2,8 +2,17 @@
 
 namespace Sequencer
 {
+    /// <summary>
+    /// Represents a musical position.
+    /// </summary>
     public sealed class Position
     {
+        /// <summary>
+        /// A position based on current measure, bar and beat.
+        /// </summary>
+        /// <param name="measure">The measure the position is in.</param>
+        /// <param name="bar">The bar the position is in.</param>
+        /// <param name="beat">The beat the position is in.</param>
         public Position(int measure, int bar, int beat)
         {
             Measure = measure;
@@ -35,8 +44,7 @@ namespace Sequencer
         public Position NextPosition(TimeSignature timeSignature)
         {
             int totalBeats = SummedBeat(timeSignature);
-            totalBeats++;
-            return PositionFromBeat(totalBeats, timeSignature);
+            return PositionFromBeat(totalBeats + 1, timeSignature);
         }
 
         /// <summary>

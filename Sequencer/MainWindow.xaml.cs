@@ -11,14 +11,13 @@ namespace Sequencer
 {
     public partial class MainWindow
     {
-        private const int MeasuresToDisplay = 4;
-        private const double NotesToDisplay = 32;
-        private static readonly ILog Log = LogManager.GetLogger(typeof (MainWindow));
-        private readonly Dictionary<int, Note> notesIndexedById = new Dictionary<int, Note>();
-        private readonly TimeSignature sequencerTimeSignature = new TimeSignature(4, 4);
+        SequencerSettings sequencerSettings = new SequencerSettings();
+
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
+        private readonly Dictionary<int, VisualNote> notesIndexedById = new Dictionary<int, VisualNote>();
         private int currentNoteId;
         private int noteId = 1;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -27,9 +26,9 @@ namespace Sequencer
             Log.Info("Main Window loaded");
         }
 
-        private double NoteHeight => SequencerCanvas.ActualHeight/NotesToDisplay;
+        private double NoteHeight => SequencerCanvas.ActualHeight/SequencerSettings.TotalNotes;
 
-        private double BeatWidth => SequencerCanvas.ActualWidth/(sequencerTimeSignature.BeatsPerMeasure*MeasuresToDisplay);
+        private double BeatWidth => SequencerCanvas.ActualWidth/(sequencerSettings.TimeSignature.BeatsPerMeasure*SequencerSettings.TotalMeasures);
 
         private void WindowChanged(object sender, RoutedEventArgs e)
         {
@@ -49,34 +48,34 @@ namespace Sequencer
 
         private void DrawNotes()
         {
-            foreach (Note note in notesIndexedById.Values)
+            foreach (VisualNote note in notesIndexedById.Values)
             {
                 DrawNote(note);
             }
         }
 
-        private void DrawNote(Note note)
+        private void DrawNote(VisualNote visualNote)
         {
-            note.DrawNote(sequencerTimeSignature, NoteHeight, BeatWidth, SequencerCanvas);
+            visualNote.DrawNote(sequencerSettings, NoteHeight, BeatWidth, SequencerCanvas);
         }
 
         private void DrawVerticalSequencerLines()
         {
-            double pointsPerMeasure = SequencerCanvas.ActualWidth/MeasuresToDisplay;
-            double pointsPerBar = pointsPerMeasure/sequencerTimeSignature.BarsPerMeasure;
-            double pointsPerBeat = pointsPerBar/sequencerTimeSignature.BeatsPerBar;
+            double pointsPerMeasure = SequencerCanvas.ActualWidth/SequencerSettings.TotalMeasures;
+            double pointsPerBar = pointsPerMeasure/sequencerSettings.TimeSignature.BarsPerMeasure;
+            double pointsPerBeat = pointsPerBar/sequencerSettings.TimeSignature.BeatsPerBar;
 
-            for (var measure = 0; measure < MeasuresToDisplay; measure++)
+            for (var measure = 0; measure < SequencerSettings.TotalMeasures; measure++)
             {
                 double currentMeasurePosition = pointsPerMeasure*measure;
                 DrawVerticalSequencerLine(currentMeasurePosition, 2, Colors.Black);
 
-                for (var bar = 0; bar < sequencerTimeSignature.BarsPerMeasure; bar++)
+                for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
                     double currentBarPosition = currentMeasurePosition + pointsPerBar*bar;
                     DrawVerticalSequencerLine(currentBarPosition, 1, Colors.Black);
 
-                    for (var beat = 1; beat < sequencerTimeSignature.BeatsPerBar; beat++)
+                    for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
                         double currentBeatPosition = currentBarPosition + pointsPerBeat*beat;
                         DrawVerticalSequencerLine(currentBeatPosition, 0.5, Colors.Black);
@@ -105,7 +104,7 @@ namespace Sequencer
             double pointsPerNote = NoteHeight;
 
             var isAlternate = false;
-            for (var currentNote = 0; currentNote < NotesToDisplay; currentNote++)
+            for (var currentNote = 0; currentNote < SequencerSettings.TotalNotes; currentNote++)
             {
                 double currentNotePosition = pointsPerNote*currentNote;
                 isAlternate = !isAlternate;
@@ -158,16 +157,17 @@ namespace Sequencer
         {
             Point mousePosition = e.GetPosition(SequencerCanvas);
             Position endPosition = FindNotePosition(mousePosition);
-            notesIndexedById[currentNoteId].UpdateNoteLength(sequencerTimeSignature, endPosition.NextPosition(sequencerTimeSignature), BeatWidth);
+            Position nextPosition = endPosition.NextPosition(sequencerSettings.TimeSignature);
+            notesIndexedById[currentNoteId].UpdateNoteLength(sequencerSettings.TimeSignature, nextPosition, BeatWidth);
         }
 
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
         {
             Point mousePosition = e.GetPosition(SequencerCanvas);
             Position notePosition = FindNotePosition(mousePosition);
-            int noteValue = FindNote(mousePosition);
+            Pitch pitch = FindPitch(mousePosition);
 
-            var note = new Note(noteId, notePosition, notePosition.NextPosition(sequencerTimeSignature),  noteValue);
+            var note = new VisualNote(noteId, notePosition, notePosition.NextPosition(sequencerSettings.TimeSignature), pitch);
             DrawNote(note);
             notesIndexedById.Add(noteId, note);
 
@@ -178,7 +178,7 @@ namespace Sequencer
         private Position FindNotePosition(Point mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
-            return Position.PositionFromBeat(beat, sequencerTimeSignature);
+            return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
         }
 
         private void SequencerMouseUp(object sender, MouseButtonEventArgs e)
@@ -186,9 +186,11 @@ namespace Sequencer
             UpdateNote(e);
         }
 
-        private int FindNote(Point mousePosition)
+        private Pitch FindPitch(Point mousePosition)
         {
-            return (int)Math.Ceiling(mousePosition.Y / NoteHeight);
+            int relativeMidiNumber = (int) ((SequencerCanvas.ActualHeight/NoteHeight)-Math.Ceiling(mousePosition.Y/NoteHeight));
+            int absoluteMidiNumber = sequencerSettings.LowestPitch.MidiNoteNumber + relativeMidiNumber;
+            return Pitch.CreatePitchFromMidiNumber(absoluteMidiNumber);
         }
     }
 }
