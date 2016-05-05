@@ -7,16 +7,17 @@ namespace Sequencer
     /// </summary>
     public sealed class Pitch : IEquatable<Pitch>
     {
-        private readonly Note note;
         private readonly int octave;
 
         public Pitch(Note note, int octave)
         {
-            this.note = note;
+            this.Note = note;
             this.octave = octave;
         }
 
-        public int MidiNoteNumber => note.Value + (octave)*12;
+        public Note Note { get; }
+
+        public int MidiNoteNumber => Note.Value + (octave)*12;
 
         public static Pitch CreatePitchFromMidiNumber(int value)
         {
@@ -40,7 +41,7 @@ namespace Sequencer
                 return true;
             }
 
-            return note.Equals(other.note) && octave == other.octave;
+            return Note.Equals(other.Note) && octave == other.octave;
         }
 
         public override bool Equals(object obj)
@@ -54,13 +55,13 @@ namespace Sequencer
         {
             unchecked
             {
-                return (note.GetHashCode()*397) ^ octave;
+                return (Note.GetHashCode()*397) ^ octave;
             }
         }
 
         public override string ToString()
         {
-            return $"{note}{octave}";
+            return $"{Note}{octave}";
         }
     }
 }

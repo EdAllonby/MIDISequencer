@@ -11,10 +11,9 @@ namespace Sequencer
 {
     public partial class MainWindow
     {
-        SequencerSettings sequencerSettings = new SequencerSettings();
-
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
         private readonly Dictionary<int, VisualNote> notesIndexedById = new Dictionary<int, VisualNote>();
+        private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private int currentNoteId;
         private int noteId = 1;
 
@@ -68,23 +67,23 @@ namespace Sequencer
             for (var measure = 0; measure < SequencerSettings.TotalMeasures; measure++)
             {
                 double currentMeasurePosition = pointsPerMeasure*measure;
-                DrawVerticalSequencerLine(currentMeasurePosition, 2, Colors.Black);
+                DrawVerticalSequencerLine(currentMeasurePosition, 2);
 
                 for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
                     double currentBarPosition = currentMeasurePosition + pointsPerBar*bar;
-                    DrawVerticalSequencerLine(currentBarPosition, 1, Colors.Black);
+                    DrawVerticalSequencerLine(currentBarPosition, 1);
 
                     for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
                         double currentBeatPosition = currentBarPosition + pointsPerBeat*beat;
-                        DrawVerticalSequencerLine(currentBeatPosition, 0.5, Colors.Black);
+                        DrawVerticalSequencerLine(currentBeatPosition, 0.5);
                     }
                 }
             }
         }
 
-        private void DrawVerticalSequencerLine(double currentBeatPosition, double thickness, Color colour)
+        private void DrawVerticalSequencerLine(double currentBeatPosition, double thickness)
         {
             var sequencerLine = new Line
             {
@@ -93,7 +92,7 @@ namespace Sequencer
                 Y1 = 0,
                 Y2 = SequencerCanvas.ActualHeight,
                 StrokeThickness = thickness,
-                Stroke = new SolidColorBrush(colour)
+                Stroke = new SolidColorBrush(sequencerSettings.LineColour)
             };
 
             SequencerCanvas.Children.Add(sequencerLine);
@@ -103,20 +102,21 @@ namespace Sequencer
         {
             double pointsPerNote = NoteHeight;
 
-            var isAlternate = false;
-            for (var currentNote = 0; currentNote < SequencerSettings.TotalNotes; currentNote++)
+            for (int currentNote = SequencerSettings.TotalNotes; currentNote >= 0; currentNote--)
             {
                 double currentNotePosition = pointsPerNote*currentNote;
-                isAlternate = !isAlternate;
 
-                DrawNoteBackground(currentNotePosition, pointsPerNote, isAlternate);
-                DrawHorizontalSequencerLine(currentNotePosition, 0.5, Colors.Black);
+                int currentMidiNote = SequencerSettings.TotalNotes + sequencerSettings.LowestPitch.MidiNoteNumber - (currentNote);
+                Pitch pitch = Pitch.CreatePitchFromMidiNumber(currentMidiNote - 1);
+
+                DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);
+                DrawHorizontalSequencerLine(currentNotePosition, 0.5);
             }
         }
 
-        private void DrawNoteBackground(double currentNotePosition, double noteSize, bool isAlternate)
+        private void DrawNoteBackground(double currentNotePosition, double noteSize, Pitch pitch)
         {
-            Color backgroundColour = isAlternate ? Colors.Gray : Colors.DarkGray;
+            Color backgroundColour = pitch.Note.IsAccidental ? sequencerSettings.AccidentalKeyColour : sequencerSettings.KeyColour;
 
             var noteBackground = new Rectangle
             {
@@ -130,7 +130,7 @@ namespace Sequencer
             Canvas.SetTop(noteBackground, currentNotePosition);
         }
 
-        private void DrawHorizontalSequencerLine(double currentNotePosition, double thickness, Color colour)
+        private void DrawHorizontalSequencerLine(double currentNotePosition, double thickness)
         {
             var sequencerLine = new Line
             {
@@ -139,7 +139,7 @@ namespace Sequencer
                 Y1 = currentNotePosition,
                 Y2 = currentNotePosition,
                 StrokeThickness = thickness,
-                Stroke = new SolidColorBrush(colour)
+                Stroke = new SolidColorBrush(sequencerSettings.LineColour)
             };
 
             SequencerCanvas.Children.Add(sequencerLine);
@@ -188,7 +188,7 @@ namespace Sequencer
 
         private Pitch FindPitch(Point mousePosition)
         {
-            int relativeMidiNumber = (int) ((SequencerCanvas.ActualHeight/NoteHeight)-Math.Ceiling(mousePosition.Y/NoteHeight));
+            int relativeMidiNumber = (int) (SequencerCanvas.ActualHeight/NoteHeight - Math.Ceiling(mousePosition.Y/NoteHeight));
             int absoluteMidiNumber = sequencerSettings.LowestPitch.MidiNoteNumber + relativeMidiNumber;
             return Pitch.CreatePitchFromMidiNumber(absoluteMidiNumber);
         }
