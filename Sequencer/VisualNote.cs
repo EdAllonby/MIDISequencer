@@ -30,9 +30,12 @@ namespace Sequencer
 
         public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)
         {
-            Log.InfoFormat("Updating note length with start position {0} to end position {1}", startPosition, endPosition);
-            endPosition = newEndPosition;
-            noteDrawer.UpdateLength(timeSignature, startPosition, newEndPosition, beatWidth);
+            if (newEndPosition >= startPosition)
+            {
+                Log.InfoFormat("Updating note length with start position {0} to end position {1}", startPosition, endPosition);
+                endPosition = newEndPosition;
+                noteDrawer.UpdateLength(timeSignature, startPosition, newEndPosition, beatWidth);
+            }
         }
     }
 }
