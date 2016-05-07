@@ -28,6 +28,22 @@ namespace Sequencer.Tests
         }
 
         [Test]
+        public void MidiNote0ShouldReturnC0()
+        {
+            var pitch = Pitch.CreatePitchFromMidiNumber(0);
+            var expectedPitch = new Pitch(Note.C, 0);
+            Assert.AreEqual(expectedPitch, pitch);
+        }
+
+        [Test]
+        public void MidiNote127ShouldReturnG10()
+        {
+            var pitch = Pitch.CreatePitchFromMidiNumber(127);
+            var expectedPitch = new Pitch(Note.G, 10);
+            Assert.AreEqual(expectedPitch, pitch);
+        }
+
+        [Test]
         public void MidiNote12ShouldReturnC1()
         {
             var pitch = Pitch.CreatePitchFromMidiNumber(12);
@@ -43,30 +59,6 @@ namespace Sequencer.Tests
             Assert.AreEqual(expectedPitch, pitch);
         }
 
-        [Test]
-        public void MidiNote77ShouldReturnF6()
-        {
-            var pitch = Pitch.CreatePitchFromMidiNumber(77);
-            var expectedPitch = new Pitch(Note.F, 6);
-            Assert.AreEqual(expectedPitch, pitch);
-        }
-
-        [Test]
-        public void MidiNote127ShouldReturnG10()
-        {
-            var pitch = Pitch.CreatePitchFromMidiNumber(127);
-            var expectedPitch = new Pitch(Note.G, 10);
-            Assert.AreEqual(expectedPitch, pitch);
-        }
-
-        [Test]
-        public void MidiNote0ShouldReturnC0()
-        {
-            var pitch = Pitch.CreatePitchFromMidiNumber(0);
-            var expectedPitch = new Pitch(Note.C, 0);
-            Assert.AreEqual(expectedPitch, pitch);
-        }
-
 
         [Test]
         public void MidiNote48ShouldReturnC4()
@@ -75,6 +67,15 @@ namespace Sequencer.Tests
             var expectedPitch = new Pitch(Note.C, 4);
             Assert.AreEqual(expectedPitch, pitch);
         }
+
+        [Test]
+        public void MidiNote77ShouldReturnF6()
+        {
+            var pitch = Pitch.CreatePitchFromMidiNumber(77);
+            var expectedPitch = new Pitch(Note.F, 6);
+            Assert.AreEqual(expectedPitch, pitch);
+        }
+
         [Test]
         public void MidiNote99ShouldReturnDSharp8()
         {

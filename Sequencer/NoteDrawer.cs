@@ -15,7 +15,7 @@ namespace Sequencer
             this.sequencerSettings = sequencerSettings;
         }
 
-        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState, 
+        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState,
             double noteHeight, double beatWidth, Canvas sequencer)
         {
             TimeSignature timeSignature = sequencerSettings.TimeSignature;
@@ -64,7 +64,7 @@ namespace Sequencer
         private static double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight, Pitch startingPitch)
         {
             int pitchDelta = pitch.MidiNoteNumber - startingPitch.MidiNoteNumber;
-            double relativePitchPosition = noteHeight * pitchDelta + noteHeight;
+            double relativePitchPosition = (noteHeight*pitchDelta) + noteHeight;
             return sequencerHeight - relativePitchPosition;
         }
 
@@ -79,7 +79,7 @@ namespace Sequencer
 
         private static double GetPointFromPosition(TimeSignature timeSignature, Position position, double beatWidth)
         {
-            return position.SummedBeat(timeSignature)*beatWidth - beatWidth;
+            return (position.SummedBeat(timeSignature)*beatWidth) - beatWidth;
         }
     }
 }

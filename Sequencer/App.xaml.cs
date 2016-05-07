@@ -32,7 +32,7 @@ namespace Sequencer
 
         private static void SetupLogging(string logConfigName)
         {
-            string assemblyPath = Assembly.GetAssembly(typeof (App)).Location;
+            string assemblyPath = Assembly.GetAssembly(typeof(App)).Location;
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
 
             if (assemblyDirectory != null)

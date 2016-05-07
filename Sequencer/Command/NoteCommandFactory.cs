@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace Sequencer.Command
 {
@@ -8,7 +7,7 @@ namespace Sequencer.Command
     {
         private readonly Dictionary<NoteAction, NoteCommand> noteCommandRegistry;
 
-        public NoteCommandFactory(Canvas sequencerCanvas, List<VisualNote> sequencerNotes, 
+        public NoteCommandFactory(Canvas sequencerCanvas, List<VisualNote> sequencerNotes,
             SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             noteCommandRegistry = new Dictionary<NoteAction, NoteCommand>

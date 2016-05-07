@@ -22,7 +22,7 @@ namespace Sequencer.Domain
         /// <summary>
         /// The MIDI Equivalent of this pitch.
         /// </summary>
-        public int MidiNoteNumber => Note.Value + octave*12;
+        public int MidiNoteNumber => Note.Value + (octave*12);
 
         public bool Equals(Pitch other)
         {
@@ -35,7 +35,7 @@ namespace Sequencer.Domain
                 return true;
             }
 
-            return Note.Equals(other.Note) && octave == other.octave;
+            return Note.Equals(other.Note) && (octave == other.octave);
         }
 
         public static Pitch CreatePitchFromMidiNumber(int value)

@@ -16,12 +16,12 @@ namespace Sequencer
     public partial class MainWindow : INotifyPropertyChanged
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
+        private readonly NoteCommandFactory noteCommandFactory;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNoteEndPositionCommand updateNoteEndPositionCommand;
-        private readonly NoteCommandFactory noteCommandFactory;
 
         private NoteAction noteAction;
 
@@ -85,12 +85,12 @@ namespace Sequencer
 
                 for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
-                    double currentBarPosition = currentMeasurePosition + pointsPerBar*bar;
+                    double currentBarPosition = currentMeasurePosition + (pointsPerBar*bar);
                     DrawVerticalSequencerLine(currentBarPosition, 1);
 
                     for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
-                        double currentBeatPosition = currentBarPosition + pointsPerBeat*beat;
+                        double currentBeatPosition = currentBarPosition + (pointsPerBeat*beat);
                         DrawVerticalSequencerLine(currentBeatPosition, 0.5);
                     }
                 }
@@ -120,7 +120,7 @@ namespace Sequencer
             {
                 double currentNotePosition = pointsPerNote*note;
 
-                int currentMidiNote = SequencerSettings.TotalNotes + sequencerSettings.LowestPitch.MidiNoteNumber - note;
+                int currentMidiNote = (SequencerSettings.TotalNotes + sequencerSettings.LowestPitch.MidiNoteNumber) - note;
                 Pitch pitch = Pitch.CreatePitchFromMidiNumber(currentMidiNote - 1);
 
                 DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);
@@ -161,7 +161,7 @@ namespace Sequencer
 
         private void SequencerMouseMoved(object sender, MouseEventArgs e)
         {
-            if (NoteAction == NoteAction.Create && notes != null && Mouse.RightButton == MouseButtonState.Pressed)
+            if ((NoteAction == NoteAction.Create) && (notes != null) && (Mouse.RightButton == MouseButtonState.Pressed))
             {
                 Point mousePosition = CurrentMousePosition(e);
                 updateNoteEndPositionCommand.Execute(mousePosition);

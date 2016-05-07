@@ -29,14 +29,14 @@ namespace Sequencer
 
         public Position FindNotePositionFromPoint(Point mousePosition)
         {
-            var beat = (int)Math.Ceiling(mousePosition.X / BeatWidth);
+            var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
             return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
         }
 
         public Pitch FindPitch(Point mousePosition)
         {
             double noteHeight = NoteHeight;
-            int relativeMidiNumber = (int)(sequencerCanvas.ActualHeight / noteHeight - Math.Ceiling(mousePosition.Y / noteHeight));
+            int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/noteHeight) - Math.Ceiling(mousePosition.Y/noteHeight));
             int absoluteMidiNumber = sequencerSettings.LowestPitch.MidiNoteNumber + relativeMidiNumber;
             return Pitch.CreatePitchFromMidiNumber(absoluteMidiNumber);
         }

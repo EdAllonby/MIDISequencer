@@ -74,7 +74,7 @@ namespace Sequencer
             consoleOut.SetValue(null, null);
             consoleError.SetValue(null, null);
 
-            consoleInitializeStdOutError.Invoke(null, new object[] { true });
+            consoleInitializeStdOutError.Invoke(null, new object[] {true});
         }
 
         private static void SetOutAndErrorNull()

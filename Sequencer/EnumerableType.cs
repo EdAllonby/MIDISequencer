@@ -6,7 +6,8 @@ using System.Reflection;
 namespace Sequencer
 {
     /// <summary>
-    /// Inspired from Jimmy Boggard's post on enumeration classes: https://lostechies.com/jimmybogard/2008/08/12/enumeration-classes/
+    /// Inspired from Jimmy Boggard's post on enumeration classes:
+    /// https://lostechies.com/jimmybogard/2008/08/12/enumeration-classes/
     /// This is a replacement for Enums, where more is required, such as displayable names and better parsing.
     /// </summary>
     /// <typeparam name="TElement">The enumerable element.</typeparam>

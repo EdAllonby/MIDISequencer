@@ -13,7 +13,7 @@ namespace Sequencer.Command
         protected readonly List<VisualNote> sequencerNotes;
         protected readonly SequencerSettings sequencerSettings;
 
-        protected NoteCommand([NotNull]List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        protected NoteCommand([NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencerNotes = sequencerNotes;
             this.sequencerSettings = sequencerSettings;

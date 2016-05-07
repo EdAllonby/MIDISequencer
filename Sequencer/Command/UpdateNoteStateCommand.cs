@@ -48,7 +48,7 @@ namespace Sequencer.Command
 
         private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNote(Position mousePosition, Pitch mousePitch)
         {
-            return visualNote => visualNote.StartPosition <= mousePosition && visualNote.EndPosition > mousePosition && visualNote.Pitch.Equals(mousePitch);
+            return visualNote => (visualNote.StartPosition <= mousePosition) && (visualNote.EndPosition > mousePosition) && visualNote.Pitch.Equals(mousePitch);
         }
     }
 }

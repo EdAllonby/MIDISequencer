@@ -7,6 +7,14 @@ namespace Sequencer.Tests
     public class NoteTests
     {
         [Test]
+        public void AccidentalNoteShouldBeAccidental()
+        {
+            bool isPitchAccidental = Note.ASharp.IsAccidental;
+
+            Assert.IsTrue(isPitchAccidental);
+        }
+
+        [Test]
         public void FindFromDisplayNameGetsCorrectType()
         {
             const string displayName = "A";
@@ -14,14 +22,6 @@ namespace Sequencer.Tests
             Note noteA = Note.FromDisplayName(displayName);
 
             Assert.AreEqual(noteA.DisplayName, displayName);
-        }
-
-        [Test]
-        public void AccidentalNoteShouldBeAccidental()
-        {
-            bool isPitchAccidental = Note.ASharp.IsAccidental;
-
-            Assert.IsTrue(isPitchAccidental);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Sequencer.Tests
 
             Note expectedNote = Note.ASharp;
 
-             Assert.AreEqual(expectedNote, nextPitch);
+            Assert.AreEqual(expectedNote, nextPitch);
         }
     }
 }
