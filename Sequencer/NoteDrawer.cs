@@ -15,7 +15,8 @@ namespace Sequencer
             this.sequencerSettings = sequencerSettings;
         }
 
-        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState, double noteHeight, double beatWidth, Canvas sequencer)
+        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState, 
+            double noteHeight, double beatWidth, Canvas sequencer)
         {
             TimeSignature timeSignature = sequencerSettings.TimeSignature;
 
@@ -53,6 +54,11 @@ namespace Sequencer
                     noteRectangle.Fill = new SolidColorBrush(sequencerSettings.UnselectedNoteColour);
                     break;
             }
+        }
+
+        public void RemoveNote(Canvas sequencer)
+        {
+            sequencer.Children.Remove(noteRectangle);
         }
 
         private static double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight, Pitch startingPitch)

@@ -61,7 +61,11 @@ namespace Sequencer
             }
         }
 
-
+        public void Remove(Canvas sequencer)
+        {
+            noteDrawer.RemoveNote(sequencer);
+        }
+        
         public override string ToString()
         {
             return $"Pitch: {Pitch}, Start Position: {StartPosition}, End Position: {EndPosition}";

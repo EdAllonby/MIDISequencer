@@ -64,6 +64,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Command\CreateNoteCommand.cs" />
+    <Compile Include="Command\DeleteNoteCommand.cs" />
     <Compile Include="Command\NoteCommand.cs" />
     <Compile Include="Command\NoteCommandFactory.cs" />
     <Compile Include="Command\UpdateNoteStateCommand.cs" />

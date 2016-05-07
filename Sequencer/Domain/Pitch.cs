@@ -19,6 +19,9 @@ namespace Sequencer.Domain
         [NotNull]
         public Note Note { get; }
 
+        /// <summary>
+        /// The MIDI Equivalent of this pitch.
+        /// </summary>
         public int MidiNoteNumber => Note.Value + octave*12;
 
         public bool Equals(Pitch other)
@@ -41,7 +44,7 @@ namespace Sequencer.Domain
 
             int octave = (value - noteValue)/12;
 
-            var note = Note.FromValue(noteValue);
+            Note note = Note.FromValue(noteValue);
 
             return new Pitch(note, octave);
         }

@@ -14,7 +14,8 @@ namespace Sequencer.Command
             noteCommandRegistry = new Dictionary<NoteAction, NoteCommand>
             {
                 {NoteAction.Create, new CreateNoteCommand(sequencerCanvas, sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
-                {NoteAction.Select, new UpdateNoteStateCommand(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)}
+                {NoteAction.Select, new UpdateNoteStateCommand(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
+                {NoteAction.Delete, new DeleteNoteCommand(sequencerCanvas, sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)}
             };
         }
 
