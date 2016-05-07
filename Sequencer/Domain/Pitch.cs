@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace Sequencer
+namespace Sequencer.Domain
 {
     /// <summary>
     /// A pitch combines a musical note and an octave.

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using Sequencer.Domain;
 
 namespace Sequencer
 {
@@ -17,5 +18,7 @@ namespace Sequencer
         public Color KeyColour = Colors.DarkGray;
         public Color AccidentalKeyColour = Colors.Gray;
         public Color LineColour = Colors.Black;
+        public Color SelectedNoteColour = Colors.DarkRed;
+        public Color UnselectedNoteColour = Colors.Crimson;
     }
 }

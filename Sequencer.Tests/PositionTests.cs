@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Sequencer.Domain;
 
 namespace Sequencer.Tests
 {

@@ -1,14 +1,21 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Sequencer.Domain;
 
 namespace Sequencer
 {
     public sealed class NoteDrawer
     {
+        private readonly SequencerSettings sequencerSettings;
         private Rectangle noteRectangle;
 
-        public void DrawNote(SequencerSettings sequencerSettings, Position startPosition, Position endPosition, double noteHeight, double beatWidth, Canvas sequencer, Pitch pitch)
+        public NoteDrawer(SequencerSettings sequencerSettings)
+        {
+            this.sequencerSettings = sequencerSettings;
+        }
+
+        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState, double noteHeight, double beatWidth, Canvas sequencer)
         {
             TimeSignature timeSignature = sequencerSettings.TimeSignature;
 
@@ -17,28 +24,42 @@ namespace Sequencer
             double noteStartHeight = GetPointFromPitch(pitch, sequencer.ActualHeight, noteHeight, sequencerSettings.LowestPitch);
             noteRectangle = new Rectangle
             {
-                Fill = new SolidColorBrush(Colors.DarkRed),
                 Height = noteHeight,
                 Width = noteWidth,
-                Stroke = new SolidColorBrush(Colors.Black),
+                Stroke = new SolidColorBrush(sequencerSettings.LineColour),
                 StrokeThickness = 0.5
             };
+
+            SetNoteColour(noteState);
 
             sequencer.Children.Add(noteRectangle);
             Canvas.SetLeft(noteRectangle, noteStartLocation);
             Canvas.SetTop(noteRectangle, noteStartHeight);
         }
 
-        private static double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight, Pitch startingPitch)
-        {
-            int pitchDelta = pitch.MidiNoteNumber - startingPitch.MidiNoteNumber;
-            double relativePitchPosition = noteHeight*pitchDelta + noteHeight;
-            return sequencerHeight - relativePitchPosition;
-        }
-
         public void UpdateLength(TimeSignature timeSignature, Position startPosition, Position endPosition, double beatWidth)
         {
             noteRectangle.Width = ActualWidthBetweenPositions(timeSignature, startPosition, endPosition, beatWidth);
+        }
+
+        public void SetNoteColour(NoteState noteState)
+        {
+            switch (noteState)
+            {
+                case NoteState.Selected:
+                    noteRectangle.Fill = new SolidColorBrush(sequencerSettings.SelectedNoteColour);
+                    break;
+                case NoteState.Unselected:
+                    noteRectangle.Fill = new SolidColorBrush(sequencerSettings.UnselectedNoteColour);
+                    break;
+            }
+        }
+
+        private static double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight, Pitch startingPitch)
+        {
+            int pitchDelta = pitch.MidiNoteNumber - startingPitch.MidiNoteNumber;
+            double relativePitchPosition = noteHeight * pitchDelta + noteHeight;
+            return sequencerHeight - relativePitchPosition;
         }
 
         private static double ActualWidthBetweenPositions(TimeSignature timeSignature, Position startPosition, Position endPosition, double beatWidth)

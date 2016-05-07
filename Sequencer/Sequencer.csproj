@@ -64,16 +64,20 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Command\CreateNoteCommand.cs" />
+    <Compile Include="Command\NoteCommand.cs" />
+    <Compile Include="Command\NoteCommandFactory.cs" />
+    <Compile Include="Command\UpdateNoteStateCommand.cs" />
     <Compile Include="Command\UpdateNoteEndPositionCommand.cs" />
     <Compile Include="ConsoleManager.cs" />
     <Compile Include="EnumerableType.cs" />
     <Compile Include="EnumToBoolConverter.cs" />
-    <Compile Include="Note.cs" />
+    <Compile Include="Domain\Note.cs" />
     <Compile Include="NoteAction.cs" />
-    <Compile Include="Pitch.cs" />
+    <Compile Include="Domain\Pitch.cs" />
+    <Compile Include="NoteState.cs" />
     <Compile Include="SequencerDimensionsCalculator.cs" />
     <Compile Include="SequencerSettings.cs" />
-    <Compile Include="TimeSignature.cs" />
+    <Compile Include="Domain\TimeSignature.cs" />
     <Compile Include="UnsafeNativeMethods.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -91,7 +95,7 @@
   <ItemGroup>
     <Compile Include="VisualNote.cs" />
     <Compile Include="NoteDrawer.cs" />
-    <Compile Include="Position.cs" />
+    <Compile Include="Domain\Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

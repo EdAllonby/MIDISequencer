@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sequencer
+namespace Sequencer.Domain
 {
     /// <summary>
     /// Represents a musical position.
@@ -132,7 +132,7 @@ namespace Sequencer
 
         public override string ToString()
         {
-            return $"Position at Measure {Measure}, Bar {Bar}, Beat {Beat}";
+            return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}";
         }
     }
 }

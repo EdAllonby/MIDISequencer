@@ -1,29 +1,36 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using JetBrains.Annotations;
+using Sequencer.Domain;
 
 namespace Sequencer.Command
 {
     /// <summary>
     /// Creates a <see cref="VisualNote" /> with correct pitch relative to the sequencer.
     /// </summary>
-    public class CreateNoteCommand
+    public class CreateNoteCommand : NoteCommand
     {
-        private readonly SequencerSettings sequencerSettings;
-        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
+        private readonly Canvas sequencerCanvas;
 
-        public CreateNoteCommand(SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public CreateNoteCommand([NotNull] Canvas sequencerCanvas, [NotNull] List<VisualNote> sequencerNotes,
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+            : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
-            this.sequencerSettings = sequencerSettings;
-            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
+            this.sequencerCanvas = sequencerCanvas;
         }
 
-        public VisualNote CreateNote(Point mousePoint)
+        public override void Execute(Point mousePoint)
         {
+            sequencerNotes.ForEach(note => note.NoteState = NoteState.Unselected);
             Position notePosition = sequencerDimensionsCalculator.FindNotePositionFromPoint(mousePoint);
             Pitch pitch = sequencerDimensionsCalculator.FindPitch(mousePoint);
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
 
-            return new VisualNote(notePosition, defaultEndPosition, pitch);
+            var newNote = new VisualNote(sequencerSettings, notePosition, defaultEndPosition, pitch);
+            newNote.Draw(sequencerDimensionsCalculator, sequencerCanvas);
+            sequencerNotes.Add(newNote);
         }
 
         private Position GetDefaultEndPosition(Position notePosition)

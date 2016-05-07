@@ -16,9 +16,10 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
+            <RadioButton Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Select}}" Content="Select" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Create}}" Content="Create" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}" IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Delete}}" Content="Delete" />
         </StackPanel>
-        <Canvas Grid.Column="1" x:Name="SequencerCanvas" MouseMove="SequencerMouseMoved" MouseRightButtonDown="SequencerMouseDown" />
+        <Canvas Grid.Column="1" x:Name="SequencerCanvas" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown" />
     </Grid>
 </Window>

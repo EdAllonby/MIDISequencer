@@ -9,19 +9,20 @@ using System.Windows.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Command;
+using Sequencer.Domain;
 
 namespace Sequencer
 {
     public partial class MainWindow : INotifyPropertyChanged
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
-        private readonly CreateNoteCommand createNoteCommand;
-        private readonly UpdateNoteEndPositionCommand updateNoteEndPositionCommand;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
-        private VisualNote currentNote;
+        private readonly UpdateNoteEndPositionCommand updateNoteEndPositionCommand;
+        private readonly NoteCommandFactory noteCommandFactory;
+
         private NoteAction noteAction;
 
         public MainWindow()
@@ -30,8 +31,8 @@ namespace Sequencer
             Loaded += WindowChanged;
             SizeChanged += WindowChanged;
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
-            createNoteCommand = new CreateNoteCommand(sequencerSettings, sequencerDimensionsCalculator);
-            updateNoteEndPositionCommand = new UpdateNoteEndPositionCommand(sequencerSettings, sequencerDimensionsCalculator);
+            noteCommandFactory = new NoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
+            updateNoteEndPositionCommand = new UpdateNoteEndPositionCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
             Log.Info("Main Window loaded");
         }
 
@@ -67,13 +68,8 @@ namespace Sequencer
         {
             foreach (VisualNote note in notes)
             {
-                DrawNote(note);
+                note.Draw(sequencerDimensionsCalculator, SequencerCanvas);
             }
-        }
-
-        private void DrawNote(VisualNote visualNote)
-        {
-            visualNote.Draw(sequencerDimensionsCalculator, sequencerSettings, SequencerCanvas);
         }
 
         private void DrawVerticalSequencerLines()
@@ -120,11 +116,11 @@ namespace Sequencer
         {
             double pointsPerNote = sequencerDimensionsCalculator.NoteHeight;
 
-            for (int currentNote = SequencerSettings.TotalNotes; currentNote >= 0; currentNote--)
+            for (int note = SequencerSettings.TotalNotes; note >= 0; note--)
             {
-                double currentNotePosition = pointsPerNote*currentNote;
+                double currentNotePosition = pointsPerNote*note;
 
-                int currentMidiNote = SequencerSettings.TotalNotes + sequencerSettings.LowestPitch.MidiNoteNumber - currentNote;
+                int currentMidiNote = SequencerSettings.TotalNotes + sequencerSettings.LowestPitch.MidiNoteNumber - note;
                 Pitch pitch = Pitch.CreatePitchFromMidiNumber(currentMidiNote - 1);
 
                 DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);
@@ -168,20 +164,16 @@ namespace Sequencer
             if (NoteAction == NoteAction.Create && notes != null && Mouse.RightButton == MouseButtonState.Pressed)
             {
                 Point mousePosition = CurrentMousePosition(e);
-                updateNoteEndPositionCommand.UpdateNoteEndPosition(currentNote, mousePosition);
+                updateNoteEndPositionCommand.Execute(mousePosition);
             }
         }
-        
+
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (NoteAction == NoteAction.Create)
-            {
-                Point mousePosition = CurrentMousePosition(e);
-                VisualNote note = createNoteCommand.CreateNote(mousePosition);
-                note.Draw(sequencerDimensionsCalculator, sequencerSettings, SequencerCanvas);
-                notes.Add(note);
-                currentNote = note;
-            }
+            Point mousePosition = CurrentMousePosition(e);
+
+            NoteCommand command = noteCommandFactory.FindCommand(NoteAction);
+            command.Execute(mousePosition);
         }
 
         private Point CurrentMousePosition(MouseEventArgs mouseEventArgs)

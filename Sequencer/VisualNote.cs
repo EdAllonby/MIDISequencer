@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls;
 using JetBrains.Annotations;
 using log4net;
+using Sequencer.Domain;
 
 namespace Sequencer
 {
@@ -8,33 +9,62 @@ namespace Sequencer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(VisualNote));
 
-        [NotNull] private readonly NoteDrawer noteDrawer = new NoteDrawer();
+        [NotNull] private readonly NoteDrawer noteDrawer;
+        private NoteState noteState = NoteState.Selected;
 
-        private readonly Pitch pitch;
-        private readonly Position startPosition;
-        private Position endPosition;
-
-        public VisualNote([NotNull] Position startPosition, [NotNull] Position endPosition, [NotNull] Pitch pitch)
+        public VisualNote([NotNull] SequencerSettings sequencerSettings, [NotNull] Position startPosition, [NotNull] Position endPosition, [NotNull] Pitch pitch)
         {
-            this.startPosition = startPosition;
-            this.endPosition = endPosition;
-            this.pitch = pitch;
+            StartPosition = startPosition;
+            EndPosition = endPosition;
+            Pitch = pitch;
+            noteDrawer = new NoteDrawer(sequencerSettings);
         }
 
-        public void Draw(SequencerDimensionsCalculator sequencerDimensionsCalculator , SequencerSettings sequencerSettings, Canvas sequencer)
+        public Pitch Pitch { get; }
+
+        /// <summary>
+        /// The note's starting position.
+        /// </summary>
+        public Position StartPosition { get; }
+
+        /// <summary>
+        /// The note's ending position.
+        /// </summary>
+        public Position EndPosition { get; private set; }
+
+        /// <summary>
+        /// The current state of the note.
+        /// </summary>
+        public NoteState NoteState
         {
-            Log.InfoFormat("Drawing note with start position {0} and end position {1}", startPosition, endPosition);
-            noteDrawer.DrawNote(sequencerSettings, startPosition, endPosition, sequencerDimensionsCalculator.NoteHeight, sequencerDimensionsCalculator.BeatWidth, sequencer, pitch);
+            get { return noteState; }
+            set
+            {
+                noteState = value;
+                noteDrawer.SetNoteColour(noteState);
+            }
+        }
+
+        public void Draw(SequencerDimensionsCalculator sequencerDimensionsCalculator, Canvas sequencer)
+        {
+            Log.InfoFormat("Drawing note with start position {0} and end position {1}", StartPosition, EndPosition);
+            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState, sequencerDimensionsCalculator.NoteHeight, sequencerDimensionsCalculator.BeatWidth, sequencer);
         }
 
         public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)
         {
-            if (newEndPosition >= startPosition)
+            if (newEndPosition >= StartPosition)
             {
-                Log.InfoFormat("Updating note length with start position {0} to end position {1}", startPosition, endPosition);
-                endPosition = newEndPosition;
-                noteDrawer.UpdateLength(timeSignature, startPosition, newEndPosition, beatWidth);
+                Log.InfoFormat("Updating note length with start position {0} to end position {1}", StartPosition, EndPosition);
+                EndPosition = newEndPosition;
+                noteDrawer.UpdateLength(timeSignature, StartPosition, newEndPosition, beatWidth);
             }
+        }
+
+
+        public override string ToString()
+        {
+            return $"Pitch: {Pitch}, Start Position: {StartPosition}, End Position: {EndPosition}";
         }
     }
 }
