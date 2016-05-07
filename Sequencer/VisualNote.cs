@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using JetBrains.Annotations;
 using log4net;
 
 namespace Sequencer
@@ -7,25 +8,23 @@ namespace Sequencer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(VisualNote));
 
-        private readonly NoteDrawer noteDrawer = new NoteDrawer();
+        [NotNull] private readonly NoteDrawer noteDrawer = new NoteDrawer();
+
         private readonly Pitch pitch;
         private readonly Position startPosition;
         private Position endPosition;
 
-        public VisualNote(int id, Position startPosition, Position endPosition, Pitch pitch)
+        public VisualNote([NotNull] Position startPosition, [NotNull] Position endPosition, [NotNull] Pitch pitch)
         {
-            Id = id;
             this.startPosition = startPosition;
             this.endPosition = endPosition;
             this.pitch = pitch;
         }
 
-        public int Id { get; }
-
-        public void DrawNote(SequencerSettings sequencerSettings, double noteHeight, double beatWidth, Canvas sequencer)
+        public void Draw(SequencerDimensionsCalculator sequencerDimensionsCalculator , SequencerSettings sequencerSettings, Canvas sequencer)
         {
             Log.InfoFormat("Drawing note with start position {0} and end position {1}", startPosition, endPosition);
-            noteDrawer.DrawNote(sequencerSettings, startPosition, endPosition, noteHeight, beatWidth, sequencer, pitch);
+            noteDrawer.DrawNote(sequencerSettings, startPosition, endPosition, sequencerDimensionsCalculator.NoteHeight, sequencerDimensionsCalculator.BeatWidth, sequencer, pitch);
         }
 
         public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)

@@ -18,7 +18,7 @@ namespace Sequencer
         {
             // We need to run this to make sure our static fields get instantiated before use.
             var info = typeof(TElement).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
-            info[1].GetValue(null);
+            info[1]?.GetValue(null);
         }
 
         protected EnumerableType(int value, string displayName)

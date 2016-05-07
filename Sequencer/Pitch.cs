@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Sequencer
 {
@@ -9,26 +10,16 @@ namespace Sequencer
     {
         private readonly int octave;
 
-        public Pitch(Note note, int octave)
+        public Pitch([NotNull] Note note, int octave)
         {
-            this.Note = note;
+            Note = note;
             this.octave = octave;
         }
 
+        [NotNull]
         public Note Note { get; }
 
-        public int MidiNoteNumber => Note.Value + (octave)*12;
-
-        public static Pitch CreatePitchFromMidiNumber(int value)
-        {
-            int noteValue = value%12;
-
-            int octave = (value - noteValue) / 12;
-
-            var note = Note.FromValue(noteValue);
-
-            return new Pitch(note, octave);
-        }
+        public int MidiNoteNumber => Note.Value + octave*12;
 
         public bool Equals(Pitch other)
         {
@@ -42,6 +33,17 @@ namespace Sequencer
             }
 
             return Note.Equals(other.Note) && octave == other.octave;
+        }
+
+        public static Pitch CreatePitchFromMidiNumber(int value)
+        {
+            int noteValue = value%12;
+
+            int octave = (value - noteValue)/12;
+
+            var note = Note.FromValue(noteValue);
+
+            return new Pitch(note, octave);
         }
 
         public override bool Equals(object obj)
