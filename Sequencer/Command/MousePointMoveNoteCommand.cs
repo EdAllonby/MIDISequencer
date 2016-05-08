@@ -21,7 +21,12 @@ namespace Sequencer.Command
             initialMousePitch = initialMousePoint;
         }
 
-        public override void Execute(Point mousePoint)
+        protected override bool CanExecute()
+        {
+            return Mouse.LeftButton == MouseButtonState.Pressed;
+        }
+
+        protected override void DoExecute(Point mousePoint)
         {
             MoveNotePositions(mousePoint);
 

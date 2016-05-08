@@ -23,6 +23,17 @@ namespace Sequencer.Command
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
         }
 
-        public abstract void Execute(Point mousePoint);
+
+        public void Execute(Point mousePoint)
+        {
+            if (CanExecute())
+            {
+                DoExecute(mousePoint);
+            }
+        }
+
+        protected abstract bool CanExecute();
+        
+        protected abstract void DoExecute(Point mousePoint);
     }
 }

@@ -171,13 +171,13 @@ namespace Sequencer
         {
             Point currentMousePosition = CurrentMousePosition(e);
 
-            if ((NoteAction == NoteAction.Create) && (Mouse.RightButton == MouseButtonState.Pressed))
+            if (NoteAction == NoteAction.Create)
             {
                 updateNoteEndPositionFromPointCommand.Execute(currentMousePosition);
             }
-            if ((NoteAction == NoteAction.Select) && (Mouse.LeftButton == MouseButtonState.Pressed))
+            if (NoteAction == NoteAction.Select)
             {
-                moveNoteCommand.Execute(currentMousePosition);
+                moveNoteCommand?.Execute(currentMousePosition);
             }
         }
 

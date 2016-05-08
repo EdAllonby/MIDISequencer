@@ -13,7 +13,12 @@ namespace Sequencer.Command
         {
         }
 
-        public override void Execute(Point mousePoint)
+        protected override bool CanExecute()
+        {
+            return Mouse.LeftButton == MouseButtonState.Pressed;
+        }
+
+        protected override void DoExecute(Point mousePoint)
         {
             VisualNote actionableNote = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
 

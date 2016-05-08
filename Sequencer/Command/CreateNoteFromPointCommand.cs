@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
@@ -20,7 +21,12 @@ namespace Sequencer.Command
             this.sequencerCanvas = sequencerCanvas;
         }
 
-        public override void Execute(Point mousePoint)
+        protected override bool CanExecute()
+        {
+            return Mouse.RightButton == MouseButtonState.Pressed;
+        }
+
+        protected override void DoExecute(Point mousePoint)
         {
             sequencerNotes.ForEach(note => note.NoteState = NoteState.Unselected);
             Position notePosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);

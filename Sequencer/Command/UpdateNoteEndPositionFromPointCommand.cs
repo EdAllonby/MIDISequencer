@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
@@ -17,7 +18,12 @@ namespace Sequencer.Command
         {
         }
 
-        public override void Execute(Point mousePosition)
+        protected override bool CanExecute()
+        {
+            return (Mouse.LeftButton == MouseButtonState.Pressed) || (Mouse.RightButton == MouseButtonState.Pressed);
+        }
+
+        protected override void DoExecute(Point mousePosition)
         {
             var selectedNotes = sequencerNotes.Where(note => note.NoteState == NoteState.Selected);
 
