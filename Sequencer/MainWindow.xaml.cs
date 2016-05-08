@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,23 +17,24 @@ namespace Sequencer
     public partial class MainWindow : INotifyPropertyChanged
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
+        private readonly DeleteNotesCommand deleteNotesCommand;
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
-
         private NoteAction noteAction;
 
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += WindowChanged;
             SizeChanged += WindowChanged;
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
+            deleteNotesCommand = new DeleteNotesCommand(SequencerCanvas, notes);
+
             Log.Info("Main Window loaded");
         }
 
@@ -81,12 +83,12 @@ namespace Sequencer
 
                 for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
-                    double currentBarPosition = currentMeasurePosition + (sequencerDimensionsCalculator.BarWidth* bar);
+                    double currentBarPosition = currentMeasurePosition + (sequencerDimensionsCalculator.BarWidth*bar);
                     DrawVerticalSequencerLine(currentBarPosition, 1);
 
                     for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
-                        double currentBeatPosition = currentBarPosition + (sequencerDimensionsCalculator.BeatWidth* beat);
+                        double currentBeatPosition = currentBarPosition + (sequencerDimensionsCalculator.BeatWidth*beat);
                         DrawVerticalSequencerLine(currentBeatPosition, 0.5);
                     }
                 }
@@ -181,6 +183,15 @@ namespace Sequencer
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void SequencerKeyPressed(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                deleteNotesCommand.Execute(notes.Where(x => x.NoteState == NoteState.Selected));
+                e.Handled = true;
+            }
         }
     }
 }

@@ -44,13 +44,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -64,6 +59,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Command\CreateNoteFromPointCommand.cs" />
+    <Compile Include="Command\DeleteNotesCommand.cs" />
     <Compile Include="Command\DeleteNoteFromPointCommand.cs" />
     <Compile Include="Command\MousePointNoteCommand.cs" />
     <Compile Include="Command\MousePointNoteCommandFactory.cs" />
@@ -73,6 +69,7 @@
     <Compile Include="EnumerableType.cs" />
     <Compile Include="EnumToBoolConverter.cs" />
     <Compile Include="Domain\Note.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="NoteAction.cs" />
     <Compile Include="Domain\Pitch.cs" />
     <Compile Include="NoteState.cs" />

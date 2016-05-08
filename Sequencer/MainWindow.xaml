@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Sequencer"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         mc:Ignorable="d"
-        Title="Sequencer" Height="500" Width="1200">
+        Title="Sequencer" Height="500" Width="1200" KeyDown="SequencerKeyPressed">
     <Window.Resources>
         <local:EnumToBoolConverter x:Key="EnumToBoolConverter" />
     </Window.Resources>

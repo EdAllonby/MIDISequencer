@@ -38,7 +38,7 @@ namespace Sequencer
         /// The beat widths the sequencer should display.
         /// </summary>
         public double BeatWidth => BarWidth/sequencerSettings.TimeSignature.BeatsPerBar;
-        
+
         public Position FindNotePositionFromPoint(Point mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);

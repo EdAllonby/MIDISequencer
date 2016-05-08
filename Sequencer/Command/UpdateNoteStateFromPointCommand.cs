@@ -29,7 +29,7 @@ namespace Sequencer.Command
 
                 actionableNote.NoteState = actionableNote.NoteState == NoteState.Selected ? NoteState.Unselected : NoteState.Selected;
 
-                Log.Info($"Note {actionableNote} has been {actionableNote.NoteState}");
+                Log.Info($"Visual note {actionableNote} has been {actionableNote.NoteState}");
             }
         }
     }
