@@ -9,9 +9,9 @@ namespace Sequencer.Command
     /// <summary>
     /// Command to update a <see cref="VisualNote" />'s end position based on the current mouse position in the sequencer.
     /// </summary>
-    public sealed class UpdateNoteEndPositionCommand : NoteCommand
+    public sealed class UpdateNoteEndPositionFromPointCommand : MousePointNoteCommand
     {
-        public UpdateNoteEndPositionCommand([NotNull] List<VisualNote> sequencerNotes,
+        public UpdateNoteEndPositionFromPointCommand([NotNull] List<VisualNote> sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {

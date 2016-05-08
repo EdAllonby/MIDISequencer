@@ -9,11 +9,11 @@ namespace Sequencer.Command
     /// <summary>
     /// Creates a <see cref="VisualNote" /> with correct pitch relative to the sequencer.
     /// </summary>
-    public class CreateNoteCommand : NoteCommand
+    public class CreateNoteFromPointCommand : MousePointNoteCommand
     {
         private readonly Canvas sequencerCanvas;
 
-        public CreateNoteCommand([NotNull] Canvas sequencerCanvas, [NotNull] List<VisualNote> sequencerNotes,
+        public CreateNoteFromPointCommand([NotNull] Canvas sequencerCanvas, [NotNull] List<VisualNote> sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {

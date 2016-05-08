@@ -63,12 +63,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Command\CreateNoteCommand.cs" />
-    <Compile Include="Command\DeleteNoteCommand.cs" />
-    <Compile Include="Command\NoteCommand.cs" />
-    <Compile Include="Command\NoteCommandFactory.cs" />
-    <Compile Include="Command\UpdateNoteStateCommand.cs" />
-    <Compile Include="Command\UpdateNoteEndPositionCommand.cs" />
+    <Compile Include="Command\CreateNoteFromPointCommand.cs" />
+    <Compile Include="Command\DeleteNoteFromPointCommand.cs" />
+    <Compile Include="Command\MousePointNoteCommand.cs" />
+    <Compile Include="Command\MousePointNoteCommandFactory.cs" />
+    <Compile Include="Command\UpdateNoteStateFromPointCommand.cs" />
+    <Compile Include="Command\UpdateNoteEndPositionFromPointCommand.cs" />
     <Compile Include="ConsoleManager.cs" />
     <Compile Include="EnumerableType.cs" />
     <Compile Include="EnumToBoolConverter.cs" />

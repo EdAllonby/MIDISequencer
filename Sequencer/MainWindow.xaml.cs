@@ -16,12 +16,12 @@ namespace Sequencer
     public partial class MainWindow : INotifyPropertyChanged
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
-        private readonly NoteCommandFactory noteCommandFactory;
+        private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
-        private readonly UpdateNoteEndPositionCommand updateNoteEndPositionCommand;
+        private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
 
         private NoteAction noteAction;
 
@@ -31,8 +31,8 @@ namespace Sequencer
             Loaded += WindowChanged;
             SizeChanged += WindowChanged;
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
-            noteCommandFactory = new NoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
-            updateNoteEndPositionCommand = new UpdateNoteEndPositionCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
+            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
+            updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
             Log.Info("Main Window loaded");
         }
 
@@ -74,23 +74,19 @@ namespace Sequencer
 
         private void DrawVerticalSequencerLines()
         {
-            double pointsPerMeasure = SequencerCanvas.ActualWidth/SequencerSettings.TotalMeasures;
-            double pointsPerBar = pointsPerMeasure/sequencerSettings.TimeSignature.BarsPerMeasure;
-            double pointsPerBeat = pointsPerBar/sequencerSettings.TimeSignature.BeatsPerBar;
-
             for (var measure = 0; measure < SequencerSettings.TotalMeasures; measure++)
             {
-                double currentMeasurePosition = pointsPerMeasure*measure;
+                double currentMeasurePosition = sequencerDimensionsCalculator.MeasureWidth*measure;
                 DrawVerticalSequencerLine(currentMeasurePosition, 2);
 
                 for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
-                    double currentBarPosition = currentMeasurePosition + (pointsPerBar*bar);
+                    double currentBarPosition = currentMeasurePosition + (sequencerDimensionsCalculator.BarWidth* bar);
                     DrawVerticalSequencerLine(currentBarPosition, 1);
 
                     for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
-                        double currentBeatPosition = currentBarPosition + (pointsPerBeat*beat);
+                        double currentBeatPosition = currentBarPosition + (sequencerDimensionsCalculator.BeatWidth* beat);
                         DrawVerticalSequencerLine(currentBeatPosition, 0.5);
                     }
                 }
@@ -164,7 +160,7 @@ namespace Sequencer
             if ((NoteAction == NoteAction.Create) && (notes != null) && (Mouse.RightButton == MouseButtonState.Pressed))
             {
                 Point mousePosition = CurrentMousePosition(e);
-                updateNoteEndPositionCommand.Execute(mousePosition);
+                updateNoteEndPositionFromPointCommand.Execute(mousePosition);
             }
         }
 
@@ -172,7 +168,7 @@ namespace Sequencer
         {
             Point mousePosition = CurrentMousePosition(e);
 
-            NoteCommand command = noteCommandFactory.FindCommand(NoteAction);
+            MousePointNoteCommand command = mousePointNoteCommandFactory.FindCommand(NoteAction);
             command.Execute(mousePosition);
         }
 

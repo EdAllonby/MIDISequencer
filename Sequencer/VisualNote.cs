@@ -48,7 +48,7 @@ namespace Sequencer
         public void Draw(SequencerDimensionsCalculator sequencerDimensionsCalculator, Canvas sequencer)
         {
             Log.InfoFormat("Drawing note with start position {0} and end position {1}", StartPosition, EndPosition);
-            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState, sequencerDimensionsCalculator.NoteHeight, sequencerDimensionsCalculator.BeatWidth, sequencer);
+            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState, sequencerDimensionsCalculator, sequencer);
         }
 
         public void UpdateNoteLength(TimeSignature timeSignature, Position newEndPosition, double beatWidth)

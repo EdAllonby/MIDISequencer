@@ -16,9 +16,12 @@ namespace Sequencer
         }
 
         public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState,
-            double noteHeight, double beatWidth, Canvas sequencer)
+            SequencerDimensionsCalculator sequencerDimensionsCalculator, Canvas sequencer)
         {
             TimeSignature timeSignature = sequencerSettings.TimeSignature;
+
+            double beatWidth = sequencerDimensionsCalculator.BeatWidth;
+            double noteHeight = sequencerDimensionsCalculator.NoteHeight;
 
             double noteStartLocation = GetPointFromPosition(timeSignature, startPosition, beatWidth);
             double noteWidth = ActualWidthBetweenPositions(timeSignature, startPosition, endPosition, beatWidth);
