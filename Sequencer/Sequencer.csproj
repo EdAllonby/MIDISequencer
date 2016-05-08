@@ -75,6 +75,7 @@
     <Compile Include="Domain\Pitch.cs" />
     <Compile Include="NoteState.cs" />
     <Compile Include="SequencerDimensionsCalculator.cs" />
+    <Compile Include="SequencerDrawer.cs" />
     <Compile Include="SequencerSettings.cs" />
     <Compile Include="Domain\TimeSignature.cs" />
     <Compile Include="UnsafeNativeMethods.cs" />
