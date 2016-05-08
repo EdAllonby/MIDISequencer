@@ -61,6 +61,7 @@
     <Compile Include="Command\CreateNoteFromPointCommand.cs" />
     <Compile Include="Command\DeleteNotesCommand.cs" />
     <Compile Include="Command\DeleteNoteFromPointCommand.cs" />
+    <Compile Include="Command\MousePointMoveNoteCommand.cs" />
     <Compile Include="Command\MousePointNoteCommand.cs" />
     <Compile Include="Command\MousePointNoteCommandFactory.cs" />
     <Compile Include="Command\UpdateNoteStateFromPointCommand.cs" />

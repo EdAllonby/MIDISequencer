@@ -23,13 +23,13 @@ namespace Sequencer.Command
         public override void Execute(Point mousePoint)
         {
             sequencerNotes.ForEach(note => note.NoteState = NoteState.Unselected);
-            Position notePosition = sequencerDimensionsCalculator.FindNotePositionFromPoint(mousePoint);
-            Pitch pitch = sequencerDimensionsCalculator.FindPitch(mousePoint);
+            Position notePosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            Pitch pitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
 
-            var newNote = new VisualNote(sequencerSettings, notePosition, defaultEndPosition, pitch);
-            newNote.Draw(sequencerDimensionsCalculator, sequencerCanvas);
+            var newNote = new VisualNote(sequencerDimensionsCalculator, sequencerCanvas, sequencerSettings, notePosition, defaultEndPosition, pitch);
+            newNote.Draw();
             sequencerNotes.Add(newNote);
         }
 

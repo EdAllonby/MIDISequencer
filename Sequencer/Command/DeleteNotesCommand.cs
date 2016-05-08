@@ -24,7 +24,7 @@ namespace Sequencer.Command
             {
                 if (noteToDelete != null)
                 {
-                    noteToDelete.Remove(sequencerCanvas);
+                    noteToDelete.Remove();
                     Log.Info($"Visual note [{noteToDelete}] has been deleted.");
                 }
             }

@@ -39,7 +39,7 @@ namespace Sequencer
         /// </summary>
         public double BeatWidth => BarWidth/sequencerSettings.TimeSignature.BeatsPerBar;
 
-        public Position FindNotePositionFromPoint(Point mousePosition)
+        public Position FindPositionFromPoint(Point mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
             return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
@@ -50,7 +50,7 @@ namespace Sequencer
         /// </summary>
         /// <param name="mousePosition">The position the mouse is relative to the sequencer.</param>
         /// <returns>The pitch the mouse is over.</returns>
-        public Pitch FindPitch(Point mousePosition)
+        public Pitch FindPitchFromPoint(Point mousePosition)
         {
             int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
             int absoluteMidiNumber = sequencerSettings.LowestPitch.MidiNoteNumber + relativeMidiNumber;
@@ -65,8 +65,8 @@ namespace Sequencer
         /// <returns>The note a mouse is over.</returns>
         public VisualNote FindNoteFromPoint([NotNull] IEnumerable<VisualNote> sequencerNotes, Point point)
         {
-            Position mousePosition = FindNotePositionFromPoint(point);
-            Pitch mousePitch = FindPitch(point);
+            Position mousePosition = FindPositionFromPoint(point);
+            Pitch mousePitch = FindPitchFromPoint(point);
             return sequencerNotes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNote(mousePosition, mousePitch));
         }
 

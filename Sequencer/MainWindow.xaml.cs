@@ -24,6 +24,7 @@ namespace Sequencer
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
+        private MousePointMoveNoteCommand moveNoteCommand;
         private NoteAction noteAction;
 
         public MainWindow()
@@ -70,7 +71,7 @@ namespace Sequencer
         {
             foreach (VisualNote note in notes)
             {
-                note.Draw(sequencerDimensionsCalculator, SequencerCanvas);
+                note.Draw();
             }
         }
 
@@ -157,21 +158,27 @@ namespace Sequencer
             SequencerCanvas.Children.Add(sequencerLine);
         }
 
-        private void SequencerMouseMoved(object sender, MouseEventArgs e)
-        {
-            if ((NoteAction == NoteAction.Create) && (notes != null) && (Mouse.RightButton == MouseButtonState.Pressed))
-            {
-                Point mousePosition = CurrentMousePosition(e);
-                updateNoteEndPositionFromPointCommand.Execute(mousePosition);
-            }
-        }
-
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
         {
             Point mousePosition = CurrentMousePosition(e);
 
-            MousePointNoteCommand command = mousePointNoteCommandFactory.FindCommand(NoteAction);
-            command.Execute(mousePosition);
+            MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
+            moveNoteCommand = new MousePointMoveNoteCommand(mousePosition, notes, sequencerSettings, sequencerDimensionsCalculator);
+            noteCommand.Execute(mousePosition);
+        }
+
+        private void SequencerMouseMoved(object sender, MouseEventArgs e)
+        {
+            Point currentMousePosition = CurrentMousePosition(e);
+
+            if ((NoteAction == NoteAction.Create) && (Mouse.RightButton == MouseButtonState.Pressed))
+            {
+                updateNoteEndPositionFromPointCommand.Execute(currentMousePosition);
+            }
+            if ((NoteAction == NoteAction.Select) && (Mouse.LeftButton == MouseButtonState.Pressed))
+            {
+                moveNoteCommand.Execute(currentMousePosition);
+            }
         }
 
         private Point CurrentMousePosition(MouseEventArgs mouseEventArgs)

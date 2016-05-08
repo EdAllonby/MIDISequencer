@@ -72,8 +72,13 @@ namespace Sequencer.Domain
         /// <returns>The next <see cref="Position" />.</returns>
         public Position NextPosition(TimeSignature timeSignature)
         {
+            return PositionRelativeByBeats(1, timeSignature);
+        }
+
+        public Position PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature)
+        {
             int totalBeats = SummedBeat(timeSignature);
-            return PositionFromBeat(totalBeats + 1, timeSignature);
+            return PositionFromBeat(totalBeats + beatDelta, timeSignature);
         }
 
         /// <summary>

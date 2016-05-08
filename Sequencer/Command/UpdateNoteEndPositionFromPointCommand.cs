@@ -21,10 +21,15 @@ namespace Sequencer.Command
         {
             var selectedNotes = sequencerNotes.Where(note => note.NoteState == NoteState.Selected);
 
-            Position currentEndPosition = sequencerDimensionsCalculator.FindNotePositionFromPoint(mousePosition);
+            Position currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
             Position nextPosition = currentEndPosition.NextPosition(sequencerSettings.TimeSignature);
 
-            selectedNotes.FirstOrDefault()?.UpdateNoteLength(sequencerSettings.TimeSignature, nextPosition, sequencerDimensionsCalculator.BeatWidth);
+            VisualNote noteToUpdate = selectedNotes.FirstOrDefault();
+
+            if (noteToUpdate != null)
+            {
+                noteToUpdate.EndPosition = nextPosition;
+            }
         }
     }
 }

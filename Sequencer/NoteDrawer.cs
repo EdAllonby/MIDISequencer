@@ -18,6 +18,8 @@ namespace Sequencer
         public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState,
             SequencerDimensionsCalculator sequencerDimensionsCalculator, Canvas sequencer)
         {
+            RemoveNote(sequencer);
+
             TimeSignature timeSignature = sequencerSettings.TimeSignature;
 
             double beatWidth = sequencerDimensionsCalculator.BeatWidth;
@@ -39,11 +41,6 @@ namespace Sequencer
             sequencer.Children.Add(noteRectangle);
             Canvas.SetLeft(noteRectangle, noteStartLocation);
             Canvas.SetTop(noteRectangle, noteStartHeight);
-        }
-
-        public void UpdateLength(TimeSignature timeSignature, Position startPosition, Position endPosition, double beatWidth)
-        {
-            noteRectangle.Width = ActualWidthBetweenPositions(timeSignature, startPosition, endPosition, beatWidth);
         }
 
         public void SetNoteColour(NoteState noteState)
