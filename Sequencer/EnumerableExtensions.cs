@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sequencer
 {
@@ -13,6 +15,25 @@ namespace Sequencer
         public static IEnumerable<T> Yield<T>(this T item)
         {
             yield return item;
+        }
+
+        /// <summary>
+        /// Checks if a source collection doesn't contain a value.
+        /// </summary>
+        /// <typeparam name="TSource">The type of items in the source collection.</typeparam>
+        /// <param name="source">The source collection to check contents.</param>
+        /// <param name="value">The value to check if not contained in source.</param>
+        /// <returns>If the value is not contained in source.</returns>
+        public static bool NotContains<TSource>(this IEnumerable<TSource> source, TSource value)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            EqualityComparer<TSource> comparer = EqualityComparer<TSource>.Default;
+            
+            return source.Any(element => !comparer.Equals(element, value));
         }
     }
 }

@@ -10,8 +10,6 @@ namespace Sequencer.Command
     /// </summary>
     public abstract class MousePointNoteCommand
     {
-        protected static readonly ILog Log = LogManager.GetLogger(typeof(MousePointNoteCommand));
-
         protected readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         protected readonly List<VisualNote> sequencerNotes;
         protected readonly SequencerSettings sequencerSettings;

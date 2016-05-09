@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -8,9 +9,14 @@ namespace Sequencer.Command
 {
     public sealed class UpdateNoteStateFromPointCommand : MousePointNoteCommand
     {
+        private readonly UpdateNoteStateCommand noteStateSelectedCommand;
+        private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
+
         public UpdateNoteStateFromPointCommand([NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
+            noteStateSelectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Selected);
+            noteStateUnselectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Unselected);
         }
 
         protected override bool CanExecute()
@@ -21,20 +27,19 @@ namespace Sequencer.Command
         protected override void DoExecute(Point mousePoint)
         {
             VisualNote actionableNote = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
-
             if (actionableNote != null)
             {
-                if (!Keyboard.IsKeyDown(Key.LeftCtrl))
+                switch (actionableNote.NoteState)
                 {
-                    foreach (VisualNote visualNote in sequencerNotes.Where(x => x != actionableNote))
-                    {
-                        visualNote.NoteState = NoteState.Unselected;
-                    }
+                    case NoteState.Selected:
+                        noteStateUnselectedCommand.Execute(actionableNote.Yield());
+                        break;
+                    case NoteState.Unselected:
+                        noteStateSelectedCommand.Execute(actionableNote.Yield());
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-
-                actionableNote.NoteState = actionableNote.NoteState == NoteState.Selected ? NoteState.Unselected : NoteState.Selected;
-
-                Log.Info($"Visual note {actionableNote} has been {actionableNote.NoteState}");
             }
         }
     }

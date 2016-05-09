@@ -14,6 +14,8 @@ namespace Sequencer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
         private readonly DeleteNotesCommand deleteNotesCommand;
+        private readonly UpdateNoteStateCommand selectNoteCommand;
+
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
@@ -32,6 +34,7 @@ namespace Sequencer
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
             deleteNotesCommand = new DeleteNotesCommand(SequencerCanvas, notes);
+            selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
 
             Log.Info("Main Window loaded");
@@ -95,6 +98,10 @@ namespace Sequencer
             {
                 deleteNotesCommand.Execute(notes.Where(x => x.NoteState == NoteState.Selected));
                 e.Handled = true;
+            }
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && (e.Key == Key.A))
+            {
+                selectNoteCommand.Execute(notes);
             }
         }
     }
