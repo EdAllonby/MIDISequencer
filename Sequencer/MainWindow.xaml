@@ -26,6 +26,10 @@
                          IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Delete}}"
                          Content="Delete" />
         </StackPanel>
-        <Canvas Grid.Column="1" x:Name="SequencerCanvas" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown" />
+
+        <Grid x:Name="SequencerGrid" Grid.Column="1" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp">
+            <Canvas x:Name="SequencerCanvas" />
+            <local:DragSelectionBox x:Name="DragSelectionBox" />
+        </Grid>
     </Grid>
 </Window>

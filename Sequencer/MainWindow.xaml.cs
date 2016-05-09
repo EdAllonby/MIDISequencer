@@ -14,11 +14,11 @@ namespace Sequencer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
         private readonly DeleteNotesCommand deleteNotesCommand;
-        private readonly UpdateNoteStateCommand selectNoteCommand;
 
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
+        private readonly UpdateNoteStateCommand selectNoteCommand;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerDrawer sequencerDrawer;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
@@ -57,27 +57,43 @@ namespace Sequencer
         {
             sequencerDrawer.RedrawEditor();
         }
-        
+
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Point mousePosition = CurrentMousePosition(e);
+            Point mouseDownPoint = CurrentMousePosition(e);
+
+            if ((e.ChangedButton == MouseButton.Left) && !sequencerDimensionsCalculator.IsPointInsideNote(notes, mouseDownPoint)
+                && (NoteAction == NoteAction.Select))
+            {
+                DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
+            }
 
             MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
-            moveNoteCommand = new MousePointMoveNoteCommand(mousePosition, notes, sequencerSettings, sequencerDimensionsCalculator);
-            noteCommand.Execute(mousePosition);
+            moveNoteCommand = new MousePointMoveNoteCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+            noteCommand.Execute(mouseDownPoint);
         }
 
         private void SequencerMouseMoved(object sender, MouseEventArgs e)
         {
             Point currentMousePosition = CurrentMousePosition(e);
-
+            
             if (NoteAction == NoteAction.Create)
             {
                 updateNoteEndPositionFromPointCommand.Execute(currentMousePosition);
             }
             if (NoteAction == NoteAction.Select)
             {
-                moveNoteCommand?.Execute(currentMousePosition);
+                DragSelectionBox.UpdateDragSelectionBox(currentMousePosition);
+
+                if (!DragSelectionBox.IsDragging)
+                {
+                    moveNoteCommand?.Execute(currentMousePosition);
+                }
+                else
+                {
+                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes);
+                    selectNoteCommand.Execute(containedNotes);
+                }
             }
         }
 
@@ -97,11 +113,18 @@ namespace Sequencer
             if (e.Key == Key.Delete)
             {
                 deleteNotesCommand.Execute(notes.Where(x => x.NoteState == NoteState.Selected));
-                e.Handled = true;
             }
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && (e.Key == Key.A))
             {
                 selectNoteCommand.Execute(notes);
+            }
+        }
+
+        private void SequencerMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragSelectionBox.CloseSelectionBox();
             }
         }
     }

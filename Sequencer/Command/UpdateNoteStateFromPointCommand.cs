@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -27,19 +25,21 @@ namespace Sequencer.Command
         protected override void DoExecute(Point mousePoint)
         {
             VisualNote actionableNote = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
+
             if (actionableNote != null)
             {
-                switch (actionableNote.NoteState)
+                if ((actionableNote.NoteState == NoteState.Selected) && Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    case NoteState.Selected:
-                        noteStateUnselectedCommand.Execute(actionableNote.Yield());
-                        break;
-                    case NoteState.Unselected:
-                        noteStateSelectedCommand.Execute(actionableNote.Yield());
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    noteStateUnselectedCommand.Execute(actionableNote.Yield());
                 }
+                else if (actionableNote.NoteState == NoteState.Unselected)
+                {
+                    noteStateSelectedCommand.Execute(actionableNote.Yield());
+                }
+            }
+            else if(!Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                noteStateUnselectedCommand.Execute(sequencerNotes);
             }
         }
     }

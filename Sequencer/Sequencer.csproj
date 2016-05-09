@@ -68,10 +68,14 @@
     <Compile Include="Command\UpdateNoteStateFromPointCommand.cs" />
     <Compile Include="Command\UpdateNoteEndPositionFromPointCommand.cs" />
     <Compile Include="ConsoleManager.cs" />
+    <Compile Include="DragSelectionBox.xaml.cs">
+      <DependentUpon>DragSelectionBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EnumerableType.cs" />
     <Compile Include="EnumToBoolConverter.cs" />
     <Compile Include="Domain\Note.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="IPositionAware.cs" />
     <Compile Include="NoteAction.cs" />
     <Compile Include="Domain\Pitch.cs" />
     <Compile Include="NoteState.cs" />
@@ -80,6 +84,10 @@
     <Compile Include="SequencerSettings.cs" />
     <Compile Include="Domain\TimeSignature.cs" />
     <Compile Include="UnsafeNativeMethods.cs" />
+    <Page Include="DragSelectionBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

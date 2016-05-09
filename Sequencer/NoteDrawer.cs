@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Sequencer.Domain;
@@ -7,18 +8,20 @@ namespace Sequencer
 {
     public sealed class NoteDrawer
     {
+        private readonly Canvas sequencer;
         private readonly SequencerSettings sequencerSettings;
         private Rectangle noteRectangle;
 
-        public NoteDrawer(SequencerSettings sequencerSettings)
+        public NoteDrawer(Canvas sequencer, SequencerSettings sequencerSettings)
         {
+            this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
         }
 
         public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState,
-            SequencerDimensionsCalculator sequencerDimensionsCalculator, Canvas sequencer)
+            SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
-            RemoveNote(sequencer);
+            RemoveNote();
 
             TimeSignature timeSignature = sequencerSettings.TimeSignature;
 
@@ -56,7 +59,7 @@ namespace Sequencer
             }
         }
 
-        public void RemoveNote(Canvas sequencer)
+        public void RemoveNote()
         {
             sequencer.Children.Remove(noteRectangle);
         }
@@ -80,6 +83,13 @@ namespace Sequencer
         private static double GetPointFromPosition(TimeSignature timeSignature, Position position, double beatWidth)
         {
             return (position.SummedBeat(timeSignature)*beatWidth) - beatWidth;
+        }
+
+        public bool IntersectsWith(Rect rectangle)
+        {
+            var noteRect = new Rect(Canvas.GetLeft(noteRectangle), Canvas.GetTop(noteRectangle), noteRectangle.Width, noteRectangle.Height);
+
+            return rectangle.IntersectsWith(noteRect);
         }
     }
 }

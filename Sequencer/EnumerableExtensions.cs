@@ -33,7 +33,7 @@ namespace Sequencer
 
             EqualityComparer<TSource> comparer = EqualityComparer<TSource>.Default;
             
-            return source.Any(element => !comparer.Equals(element, value));
+            return source.All(element => !comparer.Equals(element, value));
         }
     }
 }

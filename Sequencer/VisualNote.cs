@@ -1,11 +1,12 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 
 namespace Sequencer
 {
-    public sealed class VisualNote
+    public sealed class VisualNote : IPositionAware
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(VisualNote));
 
@@ -27,7 +28,7 @@ namespace Sequencer
             this.startPosition = startPosition;
             this.endPosition = endPosition;
             this.pitch = pitch;
-            noteDrawer = new NoteDrawer(sequencerSettings);
+            noteDrawer = new NoteDrawer(sequencer, sequencerSettings);
         }
 
         public Pitch Pitch
@@ -85,17 +86,22 @@ namespace Sequencer
         public void Draw()
         {
             Log.InfoFormat("Drawing note length with start position {0} to end position {1}", StartPosition, EndPosition);
-            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState, sequencerDimensionsCalculator, sequencer);
+            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState, sequencerDimensionsCalculator);
         }
 
         public void Remove()
         {
-            noteDrawer.RemoveNote(sequencer);
+            noteDrawer.RemoveNote();
         }
 
         public override string ToString()
         {
             return $"Pitch: {Pitch}, Start Position: {StartPosition}, End Position: {EndPosition}";
+        }
+
+        public bool IntersectsWith(Rect rectangle)
+        {
+            return noteDrawer.IntersectsWith(rectangle);
         }
 
         public void MovePositionRelativeTo(int beatsToMove)

@@ -8,7 +8,7 @@ namespace Sequencer.Command
 {
     public sealed class UpdateNoteStateCommand
     {
-        protected static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
 
         private readonly List<VisualNote> sequencerNotes;
         private readonly NoteState noteState;
@@ -23,7 +23,7 @@ namespace Sequencer.Command
         {
             foreach (VisualNote visualNote in notesToChange)
             {
-                if (visualNote != null)
+                if ((visualNote != null) && (visualNote.NoteState != noteState))
                 {
                     visualNote.NoteState = noteState;
 
@@ -35,7 +35,12 @@ namespace Sequencer.Command
             {
                 foreach (VisualNote visualNote in sequencerNotes.Where(notesToChange.NotContains))
                 {
-                    visualNote.NoteState = NoteState.Unselected;
+                    if (visualNote.NoteState != NoteState.Unselected)
+                    {
+                        Log.Info($"Visual note {visualNote} has been {visualNote.NoteState}");
+
+                        visualNote.NoteState = NoteState.Unselected;
+                    }
                 }
             }
 

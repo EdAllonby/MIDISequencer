@@ -39,6 +39,11 @@ namespace Sequencer
         /// </summary>
         public double BeatWidth => BarWidth/sequencerSettings.TimeSignature.BeatsPerBar;
 
+        public bool IsPointInsideNote(IEnumerable<VisualNote> sequencerNotes, Point mousePoint)
+        {
+            return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
+        }
+
         public Position FindPositionFromPoint(Point mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
