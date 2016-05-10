@@ -23,6 +23,9 @@ namespace Sequencer
         private readonly SequencerDrawer sequencerDrawer;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
+        private readonly MoveNotePositionCommand moveNoteLeftCommand;
+        private readonly MoveNotePositionCommand moveNoteRightCommand;
+        
         private MousePointMoveNoteCommand moveNoteCommand;
         private NoteAction noteAction;
 
@@ -36,6 +39,8 @@ namespace Sequencer
             deleteNotesCommand = new DeleteNotesCommand(SequencerCanvas, notes);
             selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
+            moveNoteLeftCommand = new MoveNotePositionCommand(-1);
+            moveNoteRightCommand = new MoveNotePositionCommand(1);
 
             Log.Info("Main Window loaded");
         }
@@ -124,6 +129,18 @@ namespace Sequencer
             {
                 selectNoteCommand.Execute(notes);
             }
+            if (e.Key == Key.Left)
+            {
+                moveNoteLeftCommand.Execute(notes.Where(note=>note.NoteState == NoteState.Selected));
+            }
+            if (e.Key == Key.Right)
+            {
+                moveNoteRightCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
+            }
+            if (e.Key == Key.A)
+            {
+                Log.Info(SequencerCanvas.Children.Count);
+            }
         }
 
         private void SequencerMouseUp(object sender, MouseButtonEventArgs e)
@@ -135,7 +152,6 @@ namespace Sequencer
 
             SequencerGrid.ReleaseMouseCapture();
             e.Handled = true;
-
         }
     }
 }

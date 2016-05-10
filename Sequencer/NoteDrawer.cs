@@ -10,38 +10,43 @@ namespace Sequencer
     {
         private readonly Canvas sequencer;
         private readonly SequencerSettings sequencerSettings;
-        private Rectangle noteRectangle;
+        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
+        private readonly Rectangle noteRectangle;
+        private readonly TimeSignature timeSignature;
 
-        public NoteDrawer(Canvas sequencer, SequencerSettings sequencerSettings)
+        public NoteDrawer(Canvas sequencer, SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
-        }
+            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
+            timeSignature = sequencerSettings.TimeSignature;
 
-        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState,
-            SequencerDimensionsCalculator sequencerDimensionsCalculator)
-        {
-            RemoveNote();
-
-            TimeSignature timeSignature = sequencerSettings.TimeSignature;
-
-            double beatWidth = sequencerDimensionsCalculator.BeatWidth;
-            double noteHeight = sequencerDimensionsCalculator.NoteHeight;
-
-            double noteStartLocation = GetPointFromPosition(timeSignature, startPosition, beatWidth);
-            double noteWidth = ActualWidthBetweenPositions(timeSignature, startPosition, endPosition, beatWidth);
-            double noteStartHeight = GetPointFromPitch(pitch, sequencer.ActualHeight, noteHeight, sequencerSettings.LowestPitch);
             noteRectangle = new Rectangle
             {
-                Height = noteHeight,
-                Width = noteWidth,
                 Stroke = new SolidColorBrush(sequencerSettings.LineColour),
                 StrokeThickness = 0.5
             };
 
+            sequencer.Children.Add(noteRectangle);
+
+            // We always want the notes to be in the foreground.
+            Panel.SetZIndex(noteRectangle, 99);
+        }
+
+        public void DrawNote(Pitch pitch, Position startPosition, Position endPosition, NoteState noteState)
+        {
+            double beatWidth = sequencerDimensionsCalculator.BeatWidth;
+            double noteHeight = sequencerDimensionsCalculator.NoteHeight;
+
+            double noteWidth = ActualWidthBetweenPositions(startPosition, endPosition, beatWidth);
+            double noteStartHeight = GetPointFromPitch(pitch, sequencer.ActualHeight, noteHeight, sequencerSettings.LowestPitch);
+
+            noteRectangle.Height = noteHeight;
+            noteRectangle.Width = noteWidth;
+
             SetNoteColour(noteState);
 
-            sequencer.Children.Add(noteRectangle);
+            double noteStartLocation = GetPointFromPosition(startPosition, sequencerDimensionsCalculator.BeatWidth);
             Canvas.SetLeft(noteRectangle, noteStartLocation);
             Canvas.SetTop(noteRectangle, noteStartHeight);
         }
@@ -71,16 +76,16 @@ namespace Sequencer
             return sequencerHeight - relativePitchPosition;
         }
 
-        private static double ActualWidthBetweenPositions(TimeSignature timeSignature, Position startPosition, Position endPosition, double beatWidth)
+        private double ActualWidthBetweenPositions(Position startPosition, Position endPosition, double beatWidth)
         {
-            double noteStartingPoint = GetPointFromPosition(timeSignature, startPosition, beatWidth);
-            double noteEndingPoint = GetPointFromPosition(timeSignature, endPosition, beatWidth);
+            double noteStartingPoint = GetPointFromPosition(startPosition, beatWidth);
+            double noteEndingPoint = GetPointFromPosition(endPosition, beatWidth);
             double newNoteWidth = noteEndingPoint - noteStartingPoint;
 
             return newNoteWidth >= 0 ? newNoteWidth : 0;
         }
 
-        private static double GetPointFromPosition(TimeSignature timeSignature, Position position, double beatWidth)
+        private double GetPointFromPosition(Position position, double beatWidth)
         {
             return (position.SummedBeat(timeSignature)*beatWidth) - beatWidth;
         }

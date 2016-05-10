@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -11,6 +12,7 @@ namespace Sequencer
     public sealed class SequencerDrawer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerDrawer));
+        private readonly List<UIElement> elementCache = new List<UIElement>();
 
         private readonly Canvas sequencerCanvas;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
@@ -28,10 +30,10 @@ namespace Sequencer
 
         public void RedrawEditor()
         {
-            sequencerCanvas.Children.Clear();
-
+            RemoveElements();
             DrawHorizontalSequencerLines();
             DrawVerticalSequencerLines();
+            AddElements();
             DrawNotes();
 
             Log.Debug("Sequencer redrawn");
@@ -44,7 +46,7 @@ namespace Sequencer
                 note.Draw();
             }
         }
-        
+
         private void DrawVerticalSequencerLines()
         {
             for (var measure = 0; measure < SequencerSettings.TotalMeasures; measure++)
@@ -65,7 +67,7 @@ namespace Sequencer
                 }
             }
         }
-        
+
         private void DrawHorizontalSequencerLines()
         {
             double pointsPerNote = sequencerDimensionsCalculator.NoteHeight;
@@ -81,7 +83,7 @@ namespace Sequencer
                 DrawHorizontalSequencerLine(currentNotePosition, 0.5);
             }
         }
-        
+
         private void DrawVerticalSequencerLine(double currentBeatPosition, double thickness)
         {
             var sequencerLine = new Line
@@ -94,7 +96,7 @@ namespace Sequencer
                 Stroke = new SolidColorBrush(sequencerSettings.LineColour)
             };
 
-            sequencerCanvas.Children.Add(sequencerLine);
+            elementCache.Add(sequencerLine);
         }
 
         private void DrawNoteBackground(double currentNotePosition, double noteSize, Pitch pitch)
@@ -108,9 +110,10 @@ namespace Sequencer
                 Fill = new SolidColorBrush(backgroundColour)
             };
 
-            sequencerCanvas.Children.Add(noteBackground);
             Canvas.SetLeft(noteBackground, 0);
             Canvas.SetTop(noteBackground, currentNotePosition);
+
+            elementCache.Add(noteBackground);
         }
 
         private void DrawHorizontalSequencerLine(double currentNotePosition, double thickness)
@@ -125,7 +128,25 @@ namespace Sequencer
                 Stroke = new SolidColorBrush(sequencerSettings.LineColour)
             };
 
-            sequencerCanvas.Children.Add(sequencerLine);
+            elementCache.Add(sequencerLine);
+        }
+
+        private void AddElements()
+        {
+            foreach (UIElement uiElement in elementCache)
+            {
+                sequencerCanvas.Children.Add(uiElement);
+            }
+        }
+
+        private void RemoveElements()
+        {
+            foreach (UIElement uiElement in elementCache)
+            {
+                sequencerCanvas.Children.Remove(uiElement);
+            }
+
+            elementCache.Clear();
         }
     }
 }

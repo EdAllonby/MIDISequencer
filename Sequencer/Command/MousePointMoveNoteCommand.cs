@@ -50,10 +50,8 @@ namespace Sequencer.Command
 
                 initialMousePosition = mousePoint;
 
-                foreach (VisualNote visualNote in sequencerNotes.Where(note => note.NoteState == NoteState.Selected))
-                {
-                    visualNote.MovePositionRelativeTo(beatsDelta);
-                }
+                var moveNotePositionCommand = new MoveNotePositionCommand(beatsDelta);
+                moveNotePositionCommand.Execute(sequencerNotes.Where(note=>note.NoteState == NoteState.Selected));
             }
         }
 

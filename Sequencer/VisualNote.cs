@@ -11,8 +11,6 @@ namespace Sequencer
         private static readonly ILog Log = LogManager.GetLogger(typeof(VisualNote));
 
         [NotNull] private readonly NoteDrawer noteDrawer;
-        private readonly Canvas sequencer;
-        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings;
         private Position endPosition;
         private NoteState noteState = NoteState.Selected;
@@ -22,13 +20,12 @@ namespace Sequencer
         public VisualNote([NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] Canvas sequencer, 
             [NotNull] SequencerSettings sequencerSettings, [NotNull] Position startPosition, [NotNull] Position endPosition, [NotNull] Pitch pitch)
         {
-            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
-            this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
             this.startPosition = startPosition;
             this.endPosition = endPosition;
             this.pitch = pitch;
-            noteDrawer = new NoteDrawer(sequencer, sequencerSettings);
+
+            noteDrawer = new NoteDrawer(sequencer, sequencerSettings, sequencerDimensionsCalculator);
         }
 
         public Pitch Pitch
@@ -86,7 +83,7 @@ namespace Sequencer
         public void Draw()
         {
             Log.InfoFormat("Drawing note length with start position {0} to end position {1}", StartPosition, EndPosition);
-            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState, sequencerDimensionsCalculator);
+            noteDrawer.DrawNote(Pitch, StartPosition, EndPosition, noteState);
         }
 
         public void Remove()
