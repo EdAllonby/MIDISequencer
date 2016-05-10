@@ -33,7 +33,7 @@ namespace Sequencer.Command
 
             if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                foreach (VisualNote visualNote in sequencerNotes.Where(notesToChange.NotContains))
+                foreach (VisualNote visualNote in sequencerNotes.Except(notesToChange))
                 {
                     if (visualNote.NoteState != NoteState.Unselected)
                     {

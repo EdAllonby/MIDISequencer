@@ -71,6 +71,10 @@ namespace Sequencer
             MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
             moveNoteCommand = new MousePointMoveNoteCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
             noteCommand.Execute(mouseDownPoint);
+
+           SequencerGrid.CaptureMouse();
+
+            e.Handled = true;
         }
 
         private void SequencerMouseMoved(object sender, MouseEventArgs e)
@@ -95,6 +99,8 @@ namespace Sequencer
                     selectNoteCommand.Execute(containedNotes);
                 }
             }
+
+            e.Handled = true;
         }
 
         private Point CurrentMousePosition(MouseEventArgs mouseEventArgs)
@@ -126,6 +132,10 @@ namespace Sequencer
             {
                 DragSelectionBox.CloseSelectionBox();
             }
+
+            SequencerGrid.ReleaseMouseCapture();
+            e.Handled = true;
+
         }
     }
 }

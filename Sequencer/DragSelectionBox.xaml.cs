@@ -116,28 +116,31 @@ namespace Sequencer
         /// </summary>
         private void UpdateDragSelectionRectSize(Point pt1, Point pt2)
         {
-            double x, y, width, height;
+            double x;
+            double y;
+            double width;
+            double height;
 
             if (pt2.X < pt1.X)
             {
-                x = pt2.X;
-                width = pt1.X - pt2.X;
+                x = Math.Max(0,pt2.X);
+                width = pt1.X - x;
             }
             else
             {
                 x = pt1.X;
-                width = pt2.X - pt1.X;
+                width = pt2.X - x;
             }
 
             if (pt2.Y < pt1.Y)
             {
-                y = pt2.Y;
-                height = pt1.Y - pt2.Y;
+                y = Math.Max(0,pt2.Y);
+                height = pt1.Y - y;
             }
             else
             {
                 y = pt1.Y;
-                height = pt2.Y - pt1.Y;
+                height = pt2.Y - y;
             }
 
             SetLeft(DragSelectionBorder, x);
