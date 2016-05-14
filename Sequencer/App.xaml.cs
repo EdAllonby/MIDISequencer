@@ -19,7 +19,7 @@ namespace Sequencer
         protected override void OnStartup(StartupEventArgs e)
         {
 #if DEBUG
-    // Console must be started before configuring log4net.
+            // Console must be started before configuring log4net.
             ConsoleManager.Show();
             SetupLogging("log4netDebug.config");
 #else

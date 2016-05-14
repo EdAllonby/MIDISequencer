@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer", "Sequencer\Sequencer.csproj", "{F891ABD0-A37F-42A2-9B98-C1723D58CED3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.Tests", "Sequencer.Tests\Sequencer.Tests.csproj", "{1A059752-22FE-407D-BE11-1F9378DB1145}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.ViewModel", "Sequencer.ViewModel\Sequencer.ViewModel.csproj", "{68A8D4A6-B8EE-4684-8F1B-21B686014069}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.Domain", "Sequencer.Domain\Sequencer.Domain.csproj", "{2F107EEB-5405-4D9A-A21E-866FBD9E697B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{1A059752-22FE-407D-BE11-1F9378DB1145}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A059752-22FE-407D-BE11-1F9378DB1145}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A059752-22FE-407D-BE11-1F9378DB1145}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68A8D4A6-B8EE-4684-8F1B-21B686014069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68A8D4A6-B8EE-4684-8F1B-21B686014069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68A8D4A6-B8EE-4684-8F1B-21B686014069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68A8D4A6-B8EE-4684-8F1B-21B686014069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿namespace Sequencer
+﻿namespace Sequencer.Domain
 {
     /// <summary>
     /// Actions a note can take.

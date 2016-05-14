@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sequencer"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        xmlns:domain="clr-namespace:Sequencer.Domain;assembly=Sequencer.Domain"
+        DataContext="{StaticResource SequencerViewModel}"
         mc:Ignorable="d"
         Title="Sequencer" Height="500" Width="1200" KeyDown="SequencerKeyPressed">
     <Window.Resources>
@@ -17,13 +18,13 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
-                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Select}}"
+                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static domain:NoteAction.Select}}"
                          Content="Select" IsTabStop="False" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
-                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Create}}"
+                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static domain:NoteAction.Create}}"
                          Content="Create" IsTabStop="False" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
-                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Delete}}"
+                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static domain:NoteAction.Delete}}"
                          Content="Delete" IsTabStop="False" />
         </StackPanel>
 

@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using JetBrains.Annotations;
 using log4net;
 using Sequencer.Command;
 using Sequencer.Command.MousePointCommand;
+using Sequencer.Domain;
+using Sequencer.ViewModel;
 
 namespace Sequencer
 {
-    public partial class MainWindow : INotifyPropertyChanged
+    public partial class MainWindow
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
         private readonly DeleteNotesCommand deleteNotesCommand;
@@ -30,7 +29,6 @@ namespace Sequencer
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
 
         private MoveNoteFromPointCommand command;
-        private NoteAction noteAction;
 
         public MainWindow()
         {
@@ -47,23 +45,11 @@ namespace Sequencer
             moveNoteUpCommand = new MoveNotePitchCommand(1);
             moveNoteDownCommand = new MoveNotePitchCommand(-1);
 
-            NoteAction = NoteAction.Create;
 
             Log.Info("Main Window loaded");
         }
 
-        public NoteAction NoteAction
-        {
-            get { return noteAction; }
-            set
-            {
-                noteAction = value;
-                OnPropertyChanged(nameof(NoteAction));
-                Log.Info($"Note action set to {NoteAction}");
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        private SequencerViewModel ViewModel => (SequencerViewModel) DataContext;
 
         private void WindowChanged(object sender, RoutedEventArgs e)
         {
@@ -75,12 +61,12 @@ namespace Sequencer
             Point mouseDownPoint = CurrentMousePosition(e);
 
             if ((e.ChangedButton == MouseButton.Left) && !sequencerDimensionsCalculator.IsPointInsideNote(notes, mouseDownPoint)
-                && (NoteAction == NoteAction.Select))
+                && (ViewModel.NoteAction == NoteAction.Select))
             {
                 DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
             }
 
-            MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
+            MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(ViewModel.NoteAction);
             command = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
             noteCommand.Execute(mouseDownPoint);
 
@@ -93,11 +79,11 @@ namespace Sequencer
         {
             Point currentMousePosition = CurrentMousePosition(e);
 
-            if (NoteAction == NoteAction.Create)
+            if (ViewModel.NoteAction == NoteAction.Create)
             {
                 updateNoteEndPositionFromPointCommand.Execute(currentMousePosition);
             }
-            if (NoteAction == NoteAction.Select)
+            if (ViewModel.NoteAction == NoteAction.Select)
             {
                 DragSelectionBox.UpdateDragSelectionBox(currentMousePosition);
 
@@ -118,12 +104,6 @@ namespace Sequencer
         private Point CurrentMousePosition(MouseEventArgs mouseEventArgs)
         {
             return mouseEventArgs.GetPosition(SequencerCanvas);
-        }
-
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void SequencerKeyPressed(object sender, KeyEventArgs e)
