@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 
-namespace Sequencer
+namespace Sequencer.Drawing
 {
     public sealed class SequencerDrawer
     {

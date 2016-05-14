@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.Drawing;
 
 namespace Sequencer
 {

@@ -10,17 +10,25 @@ namespace Sequencer.Domain
     {
         private readonly int octave;
 
+        /// <summary>
+        /// Create a new pitch with a note and and octave.
+        /// </summary>
+        /// <param name="note">The note of this pitch.</param>
+        /// <param name="octave">The octave of this pitch.</param>
         public Pitch([NotNull] Note note, int octave)
         {
             Note = note;
             this.octave = octave;
         }
 
+        /// <summary>
+        /// The note this pitch has.
+        /// </summary>
         [NotNull]
         public Note Note { get; }
 
         /// <summary>
-        /// The MIDI Equivalent of this pitch.
+        /// The MIDI equivalent of this pitch.
         /// </summary>
         public int MidiNoteNumber => Note.Value + (octave*12);
 

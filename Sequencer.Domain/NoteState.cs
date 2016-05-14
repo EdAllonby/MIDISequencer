@@ -1,4 +1,4 @@
-﻿namespace Sequencer
+﻿namespace Sequencer.Domain
 {
     public enum NoteState
     {

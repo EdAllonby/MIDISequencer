@@ -78,9 +78,8 @@
     <Compile Include="EnumToBoolConverter.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IPositionAware.cs" />
-    <Compile Include="NoteState.cs" />
     <Compile Include="SequencerDimensionsCalculator.cs" />
-    <Compile Include="SequencerDrawer.cs" />
+    <Compile Include="Drawing\SequencerDrawer.cs" />
     <Compile Include="SequencerSettings.cs" />
     <Compile Include="UnsafeNativeMethods.cs" />
     <Page Include="DragSelectionBox.xaml">
@@ -102,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="VisualNote.cs" />
-    <Compile Include="NoteDrawer.cs" />
+    <Compile Include="Drawing\NoteDrawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

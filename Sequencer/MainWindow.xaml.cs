@@ -6,6 +6,7 @@ using log4net;
 using Sequencer.Command;
 using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
+using Sequencer.Drawing;
 using Sequencer.ViewModel;
 
 namespace Sequencer
@@ -131,7 +132,6 @@ namespace Sequencer
             if (e.Key == Key.Down)
             {
                 moveNoteDownCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
-                e.Handled = true;
             }
             if (e.Key == Key.A)
             {

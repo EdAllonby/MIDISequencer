@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Sequencer.Domain;
 
-namespace Sequencer
+namespace Sequencer.Drawing
 {
     public sealed class NoteDrawer
     {

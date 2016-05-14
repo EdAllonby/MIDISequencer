@@ -41,6 +41,7 @@
     <Compile Include="EnumerableType.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="NoteAction.cs" />
+    <Compile Include="NoteState.cs" />
     <Compile Include="Pitch.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
