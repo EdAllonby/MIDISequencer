@@ -17,6 +17,10 @@ namespace Sequencer
         private readonly DeleteNotesCommand deleteNotesCommand;
 
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
+        private readonly MoveNotePitchCommand moveNoteDownCommand;
+        private readonly MoveNotePositionCommand moveNoteLeftCommand;
+        private readonly MoveNotePositionCommand moveNoteRightCommand;
+        private readonly MoveNotePitchCommand moveNoteUpCommand;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
         private readonly UpdateNoteStateCommand selectNoteCommand;
@@ -24,10 +28,6 @@ namespace Sequencer
         private readonly SequencerDrawer sequencerDrawer;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
-        private readonly MoveNotePositionCommand moveNoteLeftCommand;
-        private readonly MoveNotePositionCommand moveNoteRightCommand;
-        private readonly MoveNotePitchCommand moveNoteUpCommand;
-        private readonly MoveNotePitchCommand moveNoteDownCommand;
 
         private MoveNoteFromPointCommand command;
         private NoteAction noteAction;
@@ -84,7 +84,7 @@ namespace Sequencer
             command = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
             noteCommand.Execute(mouseDownPoint);
 
-           SequencerGrid.CaptureMouse();
+            SequencerGrid.CaptureMouse();
 
             e.Handled = true;
         }
@@ -92,7 +92,7 @@ namespace Sequencer
         private void SequencerMouseMoved(object sender, MouseEventArgs e)
         {
             Point currentMousePosition = CurrentMousePosition(e);
-            
+
             if (NoteAction == NoteAction.Create)
             {
                 updateNoteEndPositionFromPointCommand.Execute(currentMousePosition);
@@ -138,7 +138,7 @@ namespace Sequencer
             }
             if (e.Key == Key.Left)
             {
-                moveNoteLeftCommand.Execute(notes.Where(note=>note.NoteState == NoteState.Selected));
+                moveNoteLeftCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
             }
             if (e.Key == Key.Right)
             {

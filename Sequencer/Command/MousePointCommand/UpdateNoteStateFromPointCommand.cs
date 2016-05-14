@@ -37,7 +37,7 @@ namespace Sequencer.Command.MousePointCommand
                     noteStateSelectedCommand.Execute(actionableNote.Yield());
                 }
             }
-            else if(!Keyboard.IsKeyDown(Key.LeftCtrl))
+            else if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 noteStateUnselectedCommand.Execute(SequencerNotes);
             }

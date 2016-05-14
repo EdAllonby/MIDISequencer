@@ -30,7 +30,7 @@ namespace Sequencer.Command.MousePointCommand
         }
 
         protected abstract bool CanExecute();
-        
+
         protected abstract void DoExecute(Point mousePoint);
     }
 }

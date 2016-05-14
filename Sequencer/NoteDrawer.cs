@@ -8,10 +8,10 @@ namespace Sequencer
 {
     public sealed class NoteDrawer
     {
-        private readonly Canvas sequencer;
-        private readonly SequencerSettings sequencerSettings;
-        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly Rectangle noteRectangle;
+        private readonly Canvas sequencer;
+        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
+        private readonly SequencerSettings sequencerSettings;
         private readonly TimeSignature timeSignature;
 
         public NoteDrawer(Canvas sequencer, SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)

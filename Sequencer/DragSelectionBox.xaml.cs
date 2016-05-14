@@ -123,7 +123,7 @@ namespace Sequencer
 
             if (pt2.X < pt1.X)
             {
-                x = Math.Max(0,pt2.X);
+                x = Math.Max(0, pt2.X);
                 width = pt1.X - x;
             }
             else
@@ -134,7 +134,7 @@ namespace Sequencer
 
             if (pt2.Y < pt1.Y)
             {
-                y = Math.Max(0,pt2.Y);
+                y = Math.Max(0, pt2.Y);
                 height = pt1.Y - y;
             }
             else

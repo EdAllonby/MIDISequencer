@@ -27,7 +27,8 @@
                          Content="Delete" IsTabStop="False" />
         </StackPanel>
 
-        <Grid x:Name="SequencerGrid" Grid.Column="1" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp">
+        <Grid x:Name="SequencerGrid" Grid.Column="1" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown"
+              MouseUp="SequencerMouseUp">
             <Canvas x:Name="SequencerCanvas" />
             <local:DragSelectionBox x:Name="DragSelectionBox" />
         </Grid>

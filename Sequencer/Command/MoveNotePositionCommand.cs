@@ -13,7 +13,7 @@ namespace Sequencer.Command
 
         public void Execute(IEnumerable<VisualNote> notes)
         {
-              foreach (VisualNote visualNote in notes)
+            foreach (VisualNote visualNote in notes)
             {
                 visualNote.MovePositionRelativeTo(beatsToMove);
             }

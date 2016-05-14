@@ -9,9 +9,9 @@ namespace Sequencer.Command
     public sealed class UpdateNoteStateCommand
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
+        private readonly NoteState noteState;
 
         private readonly List<VisualNote> sequencerNotes;
-        private readonly NoteState noteState;
 
         public UpdateNoteStateCommand([NotNull] List<VisualNote> sequencerNotes, NoteState noteState)
         {
@@ -28,7 +28,7 @@ namespace Sequencer.Command
                     visualNote.NoteState = noteState;
 
                     Log.Info($"Visual note {visualNote} has been {visualNote.NoteState}");
-                }       
+                }
             }
 
             if (!Keyboard.IsKeyDown(Key.LeftCtrl))
@@ -43,7 +43,6 @@ namespace Sequencer.Command
                     }
                 }
             }
-
         }
     }
 }
