@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
     public sealed class UpdateNoteStateFromPointCommand : MousePointNoteCommand
     {
@@ -24,7 +24,7 @@ namespace Sequencer.Command
 
         protected override void DoExecute(Point mousePoint)
         {
-            VisualNote actionableNote = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
+            VisualNote actionableNote = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
 
             if (actionableNote != null)
             {
@@ -39,7 +39,7 @@ namespace Sequencer.Command
             }
             else if(!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                noteStateUnselectedCommand.Execute(sequencerNotes);
+                noteStateUnselectedCommand.Execute(SequencerNotes);
             }
         }
     }

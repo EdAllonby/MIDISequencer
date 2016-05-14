@@ -5,7 +5,7 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
     /// <summary>
     /// Creates a <see cref="VisualNote" /> with correct pitch relative to the sequencer.
@@ -28,20 +28,20 @@ namespace Sequencer.Command
 
         protected override void DoExecute(Point mousePoint)
         {
-            sequencerNotes.ForEach(note => note.NoteState = NoteState.Unselected);
-            Position notePosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
-            Pitch pitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
+            SequencerNotes.ForEach(note => note.NoteState = NoteState.Unselected);
+            Position notePosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            Pitch pitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
 
-            var newNote = new VisualNote(sequencerDimensionsCalculator, sequencerCanvas, sequencerSettings, notePosition, defaultEndPosition, pitch);
+            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings, notePosition, defaultEndPosition, pitch);
             newNote.Draw();
-            sequencerNotes.Add(newNote);
+            SequencerNotes.Add(newNote);
         }
 
         private Position GetDefaultEndPosition(Position notePosition)
         {
-            return notePosition.NextPosition(sequencerSettings.TimeSignature);
+            return notePosition.NextPosition(SequencerSettings.TimeSignature);
         }
     }
 }

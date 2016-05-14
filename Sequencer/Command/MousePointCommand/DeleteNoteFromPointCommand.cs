@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using JetBrains.Annotations;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
     public sealed class DeleteNoteFromPointCommand : MousePointNoteCommand
     {
@@ -22,7 +22,7 @@ namespace Sequencer.Command
 
         protected override void DoExecute(Point mousePoint)
         {
-            VisualNote noteToDelete = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
+            VisualNote noteToDelete = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
             deleteNotesCommand.Execute(noteToDelete.Yield());
         }
     }

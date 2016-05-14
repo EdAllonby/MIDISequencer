@@ -5,7 +5,7 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
     /// <summary>
     /// Command to update a <see cref="VisualNote" />'s end position based on the current mouse position in the sequencer.
@@ -25,10 +25,10 @@ namespace Sequencer.Command
 
         protected override void DoExecute(Point mousePosition)
         {
-            var selectedNotes = sequencerNotes.Where(note => note.NoteState == NoteState.Selected);
+            var selectedNotes = SequencerNotes.Where(note => note.NoteState == NoteState.Selected);
 
-            Position currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
-            Position nextPosition = currentEndPosition.NextPosition(sequencerSettings.TimeSignature);
+            Position currentEndPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
+            Position nextPosition = currentEndPosition.NextPosition(SequencerSettings.TimeSignature);
 
             VisualNote noteToUpdate = selectedNotes.FirstOrDefault();
 

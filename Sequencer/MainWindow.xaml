@@ -18,13 +18,13 @@
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
                          IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Select}}"
-                         Content="Select" />
+                         Content="Select" IsTabStop="False" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
                          IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Create}}"
-                         Content="Create" />
+                         Content="Create" IsTabStop="False" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
                          IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:NoteAction.Delete}}"
-                         Content="Delete" />
+                         Content="Delete" IsTabStop="False" />
         </StackPanel>
 
         <Grid x:Name="SequencerGrid" Grid.Column="1" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp">

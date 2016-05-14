@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
     public sealed class MousePointNoteCommandFactory
     {

@@ -58,16 +58,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Command\CreateNoteFromPointCommand.cs" />
+    <Compile Include="Command\MousePointCommand\CreateNoteFromPointCommand.cs" />
     <Compile Include="Command\DeleteNotesCommand.cs" />
-    <Compile Include="Command\DeleteNoteFromPointCommand.cs" />
-    <Compile Include="Command\MousePointMoveNoteCommand.cs" />
-    <Compile Include="Command\MousePointNoteCommand.cs" />
-    <Compile Include="Command\MousePointNoteCommandFactory.cs" />
+    <Compile Include="Command\MousePointCommand\DeleteNoteFromPointCommand.cs" />
+    <Compile Include="Command\MousePointCommand\IMousePointNoteCommand.cs" />
+    <Compile Include="Command\MousePointCommand\MoveNoteFromPointCommand.cs" />
+    <Compile Include="Command\MousePointCommand\MousePointNoteCommand.cs" />
+    <Compile Include="Command\MousePointCommand\MousePointNoteCommandFactory.cs" />
+    <Compile Include="Command\MoveNotePitchCommand.cs" />
     <Compile Include="Command\MoveNotePositionCommand.cs" />
     <Compile Include="Command\UpdateNoteStateCommand.cs" />
-    <Compile Include="Command\UpdateNoteStateFromPointCommand.cs" />
-    <Compile Include="Command\UpdateNoteEndPositionFromPointCommand.cs" />
+    <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
+    <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromPointCommand.cs" />
     <Compile Include="ConsoleManager.cs" />
     <Compile Include="DragSelectionBox.xaml.cs">
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>

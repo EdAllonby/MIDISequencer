@@ -1,24 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using JetBrains.Annotations;
-using log4net;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
     /// <summary>
     /// Commands for mouse driven actions to notes.
     /// </summary>
-    public abstract class MousePointNoteCommand
+    public abstract class MousePointNoteCommand : IMousePointNoteCommand
     {
-        protected readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
-        protected readonly List<VisualNote> sequencerNotes;
-        protected readonly SequencerSettings sequencerSettings;
+        protected readonly SequencerDimensionsCalculator SequencerDimensionsCalculator;
+        protected readonly List<VisualNote> SequencerNotes;
+        protected readonly SequencerSettings SequencerSettings;
 
         protected MousePointNoteCommand([NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
-            this.sequencerNotes = sequencerNotes;
-            this.sequencerSettings = sequencerSettings;
-            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
+            SequencerNotes = sequencerNotes;
+            SequencerSettings = sequencerSettings;
+            SequencerDimensionsCalculator = sequencerDimensionsCalculator;
         }
 
 

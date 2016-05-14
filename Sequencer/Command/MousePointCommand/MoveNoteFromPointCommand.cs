@@ -5,16 +5,16 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.MousePointCommand
 {
-    public sealed class MousePointMoveNoteCommand : MousePointNoteCommand
+    public sealed class MoveNoteFromPointCommand : MousePointNoteCommand
     {
         private int beatsDelta;
         private Point initialMousePitch;
         private Point initialMousePosition;
         private int midiPitchDelta;
 
-        public MousePointMoveNoteCommand(Point initialMousePoint, [NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
+        public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             initialMousePosition = initialMousePoint;
@@ -38,11 +38,11 @@ namespace Sequencer.Command
 
         private void MoveNotePositions(Point mousePoint)
         {
-            Position initialPosition = sequencerDimensionsCalculator.FindPositionFromPoint(initialMousePosition);
-            Position newPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            Position initialPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePosition);
+            Position newPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-            int newBeatsDelta = newPosition.SummedBeat(sequencerSettings.TimeSignature) -
-                                initialPosition.SummedBeat(sequencerSettings.TimeSignature);
+            int newBeatsDelta = newPosition.SummedBeat(SequencerSettings.TimeSignature) -
+                                initialPosition.SummedBeat(SequencerSettings.TimeSignature);
 
             if (newBeatsDelta != beatsDelta)
             {
@@ -51,14 +51,14 @@ namespace Sequencer.Command
                 initialMousePosition = mousePoint;
 
                 var moveNotePositionCommand = new MoveNotePositionCommand(beatsDelta);
-                moveNotePositionCommand.Execute(sequencerNotes.Where(note=>note.NoteState == NoteState.Selected));
+                moveNotePositionCommand.Execute(SequencerNotes.Where(note => note.NoteState == NoteState.Selected));
             }
         }
 
         private void MoveNotePitch(Point mousePoint)
         {
-            Pitch initialPitch = sequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
-            Pitch newPitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
+            Pitch initialPitch = SequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
+            Pitch newPitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
             int newMidiPitchDelta = newPitch.MidiNoteNumber - initialPitch.MidiNoteNumber;
 
@@ -68,10 +68,8 @@ namespace Sequencer.Command
 
                 initialMousePitch = mousePoint;
 
-                foreach (VisualNote visualNote in sequencerNotes.Where(note => note.NoteState == NoteState.Selected))
-                {
-                    visualNote.MovePitchRelativeTo(midiPitchDelta);
-                }
+                var moveNotePitchCommand = new MoveNotePitchCommand(beatsDelta);
+                moveNotePitchCommand.Execute(SequencerNotes.Where(note => note.NoteState == NoteState.Selected));
             }
         }
     }

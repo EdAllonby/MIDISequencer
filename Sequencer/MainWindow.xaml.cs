@@ -7,6 +7,7 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Command;
+using Sequencer.Command.MousePointCommand;
 
 namespace Sequencer
 {
@@ -25,8 +26,10 @@ namespace Sequencer
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
         private readonly MoveNotePositionCommand moveNoteLeftCommand;
         private readonly MoveNotePositionCommand moveNoteRightCommand;
-        
-        private MousePointMoveNoteCommand moveNoteCommand;
+        private readonly MoveNotePitchCommand moveNoteUpCommand;
+        private readonly MoveNotePitchCommand moveNoteDownCommand;
+
+        private MoveNoteFromPointCommand command;
         private NoteAction noteAction;
 
         public MainWindow()
@@ -41,6 +44,10 @@ namespace Sequencer
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
             moveNoteLeftCommand = new MoveNotePositionCommand(-1);
             moveNoteRightCommand = new MoveNotePositionCommand(1);
+            moveNoteUpCommand = new MoveNotePitchCommand(1);
+            moveNoteDownCommand = new MoveNotePitchCommand(-1);
+
+            NoteAction = NoteAction.Create;
 
             Log.Info("Main Window loaded");
         }
@@ -74,7 +81,7 @@ namespace Sequencer
             }
 
             MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
-            moveNoteCommand = new MousePointMoveNoteCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+            command = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
             noteCommand.Execute(mouseDownPoint);
 
            SequencerGrid.CaptureMouse();
@@ -96,7 +103,7 @@ namespace Sequencer
 
                 if (!DragSelectionBox.IsDragging)
                 {
-                    moveNoteCommand?.Execute(currentMousePosition);
+                    command?.Execute(currentMousePosition);
                 }
                 else
                 {
@@ -136,6 +143,15 @@ namespace Sequencer
             if (e.Key == Key.Right)
             {
                 moveNoteRightCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
+            }
+            if (e.Key == Key.Up)
+            {
+                moveNoteUpCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
+            }
+            if (e.Key == Key.Down)
+            {
+                moveNoteDownCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
+                e.Handled = true;
             }
             if (e.Key == Key.A)
             {
