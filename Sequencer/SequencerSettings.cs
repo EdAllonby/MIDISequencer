@@ -11,7 +11,8 @@ namespace Sequencer
         // Musical definitions
         public const int TotalNotes = 32;
         public const int TotalMeasures = 4;
-        public readonly Pitch LowestPitch = new Pitch(Note.A, 2);
+        private readonly Pitch lowestPitch = new Pitch(Note.A, 2);
+        public readonly IDigitalAudioProtocol Protocol = new MidiProtocol();
         public readonly TimeSignature TimeSignature = new TimeSignature(4, 4);
 
         // Colour definitions
@@ -20,5 +21,10 @@ namespace Sequencer
         public Color LineColour = Colors.Black;
         public Color SelectedNoteColour = Colors.DarkRed;
         public Color UnselectedNoteColour = Colors.Crimson;
+
+        /// <summary>
+        /// Helper for finding the lower pitch protocol number with the currently set protocol.
+        /// </summary>
+        public int LowestPitchProtocolNumber => Protocol.ProtocolNoteNumber(lowestPitch);
     }
 }

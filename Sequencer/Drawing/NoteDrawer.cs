@@ -9,6 +9,7 @@ namespace Sequencer.Drawing
     public sealed class NoteDrawer
     {
         private readonly Rectangle noteRectangle;
+        private readonly IDigitalAudioProtocol protocol;
         private readonly Canvas sequencer;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings;
@@ -20,6 +21,7 @@ namespace Sequencer.Drawing
             this.sequencerSettings = sequencerSettings;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
             timeSignature = sequencerSettings.TimeSignature;
+            protocol = sequencerSettings.Protocol;
 
             noteRectangle = new Rectangle
             {
@@ -39,7 +41,7 @@ namespace Sequencer.Drawing
             double noteHeight = sequencerDimensionsCalculator.NoteHeight;
 
             double noteWidth = ActualWidthBetweenPositions(startPosition, endPosition, beatWidth);
-            double noteStartHeight = GetPointFromPitch(pitch, sequencer.ActualHeight, noteHeight, sequencerSettings.LowestPitch);
+            double noteStartHeight = GetPointFromPitch(pitch, sequencer.ActualHeight, noteHeight);
 
             noteRectangle.Height = noteHeight;
             noteRectangle.Width = noteWidth;
@@ -69,9 +71,9 @@ namespace Sequencer.Drawing
             sequencer.Children.Remove(noteRectangle);
         }
 
-        private static double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight, Pitch startingPitch)
+        private double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight)
         {
-            int pitchDelta = pitch.MidiNoteNumber - startingPitch.MidiNoteNumber;
+            int pitchDelta = protocol.ProtocolNoteNumber(pitch) - sequencerSettings.LowestPitchProtocolNumber;
             double relativePitchPosition = (noteHeight*pitchDelta) + noteHeight;
             return sequencerHeight - relativePitchPosition;
         }

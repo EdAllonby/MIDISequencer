@@ -13,6 +13,7 @@ namespace Sequencer.Drawing
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerDrawer));
         private readonly List<UIElement> elementCache = new List<UIElement>();
+        private readonly IDigitalAudioProtocol protocol;
 
         private readonly Canvas sequencerCanvas;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
@@ -22,6 +23,7 @@ namespace Sequencer.Drawing
         public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] IEnumerable<VisualNote> sequencerNotes,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
         {
+            protocol = sequencerSettings.Protocol;
             this.sequencerCanvas = sequencerCanvas;
             this.sequencerNotes = sequencerNotes;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
@@ -76,8 +78,8 @@ namespace Sequencer.Drawing
             {
                 double currentNotePosition = pointsPerNote*note;
 
-                int currentMidiNote = (SequencerSettings.TotalNotes + sequencerSettings.LowestPitch.MidiNoteNumber) - note;
-                Pitch pitch = Pitch.CreatePitchFromMidiNumber(currentMidiNote - 1);
+                int currentMidiNote = (SequencerSettings.TotalNotes + sequencerSettings.LowestPitchProtocolNumber) - note;
+                Pitch pitch = protocol.CreatePitchFromProtocolNumber(currentMidiNote - 1);
 
                 DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);
                 DrawHorizontalSequencerLine(currentNotePosition, 0.5);

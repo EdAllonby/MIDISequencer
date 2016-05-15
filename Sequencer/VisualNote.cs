@@ -12,6 +12,7 @@ namespace Sequencer
         private static readonly ILog Log = LogManager.GetLogger(typeof(VisualNote));
 
         [NotNull] private readonly NoteDrawer noteDrawer;
+        private readonly IDigitalAudioProtocol protocol;
         private readonly SequencerSettings sequencerSettings;
         private Position endPosition;
         private NoteState noteState = NoteState.Selected;
@@ -21,6 +22,7 @@ namespace Sequencer
         public VisualNote([NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] Canvas sequencer,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] Position startPosition, [NotNull] Position endPosition, [NotNull] Pitch pitch)
         {
+            protocol = sequencerSettings.Protocol;
             this.sequencerSettings = sequencerSettings;
             this.startPosition = startPosition;
             this.endPosition = endPosition;
@@ -110,7 +112,8 @@ namespace Sequencer
 
         public void MovePitchRelativeTo(int pitchesToMove)
         {
-            Pitch = Pitch.CreatePitchFromMidiNumber(Pitch.MidiNoteNumber + pitchesToMove);
+            int midiNoteNumber = protocol.ProtocolNoteNumber(pitch);
+            Pitch = protocol.CreatePitchFromProtocolNumber(midiNoteNumber + pitchesToMove);
         }
     }
 }

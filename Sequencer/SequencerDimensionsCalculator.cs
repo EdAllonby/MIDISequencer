@@ -10,11 +10,13 @@ namespace Sequencer
 {
     public sealed class SequencerDimensionsCalculator
     {
+        private readonly IDigitalAudioProtocol protocol;
         private readonly Canvas sequencerCanvas;
         private readonly SequencerSettings sequencerSettings;
 
         public SequencerDimensionsCalculator([NotNull] Canvas sequencerCanvas, [NotNull] SequencerSettings sequencerSettings)
         {
+            protocol = sequencerSettings.Protocol;
             this.sequencerCanvas = sequencerCanvas;
             this.sequencerSettings = sequencerSettings;
         }
@@ -58,8 +60,8 @@ namespace Sequencer
         public Pitch FindPitchFromPoint(Point mousePosition)
         {
             int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
-            int absoluteMidiNumber = sequencerSettings.LowestPitch.MidiNoteNumber + relativeMidiNumber;
-            return Pitch.CreatePitchFromMidiNumber(absoluteMidiNumber);
+            int absoluteMidiNumber = sequencerSettings.LowestPitchProtocolNumber + relativeMidiNumber;
+            return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }
 
         /// <summary>

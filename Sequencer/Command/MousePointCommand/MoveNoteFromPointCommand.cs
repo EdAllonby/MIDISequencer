@@ -13,12 +13,14 @@ namespace Sequencer.Command.MousePointCommand
         private Point initialMousePitch;
         private Point initialMousePosition;
         private int midiPitchDelta;
+        private readonly IDigitalAudioProtocol protocol;
 
         public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             initialMousePosition = initialMousePoint;
             initialMousePitch = initialMousePoint;
+            protocol = sequencerSettings.Protocol;
         }
 
         protected override bool CanExecute()
@@ -60,7 +62,7 @@ namespace Sequencer.Command.MousePointCommand
             Pitch initialPitch = SequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
             Pitch newPitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
-            int newMidiPitchDelta = newPitch.MidiNoteNumber - initialPitch.MidiNoteNumber;
+            int newMidiPitchDelta = protocol.ProtocolNoteNumber(newPitch) - protocol.ProtocolNoteNumber(initialPitch);
 
             if (newMidiPitchDelta != midiPitchDelta)
             {

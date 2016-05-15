@@ -8,8 +8,6 @@ namespace Sequencer.Domain
     /// </summary>
     public sealed class Pitch : IEquatable<Pitch>
     {
-        private readonly int octave;
-
         /// <summary>
         /// Create a new pitch with a note and and octave.
         /// </summary>
@@ -18,19 +16,19 @@ namespace Sequencer.Domain
         public Pitch([NotNull] Note note, int octave)
         {
             Note = note;
-            this.octave = octave;
+            Octave = octave;
         }
+
+        /// <summary>
+        /// The octave this pitch is in.
+        /// </summary>
+        public int Octave { get; }
 
         /// <summary>
         /// The note this pitch has.
         /// </summary>
         [NotNull]
         public Note Note { get; }
-
-        /// <summary>
-        /// The MIDI equivalent of this pitch.
-        /// </summary>
-        public int MidiNoteNumber => Note.Value + (octave*12);
 
         public bool Equals(Pitch other)
         {
@@ -43,18 +41,7 @@ namespace Sequencer.Domain
                 return true;
             }
 
-            return Note.Equals(other.Note) && (octave == other.octave);
-        }
-
-        public static Pitch CreatePitchFromMidiNumber(int value)
-        {
-            int noteValue = value%12;
-
-            int octave = (value - noteValue)/12;
-
-            Note note = Note.FromValue(noteValue);
-
-            return new Pitch(note, octave);
+            return Note.Equals(other.Note) && (Octave == other.Octave);
         }
 
         public override bool Equals(object obj)
@@ -68,13 +55,13 @@ namespace Sequencer.Domain
         {
             unchecked
             {
-                return (Note.GetHashCode()*397) ^ octave;
+                return (Note.GetHashCode()*397) ^ Octave;
             }
         }
 
         public override string ToString()
         {
-            return $"{Note}{octave}";
+            return $"{Note}{Octave}";
         }
     }
 }
