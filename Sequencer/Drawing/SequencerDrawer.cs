@@ -78,7 +78,7 @@ namespace Sequencer.Drawing
             {
                 double currentNotePosition = pointsPerNote*note;
 
-                int currentMidiNote = (SequencerSettings.TotalNotes + sequencerSettings.LowestPitchProtocolNumber) - note;
+                int currentMidiNote = (SequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.lowestPitch)) - note;
                 Pitch pitch = protocol.CreatePitchFromProtocolNumber(currentMidiNote - 1);
 
                 DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);

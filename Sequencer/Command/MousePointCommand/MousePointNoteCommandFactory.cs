@@ -15,7 +15,7 @@ namespace Sequencer.Command.MousePointCommand
             {
                 {NoteAction.Create, new CreateNoteFromPointCommand(sequencerCanvas, sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
                 {NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
-                {NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerCanvas, sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)}
+                {NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)}
             };
         }
 

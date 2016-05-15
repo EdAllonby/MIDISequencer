@@ -73,8 +73,8 @@ namespace Sequencer.Drawing
 
         private double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight)
         {
-            int pitchDelta = protocol.ProtocolNoteNumber(pitch) - sequencerSettings.LowestPitchProtocolNumber;
-            double relativePitchPosition = (noteHeight*pitchDelta) + noteHeight;
+            int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(sequencerSettings.lowestPitch, pitch);
+            double relativePitchPosition = (noteHeight*halfStepDifference) + noteHeight;
             return sequencerHeight - relativePitchPosition;
         }
 

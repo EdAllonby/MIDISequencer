@@ -39,6 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EnumerableType.cs" />
+    <Compile Include="FrequencyCalculator.cs" />
+    <Compile Include="PitchStepCalculator.cs" />
     <Compile Include="IDigitalAudioProtocol.cs" />
     <Compile Include="MidiProtocol.cs" />
     <Compile Include="Note.cs" />

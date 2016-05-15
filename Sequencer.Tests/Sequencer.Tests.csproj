@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="NoteTests.cs" />
     <Compile Include="MidiProtocolTests.cs" />
+    <Compile Include="PitchFrequencyTests.cs" />
     <Compile Include="PositionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

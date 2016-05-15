@@ -60,7 +60,7 @@ namespace Sequencer
         public Pitch FindPitchFromPoint(Point mousePosition)
         {
             int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
-            int absoluteMidiNumber = sequencerSettings.LowestPitchProtocolNumber + relativeMidiNumber;
+            int absoluteMidiNumber = protocol.ProtocolNoteNumber(sequencerSettings.lowestPitch) + relativeMidiNumber;
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }
 

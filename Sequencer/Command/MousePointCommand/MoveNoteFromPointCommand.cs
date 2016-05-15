@@ -12,7 +12,7 @@ namespace Sequencer.Command.MousePointCommand
         private int beatsDelta;
         private Point initialMousePitch;
         private Point initialMousePosition;
-        private int midiPitchDelta;
+        private int lastHalfStepDifference;
         private readonly IDigitalAudioProtocol protocol;
 
         public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
@@ -62,15 +62,15 @@ namespace Sequencer.Command.MousePointCommand
             Pitch initialPitch = SequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
             Pitch newPitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
-            int newMidiPitchDelta = protocol.ProtocolNoteNumber(newPitch) - protocol.ProtocolNoteNumber(initialPitch);
+            int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(initialPitch, newPitch);
 
-            if (newMidiPitchDelta != midiPitchDelta)
+            if (halfStepDifference != lastHalfStepDifference)
             {
-                midiPitchDelta = newMidiPitchDelta;
+                lastHalfStepDifference = halfStepDifference;
 
                 initialMousePitch = mousePoint;
 
-                var moveNotePitchCommand = new MoveNotePitchCommand(midiPitchDelta);
+                var moveNotePitchCommand = new MoveNotePitchCommand(lastHalfStepDifference);
                 moveNotePitchCommand.Execute(SequencerNotes.Where(note => note.NoteState == NoteState.Selected));
             }
         }

@@ -9,16 +9,14 @@ namespace Sequencer.Command
     public sealed class DeleteNotesCommand
     {
         private readonly ILog Log = LogManager.GetLogger(typeof(DeleteNotesCommand));
-        private readonly Canvas sequencerCanvas;
         private readonly List<VisualNote> sequencerNotes;
 
-        public DeleteNotesCommand([NotNull] Canvas sequencerCanvas, [NotNull] List<VisualNote> sequencerNotes)
+        public DeleteNotesCommand([NotNull] List<VisualNote> sequencerNotes)
         {
-            this.sequencerCanvas = sequencerCanvas;
             this.sequencerNotes = sequencerNotes;
         }
 
-        public void Execute(IEnumerable<VisualNote> notesToDelete)
+        public void Execute([NotNull] IEnumerable<VisualNote> notesToDelete)
         {
             foreach (VisualNote noteToDelete in notesToDelete)
             {

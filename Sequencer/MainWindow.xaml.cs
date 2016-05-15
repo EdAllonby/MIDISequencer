@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using log4net;
@@ -14,15 +13,11 @@ namespace Sequencer
     public partial class MainWindow
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
-        private readonly DeleteNotesCommand deleteNotesCommand;
 
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
-        private readonly MoveNotePitchCommand moveNoteDownCommand;
-        private readonly MoveNotePositionCommand moveNoteLeftCommand;
-        private readonly MoveNotePositionCommand moveNoteRightCommand;
-        private readonly MoveNotePitchCommand moveNoteUpCommand;
 
         private readonly List<VisualNote> notes = new List<VisualNote>();
+        private readonly SequencerKeyPressHandler keyPressHandler;
         private readonly UpdateNoteStateCommand selectNoteCommand;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerDrawer sequencerDrawer;
@@ -38,14 +33,9 @@ namespace Sequencer
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
-            deleteNotesCommand = new DeleteNotesCommand(SequencerCanvas, notes);
             selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
-            moveNoteLeftCommand = new MoveNotePositionCommand(-1);
-            moveNoteRightCommand = new MoveNotePositionCommand(1);
-            moveNoteUpCommand = new MoveNotePitchCommand(1);
-            moveNoteDownCommand = new MoveNotePitchCommand(-1);
-
+            keyPressHandler = new SequencerKeyPressHandler(notes);
 
             Log.Info("Main Window loaded");
         }
@@ -86,10 +76,13 @@ namespace Sequencer
             }
             if (ViewModel.NoteAction == NoteAction.Select)
             {
+                var noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, currentMousePosition);
+                
                 DragSelectionBox.UpdateDragSelectionBox(currentMousePosition);
 
                 if (!DragSelectionBox.IsDragging)
                 {
+                    Mouse.OverrideCursor = noteUnderMouse != null ? Cursors.Hand : null;
                     command?.Execute(currentMousePosition);
                 }
                 else
@@ -109,34 +102,7 @@ namespace Sequencer
 
         private void SequencerKeyPressed(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete)
-            {
-                deleteNotesCommand.Execute(notes.Where(x => x.NoteState == NoteState.Selected));
-            }
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && (e.Key == Key.A))
-            {
-                selectNoteCommand.Execute(notes);
-            }
-            if (e.Key == Key.Left)
-            {
-                moveNoteLeftCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
-            }
-            if (e.Key == Key.Right)
-            {
-                moveNoteRightCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
-            }
-            if (e.Key == Key.Up)
-            {
-                moveNoteUpCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
-            }
-            if (e.Key == Key.Down)
-            {
-                moveNoteDownCommand.Execute(notes.Where(note => note.NoteState == NoteState.Selected));
-            }
-            if (e.Key == Key.A)
-            {
-                Log.Info(SequencerCanvas.Children.Count);
-            }
+            keyPressHandler.HandleSequencerKeyPressed(e.Key);
         }
 
         private void SequencerMouseUp(object sender, MouseButtonEventArgs e)

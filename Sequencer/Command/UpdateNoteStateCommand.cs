@@ -10,23 +10,23 @@ namespace Sequencer.Command
     public sealed class UpdateNoteStateCommand
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
-        private readonly NoteState noteState;
+        private readonly NoteState newState;
 
         private readonly List<VisualNote> sequencerNotes;
 
-        public UpdateNoteStateCommand([NotNull] List<VisualNote> sequencerNotes, NoteState noteState)
+        public UpdateNoteStateCommand([NotNull] List<VisualNote> sequencerNotes, NoteState newState)
         {
             this.sequencerNotes = sequencerNotes;
-            this.noteState = noteState;
+            this.newState = newState;
         }
 
         public void Execute(IEnumerable<VisualNote> notesToChange)
         {
             foreach (VisualNote visualNote in notesToChange)
             {
-                if ((visualNote != null) && (visualNote.NoteState != noteState))
+                if ((visualNote != null) && (visualNote.NoteState != newState))
                 {
-                    visualNote.NoteState = noteState;
+                    visualNote.NoteState = newState;
 
                     Log.Info($"Visual note {visualNote} has been {visualNote.NoteState}");
                 }
