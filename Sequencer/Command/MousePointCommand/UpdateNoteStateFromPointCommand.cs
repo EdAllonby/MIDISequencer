@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
@@ -11,7 +10,7 @@ namespace Sequencer.Command.MousePointCommand
         private readonly UpdateNoteStateCommand noteStateSelectedCommand;
         private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
 
-        public UpdateNoteStateFromPointCommand([NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public UpdateNoteStateFromPointCommand([NotNull] SequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             noteStateSelectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Selected);
@@ -40,7 +39,7 @@ namespace Sequencer.Command.MousePointCommand
             }
             else if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                noteStateUnselectedCommand.Execute(SequencerNotes);
+                noteStateUnselectedCommand.Execute(SequencerNotes.SelectedNotes);
             }
         }
     }

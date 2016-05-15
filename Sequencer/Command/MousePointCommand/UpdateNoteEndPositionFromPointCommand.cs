@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
@@ -12,7 +10,7 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public sealed class UpdateNoteEndPositionFromPointCommand : MousePointNoteCommand
     {
-        public UpdateNoteEndPositionFromPointCommand([NotNull] List<VisualNote> sequencerNotes,
+        public UpdateNoteEndPositionFromPointCommand([NotNull] SequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
@@ -25,16 +23,12 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override void DoExecute(Point mousePosition)
         {
-            var selectedNotes = SequencerNotes.Where(note => note.NoteState == NoteState.Selected);
-
             Position currentEndPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
             Position nextPosition = currentEndPosition.NextPosition(SequencerSettings.TimeSignature);
 
-            VisualNote noteToUpdate = selectedNotes.FirstOrDefault();
-
-            if (noteToUpdate != null)
+            foreach (VisualNote selectedNote in SequencerNotes.SelectedNotes)
             {
-                noteToUpdate.EndPosition = nextPosition;
+                selectedNote.EndPosition = nextPosition;
             }
         }
     }

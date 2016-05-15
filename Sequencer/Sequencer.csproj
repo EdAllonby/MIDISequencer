@@ -81,6 +81,7 @@
     <Compile Include="SequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerDrawer.cs" />
     <Compile Include="SequencerKeyPressHandler.cs" />
+    <Compile Include="SequencerNotes.cs" />
     <Compile Include="SequencerSettings.cs" />
     <Compile Include="UnsafeNativeMethods.cs" />
     <Page Include="DragSelectionBox.xaml">

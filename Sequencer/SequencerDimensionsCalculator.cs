@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using JetBrains.Annotations;
@@ -41,7 +39,7 @@ namespace Sequencer
         /// </summary>
         public double BeatWidth => BarWidth/sequencerSettings.TimeSignature.BeatsPerBar;
 
-        public bool IsPointInsideNote(IEnumerable<VisualNote> sequencerNotes, Point mousePoint)
+        public bool IsPointInsideNote(SequencerNotes sequencerNotes, Point mousePoint)
         {
             return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
         }
@@ -70,16 +68,11 @@ namespace Sequencer
         /// <param name="sequencerNotes">The notes in the sequencer.</param>
         /// <param name="point">The position the mouse is relative to the sequencer.</param>
         /// <returns>The note a mouse is over.</returns>
-        public VisualNote FindNoteFromPoint([NotNull] IEnumerable<VisualNote> sequencerNotes, Point point)
+        public VisualNote FindNoteFromPoint([NotNull] SequencerNotes sequencerNotes, Point point)
         {
             Position mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);
-            return sequencerNotes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNote(mousePosition, mousePitch));
-        }
-
-        private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNote(Position mousePosition, Pitch mousePitch)
-        {
-            return visualNote => (visualNote.StartPosition <= mousePosition) && (visualNote.EndPosition > mousePosition) && visualNote.Pitch.Equals(mousePitch);
+            return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Sequencer.Command.MousePointCommand
     {
         private readonly Dictionary<NoteAction, MousePointNoteCommand> noteCommandRegistry;
 
-        public MousePointNoteCommandFactory(Canvas sequencerCanvas, List<VisualNote> sequencerNotes,
+        public MousePointNoteCommandFactory(Canvas sequencerCanvas, SequencerNotes sequencerNotes,
             SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             noteCommandRegistry = new Dictionary<NoteAction, MousePointNoteCommand>

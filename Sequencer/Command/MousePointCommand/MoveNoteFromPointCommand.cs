@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
@@ -13,14 +11,12 @@ namespace Sequencer.Command.MousePointCommand
         private Point initialMousePitch;
         private Point initialMousePosition;
         private int lastHalfStepDifference;
-        private readonly IDigitalAudioProtocol protocol;
 
-        public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] List<VisualNote> sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
+        public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] SequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             initialMousePosition = initialMousePoint;
             initialMousePitch = initialMousePoint;
-            protocol = sequencerSettings.Protocol;
         }
 
         protected override bool CanExecute()
@@ -53,7 +49,7 @@ namespace Sequencer.Command.MousePointCommand
                 initialMousePosition = mousePoint;
 
                 var moveNotePositionCommand = new MoveNotePositionCommand(beatsDelta);
-                moveNotePositionCommand.Execute(SequencerNotes.Where(note => note.NoteState == NoteState.Selected));
+                moveNotePositionCommand.Execute(SequencerNotes.SelectedNotes);
             }
         }
 
@@ -71,7 +67,7 @@ namespace Sequencer.Command.MousePointCommand
                 initialMousePitch = mousePoint;
 
                 var moveNotePitchCommand = new MoveNotePitchCommand(lastHalfStepDifference);
-                moveNotePitchCommand.Execute(SequencerNotes.Where(note => note.NoteState == NoteState.Selected));
+                moveNotePitchCommand.Execute(SequencerNotes.SelectedNotes);
             }
         }
     }

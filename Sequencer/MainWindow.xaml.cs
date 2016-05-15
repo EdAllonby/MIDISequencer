@@ -13,11 +13,10 @@ namespace Sequencer
     public partial class MainWindow
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
+        private readonly SequencerKeyPressHandler keyPressHandler;
 
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
-
-        private readonly List<VisualNote> notes = new List<VisualNote>();
-        private readonly SequencerKeyPressHandler keyPressHandler;
+        private readonly SequencerNotes notes;
         private readonly UpdateNoteStateCommand selectNoteCommand;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerDrawer sequencerDrawer;
@@ -30,6 +29,7 @@ namespace Sequencer
         {
             InitializeComponent();
             SizeChanged += WindowChanged;
+            notes = new SequencerNotes();
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
@@ -77,7 +77,7 @@ namespace Sequencer
             if (ViewModel.NoteAction == NoteAction.Select)
             {
                 var noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, currentMousePosition);
-                
+
                 DragSelectionBox.UpdateDragSelectionBox(currentMousePosition);
 
                 if (!DragSelectionBox.IsDragging)
@@ -87,7 +87,7 @@ namespace Sequencer
                 }
                 else
                 {
-                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes);
+                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes.All);
                     selectNoteCommand.Execute(containedNotes);
                 }
             }

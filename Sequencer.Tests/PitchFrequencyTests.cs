@@ -21,7 +21,7 @@ namespace Sequencer.Tests
             new object[] {new Pitch(Note.B, 3), 246.94},
             new object[] {new Pitch(Note.C, 4), 261.63},
             new object[] {new Pitch(Note.F, 6), 1396.91},
-            new object[] {new Pitch(Note.DSharp, 8), 4978.03 }
+            new object[] {new Pitch(Note.DSharp, 8), 4978.03}
         };
 
 

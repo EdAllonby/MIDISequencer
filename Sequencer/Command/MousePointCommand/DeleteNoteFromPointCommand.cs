@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using JetBrains.Annotations;
 
 namespace Sequencer.Command.MousePointCommand
@@ -8,7 +7,7 @@ namespace Sequencer.Command.MousePointCommand
     {
         private readonly DeleteNotesCommand deleteNotesCommand;
 
-        public DeleteNoteFromPointCommand([NotNull] List<VisualNote> sequencerNotes,
+        public DeleteNoteFromPointCommand([NotNull] SequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {

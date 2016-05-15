@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Controls;
 using JetBrains.Annotations;
 using log4net;
 
@@ -9,9 +7,9 @@ namespace Sequencer.Command
     public sealed class DeleteNotesCommand
     {
         private readonly ILog Log = LogManager.GetLogger(typeof(DeleteNotesCommand));
-        private readonly List<VisualNote> sequencerNotes;
+        private readonly SequencerNotes sequencerNotes;
 
-        public DeleteNotesCommand([NotNull] List<VisualNote> sequencerNotes)
+        public DeleteNotesCommand([NotNull] SequencerNotes sequencerNotes)
         {
             this.sequencerNotes = sequencerNotes;
         }
@@ -20,14 +18,8 @@ namespace Sequencer.Command
         {
             foreach (VisualNote noteToDelete in notesToDelete)
             {
-                if (noteToDelete != null)
-                {
-                    noteToDelete.Remove();
-                    Log.Info($"Visual note [{noteToDelete}] has been deleted.");
-                }
+                sequencerNotes.DeleteNote(noteToDelete);
             }
-
-            sequencerNotes.RemoveAll(notesToDelete.Contains);
         }
     }
 }

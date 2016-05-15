@@ -17,10 +17,10 @@ namespace Sequencer.Drawing
 
         private readonly Canvas sequencerCanvas;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly IEnumerable<VisualNote> sequencerNotes;
+        private readonly SequencerNotes sequencerNotes;
         private readonly SequencerSettings sequencerSettings;
 
-        public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] IEnumerable<VisualNote> sequencerNotes,
+        public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] SequencerNotes sequencerNotes,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
         {
             protocol = sequencerSettings.Protocol;
@@ -36,17 +36,9 @@ namespace Sequencer.Drawing
             DrawHorizontalSequencerLines();
             DrawVerticalSequencerLines();
             AddElements();
-            DrawNotes();
+            sequencerNotes.DrawNotes();
 
             Log.Debug("Sequencer redrawn");
-        }
-
-        private void DrawNotes()
-        {
-            foreach (VisualNote note in sequencerNotes)
-            {
-                note.Draw();
-            }
         }
 
         private void DrawVerticalSequencerLines()

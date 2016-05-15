@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
@@ -12,9 +11,9 @@ namespace Sequencer.Command
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
         private readonly NoteState newState;
 
-        private readonly List<VisualNote> sequencerNotes;
+        private readonly SequencerNotes sequencerNotes;
 
-        public UpdateNoteStateCommand([NotNull] List<VisualNote> sequencerNotes, NoteState newState)
+        public UpdateNoteStateCommand([NotNull] SequencerNotes sequencerNotes, NoteState newState)
         {
             this.sequencerNotes = sequencerNotes;
             this.newState = newState;
@@ -34,7 +33,7 @@ namespace Sequencer.Command
 
             if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                foreach (VisualNote visualNote in sequencerNotes.Except(notesToChange))
+                foreach (VisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesToChange))
                 {
                     if (visualNote.NoteState != NoteState.Unselected)
                     {
