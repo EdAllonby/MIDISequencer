@@ -68,7 +68,7 @@ namespace Sequencer.Command.MousePointCommand
 
                 initialMousePitch = mousePoint;
 
-                var moveNotePitchCommand = new MoveNotePitchCommand(beatsDelta);
+                var moveNotePitchCommand = new MoveNotePitchCommand(midiPitchDelta);
                 moveNotePitchCommand.Execute(SequencerNotes.Where(note => note.NoteState == NoteState.Selected));
             }
         }
