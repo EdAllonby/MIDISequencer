@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using Sequencer.Command;
-using Sequencer.Domain;
+using Sequencer.Command.NotesCommand;
+using Sequencer.View;
 
-namespace Sequencer
+namespace Sequencer.Command
 {
     /// <summary>
     /// Handles when a key is pressed.
     /// </summary>
-    public sealed class SequencerKeyPressHandler
+    public sealed class SequencerKeyPressCommandHandler
     {
-        private readonly SequencerNotes notes;
-
         private readonly IDictionary<Key, INotesCommand> noteCommandsForSelectedNotes;
+        private readonly SequencerNotes notes;
         private readonly UpdateNoteStateCommand selectNotesCommand;
-        public SequencerKeyPressHandler([NotNull] SequencerNotes notes)
+
+        public SequencerKeyPressCommandHandler([NotNull] SequencerNotes notes)
         {
             selectNotesCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
 

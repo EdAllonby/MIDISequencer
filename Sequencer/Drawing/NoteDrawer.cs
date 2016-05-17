@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.View;
 
 namespace Sequencer.Drawing
 {
@@ -12,11 +13,11 @@ namespace Sequencer.Drawing
         private static readonly ILog Log = LogManager.GetLogger(typeof(NoteDrawer));
 
         private readonly Rectangle noteRectangle;
-        private readonly Rectangle velocityRectangle;
         private readonly Canvas sequencer;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings;
         private readonly TimeSignature timeSignature;
+        private readonly Rectangle velocityRectangle;
 
         public NoteDrawer(Canvas sequencer, SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
@@ -63,11 +64,11 @@ namespace Sequencer.Drawing
 
             SetRectanglePosition(noteRectangle, noteStartLocation, noteStartHeight);
 
-            double velocityHeight = noteHeight * 0.3;
+            double velocityHeight = noteHeight*0.3;
             double velocityStartHeight = (noteStartHeight + (noteHeight/2)) - (velocityHeight/2);
 
             velocityRectangle.Height = velocityHeight;
-            velocityRectangle.Width = noteWidth * velocity.Volume;
+            velocityRectangle.Width = noteWidth*velocity.Volume;
 
             SetRectanglePosition(velocityRectangle, noteStartLocation, velocityStartHeight);
         }
@@ -84,7 +85,7 @@ namespace Sequencer.Drawing
                     break;
             }
         }
-        
+
         public bool IntersectsWith(Rect rectangle)
         {
             var noteRect = new Rect(Canvas.GetLeft(noteRectangle), Canvas.GetTop(noteRectangle), noteRectangle.Width, noteRectangle.Height);
@@ -100,7 +101,7 @@ namespace Sequencer.Drawing
 
         private double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight)
         {
-            int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(sequencerSettings.lowestPitch, pitch);
+            int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
             double relativePitchPosition = (noteHeight*halfStepDifference) + noteHeight;
             return sequencerHeight - relativePitchPosition;
         }

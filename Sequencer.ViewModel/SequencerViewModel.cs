@@ -1,5 +1,4 @@
 ﻿using log4net;
-using Sequencer.Domain;
 
 namespace Sequencer.ViewModel
 {

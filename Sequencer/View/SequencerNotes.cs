@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 
-namespace Sequencer
+namespace Sequencer.View
 {
     /// <summary>
     /// The notes contained in the sequencer.

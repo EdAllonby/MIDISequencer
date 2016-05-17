@@ -1,15 +1,17 @@
-﻿<Window x:Class="Sequencer.MainWindow"
+﻿<Window x:Class="Sequencer.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sequencer"
         xmlns:domain="clr-namespace:Sequencer.Domain;assembly=Sequencer.Domain"
+        xmlns:viewModel="clr-namespace:Sequencer.ViewModel;assembly=Sequencer.ViewModel"
+        xmlns:view="clr-namespace:Sequencer.View"
         DataContext="{StaticResource SequencerViewModel}"
         mc:Ignorable="d"
         Title="Sequencer" Height="500" Width="1200" KeyDown="SequencerKeyPressed">
     <Window.Resources>
-        <local:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+        <view:EnumToBoolConverter x:Key="EnumToBoolConverter" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -18,20 +20,20 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
-                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static domain:NoteAction.Select}}"
+                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static viewModel:NoteAction.Select}}"
                          Content="Select" IsTabStop="False" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
-                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static domain:NoteAction.Create}}"
+                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static viewModel:NoteAction.Create}}"
                          Content="Create" IsTabStop="False" />
             <RadioButton Style="{StaticResource {x:Type ToggleButton}}"
-                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static domain:NoteAction.Delete}}"
+                         IsChecked="{Binding Path=NoteAction, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static viewModel:NoteAction.Delete}}"
                          Content="Delete" IsTabStop="False" />
         </StackPanel>
 
         <Grid x:Name="SequencerGrid" Grid.Column="1" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown"
               MouseUp="SequencerMouseUp">
             <Canvas x:Name="SequencerCanvas" />
-            <local:DragSelectionBox x:Name="DragSelectionBox" />
+            <view:DragSelectionBox x:Name="DragSelectionBox" />
         </Grid>
     </Grid>
 </Window>

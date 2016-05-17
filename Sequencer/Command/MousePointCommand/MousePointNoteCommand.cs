@@ -1,5 +1,8 @@
 ﻿using System.Windows;
 using JetBrains.Annotations;
+using Sequencer.Domain;
+using Sequencer.Drawing;
+using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
 {

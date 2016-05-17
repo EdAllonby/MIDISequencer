@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 using Sequencer.Domain;
+using Sequencer.Drawing;
+using Sequencer.View;
+using Sequencer.ViewModel;
 
 namespace Sequencer.Command.MousePointCommand
 {

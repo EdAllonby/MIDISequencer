@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace Sequencer
+namespace Sequencer.Console
 {
     /// <summary>
     /// Manages a console window in a windows application.
@@ -55,7 +55,7 @@ namespace Sequencer
 
         private static void InvalidateOutAndError()
         {
-            Type type = typeof(Console);
+            Type type = typeof(System.Console);
 
             FieldInfo consoleOut = type.GetField("_out",
                 BindingFlags.Static | BindingFlags.NonPublic);
@@ -79,8 +79,8 @@ namespace Sequencer
 
         private static void SetOutAndErrorNull()
         {
-            Console.SetOut(TextWriter.Null);
-            Console.SetError(TextWriter.Null);
+            System.Console.SetOut(TextWriter.Null);
+            System.Console.SetError(TextWriter.Null);
         }
     }
 }

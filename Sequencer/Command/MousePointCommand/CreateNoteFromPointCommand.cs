@@ -3,6 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Drawing;
+using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
 {
@@ -33,7 +35,7 @@ namespace Sequencer.Command.MousePointCommand
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
 
-            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings, 
+            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings,
                 new Velocity(64), notePosition, defaultEndPosition, pitch);
 
             SequencerNotes.AddNote(newNote);

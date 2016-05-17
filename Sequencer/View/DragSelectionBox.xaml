@@ -1,4 +1,4 @@
-﻿<Canvas x:Class="Sequencer.DragSelectionBox"
+﻿<Canvas x:Class="Sequencer.View.DragSelectionBox"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Visibility="Collapsed">

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using log4net;
+using Sequencer.View;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.NotesCommand
 {
     public sealed class DeleteNotesCommand : INotesCommand
     {

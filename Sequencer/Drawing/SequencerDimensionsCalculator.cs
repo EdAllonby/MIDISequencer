@@ -3,8 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.View;
 
-namespace Sequencer
+namespace Sequencer.Drawing
 {
     public sealed class SequencerDimensionsCalculator
     {
@@ -58,7 +59,7 @@ namespace Sequencer
         public Pitch FindPitchFromPoint(Point mousePosition)
         {
             int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
-            int absoluteMidiNumber = protocol.ProtocolNoteNumber(sequencerSettings.lowestPitch) + relativeMidiNumber;
+            int absoluteMidiNumber = protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch) + relativeMidiNumber;
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }
 

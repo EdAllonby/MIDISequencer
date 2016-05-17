@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Sequencer
+namespace Sequencer.View
 {
     /// <summary>
     /// An element which is aware of its position.

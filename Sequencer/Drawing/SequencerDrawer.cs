@@ -6,6 +6,7 @@ using System.Windows.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.View;
 
 namespace Sequencer.Drawing
 {
@@ -70,7 +71,7 @@ namespace Sequencer.Drawing
             {
                 double currentNotePosition = pointsPerNote*note;
 
-                int currentMidiNote = (SequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.lowestPitch)) - note;
+                int currentMidiNote = (SequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch)) - note;
                 Pitch pitch = protocol.CreatePitchFromProtocolNumber(currentMidiNote - 1);
 
                 DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);

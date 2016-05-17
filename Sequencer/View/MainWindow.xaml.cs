@@ -4,16 +4,17 @@ using System.Windows.Input;
 using log4net;
 using Sequencer.Command;
 using Sequencer.Command.MousePointCommand;
+using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.ViewModel;
 
-namespace Sequencer
+namespace Sequencer.View
 {
     public partial class MainWindow
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
-        private readonly SequencerKeyPressHandler keyPressHandler;
+        private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
 
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
         private readonly SequencerNotes notes;
@@ -35,7 +36,7 @@ namespace Sequencer
             updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
-            keyPressHandler = new SequencerKeyPressHandler(notes);
+            keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes);
 
             Log.Info("Main Window loaded");
         }
@@ -102,7 +103,7 @@ namespace Sequencer
 
         private void SequencerKeyPressed(object sender, KeyEventArgs e)
         {
-            keyPressHandler.HandleSequencerKeyPressed(e.Key);
+            keyPressCommandHandler.HandleSequencerKeyPressed(e.Key);
         }
 
         private void SequencerMouseUp(object sender, MouseButtonEventArgs e)

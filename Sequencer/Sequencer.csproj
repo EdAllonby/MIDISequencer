@@ -59,37 +59,36 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Command\INotesCommand.cs" />
+    <Compile Include="Command\NotesCommand\INotesCommand.cs" />
     <Compile Include="Command\MousePointCommand\CreateNoteFromPointCommand.cs" />
-    <Compile Include="Command\DeleteNotesCommand.cs" />
+    <Compile Include="Command\NotesCommand\DeleteNotesCommand.cs" />
     <Compile Include="Command\MousePointCommand\DeleteNoteFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\IMousePointNoteCommand.cs" />
     <Compile Include="Command\MousePointCommand\MoveNoteFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\MousePointNoteCommand.cs" />
     <Compile Include="Command\MousePointCommand\MousePointNoteCommandFactory.cs" />
-    <Compile Include="Command\MoveNotePitchCommand.cs" />
-    <Compile Include="Command\MoveNotePositionCommand.cs" />
-    <Compile Include="Command\UpdateNoteStateCommand.cs" />
+    <Compile Include="Command\NotesCommand\MoveNotePitchCommand.cs" />
+    <Compile Include="Command\NotesCommand\MoveNotePositionCommand.cs" />
+    <Compile Include="Command\NotesCommand\UpdateNoteStateCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromPointCommand.cs" />
-    <Compile Include="ConsoleManager.cs" />
-    <Compile Include="DragSelectionBox.xaml.cs">
+    <Compile Include="Console\ConsoleManager.cs" />
+    <Compile Include="View\DragSelectionBox.xaml.cs">
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EnumToBoolConverter.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="IPositionAware.cs" />
-    <Compile Include="SequencerDimensionsCalculator.cs" />
+    <Compile Include="View\EnumToBoolConverter.cs" />
+    <Compile Include="View\IPositionAware.cs" />
+    <Compile Include="View\NoteState.cs" />
+    <Compile Include="Drawing\SequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerDrawer.cs" />
-    <Compile Include="SequencerKeyPressHandler.cs" />
-    <Compile Include="SequencerNotes.cs" />
-    <Compile Include="SequencerSettings.cs" />
-    <Compile Include="UnsafeNativeMethods.cs" />
-    <Page Include="DragSelectionBox.xaml">
+    <Compile Include="Command\SequencerKeyPressCommandHandler.cs" />
+    <Compile Include="View\SequencerNotes.cs" />
+    <Compile Include="Console\UnsafeNativeMethods.cs" />
+    <Page Include="View\DragSelectionBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -97,13 +96,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="VisualNote.cs" />
+    <Compile Include="View\VisualNote.cs" />
     <Compile Include="Drawing\NoteDrawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

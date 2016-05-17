@@ -2,6 +2,8 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Drawing;
+using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
 {

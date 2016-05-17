@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Sequencer
+namespace Sequencer.View
 {
     /// <summary>
     /// Support WPF selections based on enum values.

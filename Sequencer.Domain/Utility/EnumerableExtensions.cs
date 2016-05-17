@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Sequencer
+namespace Sequencer.Domain.Utility
 {
     public static class EnumerableExtensions
     {

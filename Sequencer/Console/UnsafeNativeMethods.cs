@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Sequencer
+namespace Sequencer.Console
 {
     /// <summary>
     /// Holds unsafe P/Invoke calls.

@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
+using Sequencer.View;
 
-namespace Sequencer.Command
+namespace Sequencer.Command.NotesCommand
 {
     public sealed class MoveNotePitchCommand : INotesCommand
     {
-        private readonly int pitchesToMove;
+        private readonly int halfStepsToMove;
 
-        public MoveNotePitchCommand(int pitchesToMove)
+        public MoveNotePitchCommand(int halfStepsToMove)
         {
-            this.pitchesToMove = pitchesToMove;
+            this.halfStepsToMove = halfStepsToMove;
         }
 
         public void Execute(IEnumerable<VisualNote> notes)
         {
             foreach (VisualNote visualNote in notes)
             {
-                visualNote.MovePitchRelativeTo(pitchesToMove);
+                visualNote.MovePitchRelativeTo(halfStepsToMove);
             }
         }
     }

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 
-namespace Sequencer
+namespace Sequencer.View
 {
     public sealed class VisualNote : IPositionAware
     {
@@ -75,7 +75,7 @@ namespace Sequencer
             get { return endPosition; }
             set
             {
-                if (value != null && !EndPosition.Equals(value) && (value > StartPosition))
+                if ((value != null) && !EndPosition.Equals(value) && (value > StartPosition))
                 {
                     endPosition = value;
                     Draw();
@@ -96,16 +96,27 @@ namespace Sequencer
             }
         }
 
+        /// <summary>
+        /// Checks if this visual note intersects with another rectangle.
+        /// </summary>
+        /// <param name="rectangle">The rectangle to check if this visual note intersects.</param>
+        /// <returns>If this visual note intersects with the rectangle.</returns>
         public bool IntersectsWith(Rect rectangle)
         {
             return noteDrawer.IntersectsWith(rectangle);
         }
 
+        /// <summary>
+        /// Draws this visual note onto its canvas.
+        /// </summary>
         public void Draw()
         {
             noteDrawer.DrawNote(Pitch, Velocity, StartPosition, EndPosition, noteState);
         }
 
+        /// <summary>
+        /// Remove this visual note from its canvas.
+        /// </summary>
         public void Remove()
         {
             noteDrawer.RemoveNote();
@@ -116,16 +127,24 @@ namespace Sequencer
             return $"Pitch: {Pitch}, Start Position: {StartPosition}, End Position: {EndPosition}";
         }
 
+        /// <summary>
+        /// Moves the start and end positions of this visual note.
+        /// </summary>
+        /// <param name="beatsToMove">How many beats to move this visual note.</param>
         public void MovePositionRelativeTo(int beatsToMove)
         {
             StartPosition = StartPosition.PositionRelativeByBeats(beatsToMove, sequencerSettings.TimeSignature);
             EndPosition = EndPosition.PositionRelativeByBeats(beatsToMove, sequencerSettings.TimeSignature);
         }
 
-        public void MovePitchRelativeTo(int pitchesToMove)
+        /// <summary>
+        /// Moves the pitch of this visual note.
+        /// </summary>
+        /// <param name="halfStepsToMove">How many half steps to move this visual note.</param>
+        public void MovePitchRelativeTo(int halfStepsToMove)
         {
             int midiNoteNumber = protocol.ProtocolNoteNumber(pitch);
-            Pitch = protocol.CreatePitchFromProtocolNumber(midiNoteNumber + pitchesToMove);
+            Pitch = protocol.CreatePitchFromProtocolNumber(midiNoteNumber + halfStepsToMove);
         }
     }
 }

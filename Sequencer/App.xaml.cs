@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using log4net.Config;
+using Sequencer.Console;
 
 namespace Sequencer
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using JetBrains.Annotations;
 
-namespace Sequencer
+namespace Sequencer.View
 {
     /// <summary>
     /// Interaction logic for DragSelectionBox.xaml

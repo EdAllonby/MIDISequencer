@@ -1,7 +1,6 @@
 ﻿using System.Windows.Media;
-using Sequencer.Domain;
 
-namespace Sequencer
+namespace Sequencer.Domain
 {
     /// <summary>
     /// Holds the sequencer's currently assigned settings.
@@ -11,7 +10,7 @@ namespace Sequencer
         // Musical definitions
         public const int TotalNotes = 32;
         public const int TotalMeasures = 4;
-        public readonly Pitch lowestPitch = new Pitch(Note.A, 2);
+        public readonly Pitch LowestPitch = new Pitch(Note.A, 2);
         public readonly IDigitalAudioProtocol Protocol = new MidiProtocol();
         public readonly TimeSignature TimeSignature = new TimeSignature(4, 4);
 
