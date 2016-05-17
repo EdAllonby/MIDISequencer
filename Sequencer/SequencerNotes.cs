@@ -61,8 +61,13 @@ namespace Sequencer
         /// Delete a note from the sequencer.
         /// </summary>
         /// <param name="noteToDelete">The note to delete from the sequencer.</param>
-        public void DeleteNote([NotNull] VisualNote noteToDelete)
+        public void DeleteNote(VisualNote noteToDelete)
         {
+            if (noteToDelete == null)
+            {
+                return;
+            }
+
             noteToDelete.Remove();
             notes.Remove(noteToDelete);
             Log.Info($"Visual note [{noteToDelete}] has been deleted.");

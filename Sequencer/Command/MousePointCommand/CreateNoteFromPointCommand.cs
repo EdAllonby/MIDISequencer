@@ -33,7 +33,9 @@ namespace Sequencer.Command.MousePointCommand
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
 
-            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings, notePosition, defaultEndPosition, pitch);
+            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings, 
+                new Velocity(64), notePosition, defaultEndPosition, pitch);
+
             SequencerNotes.AddNote(newNote);
         }
 
