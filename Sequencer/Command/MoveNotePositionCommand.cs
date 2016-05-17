@@ -2,7 +2,7 @@
 
 namespace Sequencer.Command
 {
-    public sealed class MoveNotePositionCommand
+    public sealed class MoveNotePositionCommand : INotesCommand
     {
         private readonly int beatsToMove;
 

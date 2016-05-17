@@ -6,7 +6,7 @@ using Sequencer.Domain;
 
 namespace Sequencer.Command
 {
-    public sealed class UpdateNoteStateCommand
+    public sealed class UpdateNoteStateCommand : INotesCommand
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
         private readonly NoteState newState;

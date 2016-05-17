@@ -2,7 +2,7 @@
 
 namespace Sequencer.Command
 {
-    public sealed class MoveNotePitchCommand
+    public sealed class MoveNotePitchCommand : INotesCommand
     {
         private readonly int pitchesToMove;
 

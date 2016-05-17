@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\INotesCommand.cs" />
     <Compile Include="Command\MousePointCommand\CreateNoteFromPointCommand.cs" />
     <Compile Include="Command\DeleteNotesCommand.cs" />
     <Compile Include="Command\MousePointCommand\DeleteNoteFromPointCommand.cs" />

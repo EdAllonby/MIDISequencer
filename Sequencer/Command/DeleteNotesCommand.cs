@@ -4,9 +4,8 @@ using log4net;
 
 namespace Sequencer.Command
 {
-    public sealed class DeleteNotesCommand
+    public sealed class DeleteNotesCommand : INotesCommand
     {
-        private readonly ILog Log = LogManager.GetLogger(typeof(DeleteNotesCommand));
         private readonly SequencerNotes sequencerNotes;
 
         public DeleteNotesCommand([NotNull] SequencerNotes sequencerNotes)
