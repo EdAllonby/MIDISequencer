@@ -24,7 +24,7 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute()
         {
-            return Mouse.RightButton == MouseButtonState.Pressed;
+            return Mouse.LeftButton == MouseButtonState.Pressed;
         }
 
         protected override void DoExecute(Point mousePoint)

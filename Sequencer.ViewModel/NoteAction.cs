@@ -1,23 +1,16 @@
-﻿namespace Sequencer.ViewModel
+﻿using System.Drawing;
+using Sequencer.ViewModel.Properties;
+
+namespace Sequencer.ViewModel
 {
-    /// <summary>
-    /// Actions a note can take.
-    /// </summary>
-    public enum NoteAction
+    public class NoteAction : VisualEnumerableType<NoteAction>
     {
-        /// <summary>
-        /// Allow to select and reposition a note.
-        /// </summary>
-        Select,
+        [UsedImplicitly] public static readonly NoteAction Select = new NoteAction(1, "Select", Resources.Move);
+        [UsedImplicitly] public static readonly NoteAction Create = new NoteAction(2, "Create", Resources.Create);
+        [UsedImplicitly] public static readonly NoteAction Delete = new NoteAction(3, "Delete", Resources.Delete);
 
-        /// <summary>
-        /// Allow to create a new note.
-        /// </summary>
-        Create,
-
-        /// <summary>
-        /// Allow to delete a note.
-        /// </summary>
-        Delete
+        private NoteAction(int value, string displayName, Bitmap visual) : base(value, displayName, visual)
+        {
+        }
     }
 }

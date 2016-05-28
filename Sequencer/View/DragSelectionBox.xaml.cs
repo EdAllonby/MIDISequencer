@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using JetBrains.Annotations;
 
 namespace Sequencer.View
@@ -87,14 +88,15 @@ namespace Sequencer.View
             if (IsDragging)
             {
                 Rect selectionBox = GetSelectionBox();
-                matches.AddRange(possibleMatches.Where(element => element.IntersectsWith(selectionBox)));
+                var selectionBoxGeometry = new RectangleGeometry(selectionBox);
+                matches.AddRange(possibleMatches.Where(element => element.IntersectsWith(selectionBoxGeometry)));
             }
 
             return matches;
         }
 
         /// <summary>
-        /// Remove the selection box.
+        /// RemoveWithFade the selection box.
         /// </summary>
         public void CloseSelectionBox()
         {

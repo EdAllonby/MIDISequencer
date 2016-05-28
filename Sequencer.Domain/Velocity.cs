@@ -1,4 +1,4 @@
-﻿using Sequencer.Domain.Utility;
+﻿using Sequencer.Utilities;
 
 namespace Sequencer.Domain
 {

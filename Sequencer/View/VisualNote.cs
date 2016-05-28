@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
+using System.Windows.Media;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
@@ -99,11 +99,11 @@ namespace Sequencer.View
         /// <summary>
         /// Checks if this visual note intersects with another rectangle.
         /// </summary>
-        /// <param name="rectangle">The rectangle to check if this visual note intersects.</param>
+        /// <param name="geometry">The rectangle to check if this visual note intersects.</param>
         /// <returns>If this visual note intersects with the rectangle.</returns>
-        public bool IntersectsWith(Rect rectangle)
+        public bool IntersectsWith(Geometry geometry)
         {
-            return noteDrawer.IntersectsWith(rectangle);
+            return noteDrawer.IntersectsWith(geometry.Bounds);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Sequencer.View
         }
 
         /// <summary>
-        /// Remove this visual note from its canvas.
+        /// RemoveWithFade this visual note from its canvas.
         /// </summary>
         public void Remove()
         {

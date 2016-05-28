@@ -45,6 +45,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml">
@@ -73,6 +74,7 @@
     <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromPointCommand.cs" />
     <Compile Include="Console\ConsoleManager.cs" />
+    <Compile Include="View\BitmapConverter.cs" />
     <Compile Include="View\DragSelectionBox.xaml.cs">
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>
@@ -82,6 +84,11 @@
     <Compile Include="Drawing\SequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerDrawer.cs" />
     <Compile Include="Command\SequencerKeyPressCommandHandler.cs" />
+    <Compile Include="View\RadialContextMenu\ContextMenuSegment.cs" />
+    <Compile Include="View\RadialContextMenu\RadialCursorLine.cs" />
+    <Compile Include="View\RadialContextMenu\Animator.cs" />
+    <Compile Include="View\RadialContextMenu\NoteActionRadialContextMenuWrapper.cs" />
+    <Compile Include="View\RadialContextMenu\RadialContextMenu.cs" />
     <Compile Include="View\SequencerNotes.cs" />
     <Compile Include="Console\UnsafeNativeMethods.cs" />
     <Page Include="View\DragSelectionBox.xaml">
@@ -141,6 +148,10 @@
     <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
       <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
       <Name>Sequencer.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
+      <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
+      <Name>Sequencer.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj">
       <Project>{68A8D4A6-B8EE-4684-8F1B-21B686014069}</Project>

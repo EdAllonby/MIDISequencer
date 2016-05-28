@@ -1,4 +1,4 @@
-﻿using System.Windows;
+﻿using System.Windows.Media;
 
 namespace Sequencer.View
 {
@@ -10,8 +10,8 @@ namespace Sequencer.View
         /// <summary>
         /// Is the element intersecting with a rectangle?
         /// </summary>
-        /// <param name="rectangle">The rectangle to check intersection.</param>
+        /// <param name="geometry">The rectangle to check intersection.</param>
         /// <returns>If the element intersects with the rectangle.</returns>
-        bool IntersectsWith(Rect rectangle);
+        bool IntersectsWith(Geometry geometry);
     }
 }

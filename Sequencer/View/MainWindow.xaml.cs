@@ -52,15 +52,24 @@ namespace Sequencer.View
         {
             Point mouseDownPoint = CurrentMousePosition(e);
 
-            if ((e.ChangedButton == MouseButton.Left) && !sequencerDimensionsCalculator.IsPointInsideNote(notes, mouseDownPoint)
-                && (ViewModel.NoteAction == NoteAction.Select))
+            switch (e.ChangedButton)
             {
-                DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
-            }
+                case MouseButton.Left:
+                    if (!sequencerDimensionsCalculator.IsPointInsideNote(notes, mouseDownPoint)
+                        && (ViewModel.NoteAction == NoteAction.Select))
+                    {
+                        DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
+                    }
 
-            MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(ViewModel.NoteAction);
-            command = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
-            noteCommand.Execute(mouseDownPoint);
+                    MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(ViewModel.NoteAction);
+                    command = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+                    noteCommand.Execute(mouseDownPoint);
+                    break;
+
+                case MouseButton.Right:
+                    RadialContextMenu.BuildPopup(mouseDownPoint);
+                    break;
+            }
 
             SequencerGrid.CaptureMouse();
 
@@ -70,6 +79,12 @@ namespace Sequencer.View
         private void SequencerMouseMoved(object sender, MouseEventArgs e)
         {
             Point currentMousePosition = CurrentMousePosition(e);
+
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                RadialContextMenu.SetCursorPosition(currentMousePosition);
+                return;
+            }
 
             if (ViewModel.NoteAction == NoteAction.Create)
             {
@@ -108,9 +123,14 @@ namespace Sequencer.View
 
         private void SequencerMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left)
+            switch (e.ChangedButton)
             {
-                DragSelectionBox.CloseSelectionBox();
+                case MouseButton.Left:
+                    DragSelectionBox.CloseSelectionBox();
+                    break;
+                case MouseButton.Right:
+                    RadialContextMenu.ClosePopup();
+                    break;
             }
 
             SequencerGrid.ReleaseMouseCapture();

@@ -3,8 +3,8 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
-using Sequencer.Domain.Utility;
 using Sequencer.Drawing;
+using Sequencer.Utilities;
 using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand

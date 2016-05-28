@@ -27,12 +27,21 @@ namespace Sequencer.Domain
             Value = value;
             DisplayName = displayName;
 
+            if (ElementsById.ContainsKey(value))
+            {
+                throw new ArgumentException($"Value {value} already exists for element {typeof(TElement)}.");
+            }
+
             ElementsById.Add(value, (TElement) this);
         }
+
+        public static int Count => ElementsById.Count;
 
         public int Value { get; }
 
         public string DisplayName { get; }
+
+        public static IEnumerable<TElement> All => ElementsById.Values;
 
         public static TElement FromValue(int value)
         {

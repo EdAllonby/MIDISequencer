@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.ViewModel", "Sequ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.Domain", "Sequencer.Domain\Sequencer.Domain.csproj", "{2F107EEB-5405-4D9A-A21E-866FBD9E697B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.Utilities", "Sequencer.Utilities\Sequencer.Utilities.csproj", "{00083716-D3DB-46FE-9E9F-083FF0C77CBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F107EEB-5405-4D9A-A21E-866FBD9E697B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00083716-D3DB-46FE-9E9F-083FF0C77CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00083716-D3DB-46FE-9E9F-083FF0C77CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00083716-D3DB-46FE-9E9F-083FF0C77CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00083716-D3DB-46FE-9E9F-083FF0C77CBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
