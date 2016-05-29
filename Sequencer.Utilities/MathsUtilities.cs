@@ -30,8 +30,10 @@ namespace Sequencer.Utilities
         {
             try
             {
-                double x = origin.X + GetRectangularLength(radius, degrees);
-                double y = origin.Y + GetRectangularHeight(radius, degrees);
+                double degreesInRadians = ToRadians(degrees);
+
+                double x = origin.X + (radius*Math.Cos(degreesInRadians));
+                double y = origin.Y + (radius*Math.Sin(degreesInRadians));
 
                 return new Point(x, y);
             }
@@ -41,16 +43,6 @@ namespace Sequencer.Utilities
                 ex.Data.Add("Screen polar Theta", degrees);
                 throw;
             }
-        }
-
-        public static double GetRectangularHeight(double radius, double degrees)
-        {
-            return radius*Math.Sin(ToRadians(degrees));
-        }
-
-        public static double GetRectangularLength(double radius, double degrees)
-        {
-            return radius*Math.Cos(ToRadians(degrees));
         }
 
         private static double ToRadians(double degrees)

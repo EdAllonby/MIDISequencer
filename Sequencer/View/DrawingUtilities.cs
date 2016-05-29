@@ -1,15 +1,19 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using JetBrains.Annotations;
+using Point = System.Windows.Point;
 
 namespace Sequencer.View
 {
-    public static class BitmapConverter
+    public static class DrawingUtilities
     {
         public static BitmapImage ToBitmapImage(this Bitmap bitmap)
         {
-            using (MemoryStream memory = new MemoryStream())
+            using (var memory = new MemoryStream())
             {
                 bitmap.Save(memory, ImageFormat.Png);
                 memory.Position = 0;
@@ -20,6 +24,12 @@ namespace Sequencer.View
                 bitmapImage.EndInit();
                 return bitmapImage;
             }
+        }
+
+        public static void SetCentreOnCanvas([NotNull] this FrameworkElement frameworkElement, Point startingPoint)
+        {
+            Canvas.SetLeft(frameworkElement, startingPoint.X - (frameworkElement.Width/2));
+            Canvas.SetTop(frameworkElement, startingPoint.Y - (frameworkElement.Height/2));
         }
     }
 }

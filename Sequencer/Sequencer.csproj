@@ -74,7 +74,7 @@
     <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromPointCommand.cs" />
     <Compile Include="Console\ConsoleManager.cs" />
-    <Compile Include="View\BitmapConverter.cs" />
+    <Compile Include="View\DrawingUtilities.cs" />
     <Compile Include="View\DragSelectionBox.xaml.cs">
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>

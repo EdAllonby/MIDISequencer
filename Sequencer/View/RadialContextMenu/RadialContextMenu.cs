@@ -83,11 +83,15 @@ namespace Sequencer.View.RadialContextMenu
             foreach (TMenuItem menuItem in EnumerableType<TMenuItem>.All)
             {
                 double angle = (AngleSize/2) + (AngleSize*menuItem.Value);
-                Point lineEndPoint = MathsUtilities.PolarToRectangular(point, MenuRadius, angle - 90);
+
+                // We want to start calculating where the azimuth is on the Y axis.
+                // So, we tranlate all angles by -90 degrees to rotate from X to Y.
+                double startAngle = angle - 90;
+                Point lineEndPoint = MathsUtilities.PolarToRectangular(point, MenuRadius, startAngle);
 
                 Line seperatorLine = CreateSeperatorLine(point, lineEndPoint);
 
-                segments.Add(new ContextMenuSegment<TMenuItem>(menuItem, point, MenuRadius, angle, AngleSize));
+                segments.Add(new ContextMenuSegment<TMenuItem>(menuItem, point, MenuRadius, startAngle, AngleSize));
 
                 menuSeperators.Add(seperatorLine);
             }

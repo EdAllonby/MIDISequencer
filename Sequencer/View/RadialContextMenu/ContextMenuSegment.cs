@@ -10,41 +10,50 @@ namespace Sequencer.View.RadialContextMenu
 {
     public sealed class ContextMenuSegment<TMenuItem> : Canvas, IPositionAware where TMenuItem : VisualEnumerableType<TMenuItem>
     {
+        private readonly Path segmentShape = new Path();
         private readonly Color selectedColor = Colors.CornflowerBlue;
-        private readonly Path shape = new Path();
         private readonly Color unselectedColor = Colors.LightSteelBlue;
 
+        /// <summary>
+        /// Creates a visual context menu segment.
+        /// </summary>
+        /// <param name="menuItem">The item to draw.</param>
+        /// <param name="startingPoint">The starting position.</param>
+        /// <param name="menuRadius">The radius of the menu.</param>
+        /// <param name="startAngle">The starting angle to start drawing.</param>
+        /// <param name="angle">The size of the segment in degrees.</param>
         public ContextMenuSegment(TMenuItem menuItem, Point startingPoint, double menuRadius, double startAngle, double angle)
         {
+            // This uses 3 points to create the segment. The starting point, the beginning of the arc point, and the end of the arc point.
+            // This will create the segment geometry we can use to draw the shape.
+
             MenuItem = menuItem;
             double endAngle = startAngle + angle;
 
             // path container
-            var figureP = new Point(menuRadius, menuRadius);
             var pathData = new PathFigure
             {
-                StartPoint = figureP,
+                StartPoint = startingPoint,
                 IsClosed = true
             };
 
             //  start angle line
-            double lineX = menuRadius + MathsUtilities.GetRectangularHeight(menuRadius, startAngle);
-            double lineY = menuRadius - MathsUtilities.GetRectangularLength(menuRadius, startAngle);
-            var line = new LineSegment {Point = new Point(lineX, lineY)};
-            pathData.Segments.Add(line);
+            Point arcStartPosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius, startAngle);
+
+            var lineToArc = new LineSegment {Point = arcStartPosition};
+
+            pathData.Segments.Add(lineToArc);
 
             // outer arc
-            double arcX = menuRadius + MathsUtilities.GetRectangularHeight(menuRadius, endAngle);
-            double arcY = menuRadius - MathsUtilities.GetRectangularLength(menuRadius, endAngle);
-            var arcP = new Point(arcX, arcY);
+            Point arcEndPosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius, endAngle);
 
-            var arcS = new Size(menuRadius, menuRadius);
+            var arcSize = new Size(menuRadius, menuRadius);
 
             var arc = new ArcSegment
             {
                 IsLargeArc = angle >= 180.0,
-                Point = arcP,
-                Size = arcS,
+                Point = arcEndPosition,
+                Size = arcSize,
                 SweepDirection = SweepDirection.Clockwise
             };
 
@@ -52,30 +61,30 @@ namespace Sequencer.View.RadialContextMenu
 
             var pathGeometry = new PathGeometry
             {
-                Figures = {pathData},
-                Transform = new TranslateTransform(startingPoint.X - menuRadius, startingPoint.Y - menuRadius)
+                Figures = {pathData}
             };
 
-            shape.Data = pathGeometry;
-            Children.Add(shape);
+            segmentShape.Data = pathGeometry;
+            Children.Add(segmentShape);
 
-            double imageSize = Math.Min(pathGeometry.Bounds.Width, pathGeometry.Bounds.Height);
-            var menuItemVisual = new Image
+            double segmentIconSize = Math.Min(pathGeometry.Bounds.Width, pathGeometry.Bounds.Height);
+            var segmentIcon = new Image
             {
                 Source = MenuItem.Visual.ToBitmapImage(),
                 Stretch = Stretch.Fill,
-                Height = imageSize*0.7,
-                Width = imageSize*0.7
+                Height = segmentIconSize*0.7,
+                Width = segmentIconSize*0.7
             };
 
-            RenderOptions.SetBitmapScalingMode(menuItemVisual, BitmapScalingMode.Fant);
+            RenderOptions.SetBitmapScalingMode(segmentIcon, BitmapScalingMode.Fant);
 
-            double imageX = MathsUtilities.GetRectangularHeight(menuRadius*0.5, startAngle + (angle/2));
-            double imageY = -MathsUtilities.GetRectangularLength(menuRadius*0.5, startAngle + (angle/2));
+            Children.Add(segmentIcon);
 
-            Children.Add(menuItemVisual);
-            SetLeft(menuItemVisual, imageX + (startingPoint.X - (menuItemVisual.Width/2)));
-            SetTop(menuItemVisual, imageY + (startingPoint.Y - (menuItemVisual.Height/2)));
+            double midAngle = endAngle - (angle/2);
+
+            Point imagePosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius*0.5, midAngle);
+
+            segmentIcon.SetCentreOnCanvas(imagePosition);
 
             Unselect();
         }
@@ -86,18 +95,18 @@ namespace Sequencer.View.RadialContextMenu
 
         public bool IntersectsWith(Geometry geometry)
         {
-            return shape.Data.FillContainsWithDetail(geometry) != IntersectionDetail.Empty;
+            return segmentShape.Data.FillContainsWithDetail(geometry) != IntersectionDetail.Empty;
         }
 
         public void Select()
         {
-            shape.Fill = new SolidColorBrush(selectedColor);
+            segmentShape.Fill = new SolidColorBrush(selectedColor);
             IsSelected = true;
         }
 
         public void Unselect()
         {
-            shape.Fill = new SolidColorBrush(unselectedColor) {Opacity = 0.7};
+            segmentShape.Fill = new SolidColorBrush(unselectedColor) {Opacity = 0.7};
             IsSelected = false;
         }
     }
