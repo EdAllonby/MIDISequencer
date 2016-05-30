@@ -54,7 +54,7 @@ namespace Sequencer.View.RadialContextMenu
         /// <param name="opacityProperty">Used for animating the removal.</param>
         public void RemoveWithFade(DependencyProperty opacityProperty)
         {
-            DoubleAnimation animation = Animator.CreateFadeOutAnimation(FadeOutDuration);
+            DoubleAnimation animation = DrawingUtilities.CreateFadeOutAnimation(FadeOutDuration);
 
             animation.Completed += (s, a) => AfterRemoveAnimation();
 

@@ -11,11 +11,7 @@ namespace Sequencer.View
         [NotNull] private readonly NoteDrawer noteDrawer;
         private readonly IDigitalAudioProtocol protocol;
         private readonly SequencerSettings sequencerSettings;
-        private Position endPosition;
         private NoteState noteState = NoteState.Selected;
-        private Pitch pitch;
-        private Position startPosition;
-        private Velocity velocity;
 
         public VisualNote([NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] Canvas sequencer,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] Velocity velocity,
@@ -23,30 +19,30 @@ namespace Sequencer.View
         {
             protocol = sequencerSettings.Protocol;
             this.sequencerSettings = sequencerSettings;
-            this.velocity = velocity;
-            this.startPosition = startPosition;
-            this.endPosition = endPosition;
-            this.pitch = pitch;
+
+            Tone = new Tone(pitch, velocity, startPosition, endPosition);
 
             noteDrawer = new NoteDrawer(sequencer, sequencerSettings, sequencerDimensionsCalculator);
         }
 
         public Pitch Pitch
         {
-            get { return pitch; }
+            get { return Tone.Pitch; }
             private set
             {
-                pitch = value;
+                Tone.Pitch = value;
                 Draw();
             }
         }
 
+        public Tone Tone { get; }
+
         public Velocity Velocity
         {
-            get { return velocity; }
+            get { return Tone.Velocity; }
             set
             {
-                velocity = value;
+                Tone.Velocity = value;
                 Draw();
             }
         }
@@ -56,12 +52,12 @@ namespace Sequencer.View
         /// </summary>
         public Position StartPosition
         {
-            get { return startPosition; }
+            get { return Tone.StartPosition; }
             private set
             {
                 if (value != null)
                 {
-                    startPosition = value;
+                    Tone.StartPosition = value;
                     Draw();
                 }
             }
@@ -72,12 +68,12 @@ namespace Sequencer.View
         /// </summary>
         public Position EndPosition
         {
-            get { return endPosition; }
+            get { return Tone.EndPosition; }
             set
             {
                 if ((value != null) && !EndPosition.Equals(value) && (value > StartPosition))
                 {
-                    endPosition = value;
+                    Tone.EndPosition = value;
                     Draw();
                 }
             }
@@ -143,7 +139,7 @@ namespace Sequencer.View
         /// <param name="halfStepsToMove">How many half steps to move this visual note.</param>
         public void MovePitchRelativeTo(int halfStepsToMove)
         {
-            int midiNoteNumber = protocol.ProtocolNoteNumber(pitch);
+            int midiNoteNumber = protocol.ProtocolNoteNumber(Tone.Pitch);
             Pitch = protocol.CreatePitchFromProtocolNumber(midiNoteNumber + halfStepsToMove);
         }
     }

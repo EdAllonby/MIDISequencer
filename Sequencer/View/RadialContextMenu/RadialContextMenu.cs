@@ -17,14 +17,14 @@ namespace Sequencer.View.RadialContextMenu
         /// The Items selected Dependency Property.
         /// </summary>
         public static readonly DependencyProperty SelectedMenuItemProperty =
-            DependencyProperty.Register("SelectedMenuItem", typeof(EnumerableType<TMenuItem>), typeof(RadialContextMenu<TMenuItem>),
+            DependencyProperty.Register(nameof(SelectedMenuItem), typeof(EnumerableType<TMenuItem>), typeof(RadialContextMenu<TMenuItem>),
                 new FrameworkPropertyMetadata(null));
 
         /// <summary>
         /// The Items selected Dependency Property.
         /// </summary>
         public static readonly DependencyProperty MenuRadiusProperty =
-            DependencyProperty.Register("MenuRadius", typeof(double), typeof(RadialContextMenu<TMenuItem>),
+            DependencyProperty.Register(nameof(MenuRadius), typeof(double), typeof(RadialContextMenu<TMenuItem>),
                 new FrameworkPropertyMetadata(null));
 
         private readonly List<Line> menuSeperators = new List<Line>();
@@ -124,9 +124,14 @@ namespace Sequencer.View.RadialContextMenu
 
         public void ClosePopup()
         {
-            SelectedMenuItem = segments.FirstOrDefault(x => x.IsSelected)?.MenuItem;
+            TMenuItem selectedMenuItem = segments.FirstOrDefault(item => item.IsSelected)?.MenuItem;
 
-            DoubleAnimation animation = Animator.CreateFadeOutAnimation(100);
+            if (selectedMenuItem != null)
+            {
+                SelectedMenuItem = selectedMenuItem;
+            }
+
+            DoubleAnimation animation = DrawingUtilities.CreateFadeOutAnimation(100);
 
             animation.Completed += (s, a) => AfterRemoveAnimation();
 

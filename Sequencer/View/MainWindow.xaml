@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:view="clr-namespace:Sequencer.View"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:radialContextMenu="clr-namespace:Sequencer.View.RadialContextMenu"
         DataContext="{StaticResource SequencerViewModel}"
         Title="Sequencer" Height="500" Width="1200" KeyDown="SequencerKeyPressed">
@@ -11,16 +12,31 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid x:Name="SequencerGrid" Grid.Row="0" MouseMove="SequencerMouseMoved" MouseDown="SequencerMouseDown"
-              MouseUp="SequencerMouseUp">
-            <Canvas x:Name="SequencerCanvas" />
-            <view:DragSelectionBox x:Name="DragSelectionBox" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <view:SequencerControl x:Name="Sequencer" Grid.Row="0" MouseMove="SequencerMouseMoved"
+                                   MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
+                                   NoteAction="{Binding NoteAction}" 
+                                   SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}" />
+
             <radialContextMenu:NoteActionRadialContextMenuWrapper x:Name="RadialContextMenu"
                                                                   SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
                                                                   MenuRadius="40" />
         </Grid>
+        <Grid Grid.Row="0" Grid.Column="1" MinWidth="20">
+            <xctk:PropertyGrid SelectedObject="{Binding SelectedObject}" ShowSearchBox="False" />
+        </Grid>
 
-        <StatusBar Grid.Row="1">
+        <GridSplitter Width="5" HorizontalAlignment="Left" Margin="-5,0,0,0"
+		      ResizeDirection="Columns"
+		      ShowsPreview="True"
+		      Grid.Row="0" Grid.Column="1"/>
+
+        <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid HorizontalAlignment="Right">

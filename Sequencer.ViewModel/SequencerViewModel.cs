@@ -1,4 +1,7 @@
-﻿using log4net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using log4net;
+using Sequencer.Domain;
 
 namespace Sequencer.ViewModel
 {
@@ -7,6 +10,8 @@ namespace Sequencer.ViewModel
         private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerViewModel));
 
         private NoteAction noteAction;
+        private IEnumerable<Tone> selectedNotes;
+        private object selectedObject;
 
         public SequencerViewModel()
         {
@@ -21,6 +26,27 @@ namespace Sequencer.ViewModel
                 noteAction = value;
                 OnPropertyChanged(nameof(NoteAction));
                 Log.Info($"Note action set to {NoteAction}");
+            }
+        }
+
+        public IEnumerable<Tone> SelectedNotes
+        {
+            get { return selectedNotes; }
+            set
+            {
+                selectedNotes = value;
+                SelectedObject = SelectedNotes.FirstOrDefault();
+                OnPropertyChanged(nameof(SelectedNotes));
+            }
+        }
+
+        public object SelectedObject
+        {
+            get { return selectedObject; }
+            set
+            {
+                selectedObject = value;
+                OnPropertyChanged(nameof(SelectedObject));
             }
         }
     }

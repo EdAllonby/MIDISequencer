@@ -8,7 +8,12 @@ using Sequencer.ViewModel;
 
 namespace Sequencer.View.RadialContextMenu
 {
-    public sealed class ContextMenuSegment<TMenuItem> : Canvas, IPositionAware where TMenuItem : VisualEnumerableType<TMenuItem>
+    /// <summary>
+    /// A context menu segment.
+    /// </summary>
+    /// <typeparam name="TMenuItem">The menu item to represent.</typeparam>
+    public sealed class ContextMenuSegment<TMenuItem> : Canvas, IPositionAware
+        where TMenuItem : VisualEnumerableType<TMenuItem>
     {
         private readonly Path segmentShape = new Path();
         private readonly Color selectedColor = Colors.CornflowerBlue;
@@ -76,6 +81,9 @@ namespace Sequencer.View.RadialContextMenu
                 Width = segmentIconSize*0.7
             };
 
+            // We don't want the scaled bitmap to look pixelated,
+            // and we don't really care about the performance of a context menu.
+            // This will set the icon's scaling logic to the best scaling technique.
             RenderOptions.SetBitmapScalingMode(segmentIcon, BitmapScalingMode.Fant);
 
             Children.Add(segmentIcon);
@@ -89,21 +97,38 @@ namespace Sequencer.View.RadialContextMenu
             Unselect();
         }
 
+        /// <summary>
+        /// The <see cref="TMenuItem" /> this segment represents.
+        /// </summary>
         public TMenuItem MenuItem { get; }
 
+        /// <summary>
+        /// Whether this segment is selected.
+        /// </summary>
         public bool IsSelected { get; private set; }
 
+        /// <summary>
+        /// Determines if this segment intersects with other geometry.
+        /// </summary>
+        /// <param name="geometry">The other geometry to determine if it intersects.</param>
+        /// <returns>Whether this segment intersects with the other geometry.</returns>
         public bool IntersectsWith(Geometry geometry)
         {
             return segmentShape.Data.FillContainsWithDetail(geometry) != IntersectionDetail.Empty;
         }
 
+        /// <summary>
+        /// Select this segment.
+        /// </summary>
         public void Select()
         {
             segmentShape.Fill = new SolidColorBrush(selectedColor);
             IsSelected = true;
         }
 
+        /// <summary>
+        /// Unselect this segment.
+        /// </summary>
         public void Unselect()
         {
             segmentShape.Fill = new SolidColorBrush(unselectedColor) {Opacity = 0.7};

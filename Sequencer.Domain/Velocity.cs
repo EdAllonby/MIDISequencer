@@ -28,5 +28,10 @@ namespace Sequencer.Domain
         /// The velocity as a percentage, ranging from 0 to 1.
         /// </summary>
         public double Volume => (double) Value/MaxValue;
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }
