@@ -39,18 +39,15 @@ namespace Sequencer.View
         {
             Point currentMousePosition = SequencerMousePosition(e);
 
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                Sequencer.HandleMouseMovement(currentMousePosition);
-                return;
-            }
-
             if (e.RightButton == MouseButtonState.Pressed)
             {
                 RadialContextMenu.SetCursorPosition(currentMousePosition);
-                return;
             }
-            
+            else
+            {
+                Sequencer.HandleMouseMovement(currentMousePosition);
+            }
+
             e.Handled = true;
         }
 
