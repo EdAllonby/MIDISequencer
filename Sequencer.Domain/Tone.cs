@@ -1,5 +1,10 @@
 ﻿namespace Sequencer.Domain
 {
+    /// <summary>
+    /// This domain has a concept of a 'Note' which doesn't include positions and velocity.
+    /// This <see cref="Tone" /> class unites the concepts of <see cref="Pitch" />, <see cref="Velocity" /> and <see cref="Position" />,
+    /// all of which make a 'tone'.
+    /// </summary>
     public sealed class Tone
     {
         private Position endPosition;
@@ -45,7 +50,7 @@
             get { return startPosition; }
             set
             {
-                if ((value != null) && (value < EndPosition))
+                if (value != null)
                 {
                     startPosition = value;
                 }
