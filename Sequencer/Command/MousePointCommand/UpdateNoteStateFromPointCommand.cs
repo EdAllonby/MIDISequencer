@@ -21,10 +21,7 @@ namespace Sequencer.Command.MousePointCommand
             noteStateUnselectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Unselected);
         }
 
-        protected override bool CanExecute()
-        {
-            return Mouse.LeftButton == MouseButtonState.Pressed;
-        }
+        protected override bool CanExecute => MouseOperator.CanModifyNote;
 
         protected override void DoExecute(Point mousePoint)
         {

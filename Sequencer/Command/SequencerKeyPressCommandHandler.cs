@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
+using Sequencer.Domain;
 using Sequencer.View;
 
 namespace Sequencer.Command
@@ -23,6 +24,8 @@ namespace Sequencer.Command
             {
                 {Key.A, new UpdateNoteStateCommand(notes, NoteState.Selected)},
                 {Key.Right, new MoveNotePositionCommand(1)},
+                {Key.Add, new ChangeVelocityCommand(new Velocity(100))},
+                {Key.Subtract, new ChangeVelocityCommand(new Velocity(27))},
                 {Key.Left, new MoveNotePositionCommand(-1)},
                 {Key.Up, new MoveNotePitchCommand(1)},
                 {Key.Down, new MoveNotePitchCommand(-1)},

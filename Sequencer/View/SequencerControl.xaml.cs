@@ -32,7 +32,7 @@ namespace Sequencer.View
         private readonly SequencerDrawer sequencerDrawer;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNoteEndPositionFromPointCommand updateNoteEndPositionFromPointCommand;
-        private MoveNoteFromPointCommand command;
+        private MoveNoteFromPointCommand moveNoteFromPointCommand;
 
         public SequencerControl()
         {
@@ -40,12 +40,20 @@ namespace Sequencer.View
 
             SizeChanged += SequencerSizeChanged;
             notes = new SequencerNotes();
+            notes.SelectedNotesChanged += SelectedNotesChanged;
+
+
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNoteEndPositionFromPointCommand = new UpdateNoteEndPositionFromPointCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes);
+        }
+
+        private void SelectedNotesChanged(object sender, IEnumerable<VisualNote> e)
+        {
+            SelectedNotes = e.Select(x => x.Tone);
         }
 
         public NoteAction NoteAction
@@ -69,7 +77,7 @@ namespace Sequencer.View
             }
 
             MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
-            command = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+            moveNoteFromPointCommand = new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
             noteCommand.Execute(mouseDownPoint);
         }
 
@@ -90,16 +98,15 @@ namespace Sequencer.View
 
                 DragSelectionBox.UpdateDragSelectionBox(newMousePoint);
 
-                if (!DragSelectionBox.IsDragging)
+                if (DragSelectionBox.IsDragging)
                 {
-                    Mouse.OverrideCursor = noteUnderMouse != null ? Cursors.Hand : null;
-                    command?.Execute(newMousePoint);
+                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes.All);
+                    selectNoteCommand.Execute(containedNotes);
                 }
                 else
                 {
-                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes.All);
-                    SelectedNotes = notes.SelectedNotes.Select(x => x.Tone);
-                    selectNoteCommand.Execute(containedNotes);
+                    Mouse.OverrideCursor = noteUnderMouse != null ? Cursors.Hand : null;
+                    moveNoteFromPointCommand?.Execute(newMousePoint);
                 }
             }
         }

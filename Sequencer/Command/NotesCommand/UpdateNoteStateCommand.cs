@@ -43,6 +43,8 @@ namespace Sequencer.Command.NotesCommand
                     }
                 }
             }
+
+            sequencerNotes.NoteStateChanged();
         }
     }
 }

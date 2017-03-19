@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using log4net;
+using Sequencer.Command;
 
 namespace Sequencer.View
 {
@@ -39,7 +40,7 @@ namespace Sequencer.View
         {
             Point currentMousePosition = SequencerMousePosition(e);
 
-            if (e.RightButton == MouseButtonState.Pressed)
+            if (MouseOperator.CanModifyContextMenu)
             {
                 RadialContextMenu.SetCursorPosition(currentMousePosition);
             }

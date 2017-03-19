@@ -84,6 +84,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\MouseOperator.cs" />
+    <Compile Include="Command\NotesCommand\ChangeVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\INotesCommand.cs" />
     <Compile Include="Command\MousePointCommand\CreateNoteFromPointCommand.cs" />
     <Compile Include="Command\NotesCommand\DeleteNotesCommand.cs" />

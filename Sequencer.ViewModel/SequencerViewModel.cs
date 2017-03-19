@@ -35,8 +35,16 @@ namespace Sequencer.ViewModel
             set
             {
                 selectedNotes = value;
-                SelectedObject = SelectedNotes.FirstOrDefault();
-                OnPropertyChanged(nameof(SelectedNotes));
+
+                if (selectedNotes.Count() == 1)
+                {
+                    SelectedObject = SelectedNotes.FirstOrDefault();
+                    OnPropertyChanged(nameof(SelectedNotes));
+                }
+                else
+                {
+                    SelectedObject = null;
+                }
             }
         }
 

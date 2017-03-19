@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
@@ -16,16 +15,14 @@ namespace Sequencer.Command.MousePointCommand
         private readonly Canvas sequencerCanvas;
 
         public CreateNoteFromPointCommand([NotNull] Canvas sequencerCanvas, [NotNull] SequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] SequencerSettings sequencerSettings,
+            [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             this.sequencerCanvas = sequencerCanvas;
         }
 
-        protected override bool CanExecute()
-        {
-            return Mouse.LeftButton == MouseButtonState.Pressed;
-        }
+        protected override bool CanExecute => MouseOperator.CanModifyNote;
 
         protected override void DoExecute(Point mousePoint)
         {
@@ -34,9 +31,11 @@ namespace Sequencer.Command.MousePointCommand
             Pitch pitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
+            var defaultVelocity = new Velocity(64);
 
-            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings,
-                new Velocity(64), notePosition, defaultEndPosition, pitch);
+            var  tone = new Tone(pitch, defaultVelocity, notePosition, defaultEndPosition);
+
+            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings, tone);
 
             SequencerNotes.AddNote(newNote);
         }

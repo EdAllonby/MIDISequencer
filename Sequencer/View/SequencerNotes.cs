@@ -16,6 +16,8 @@ namespace Sequencer.View
 
         [NotNull] private readonly List<VisualNote> notes = new List<VisualNote>();
 
+        public event EventHandler<IEnumerable<VisualNote>> SelectedNotesChanged;
+
         /// <summary>
         /// The currently selected sequencer notes.
         /// </summary>
@@ -92,6 +94,12 @@ namespace Sequencer.View
         private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNote(Position mousePosition, Pitch mousePitch)
         {
             return visualNote => (visualNote.StartPosition <= mousePosition) && (visualNote.EndPosition > mousePosition) && visualNote.Pitch.Equals(mousePitch);
+        }
+
+
+        public void NoteStateChanged()
+        {
+            SelectedNotesChanged?.Invoke(this, SelectedNotes);
         }
     }
 }

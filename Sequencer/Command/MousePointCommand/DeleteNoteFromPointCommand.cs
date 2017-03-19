@@ -19,10 +19,7 @@ namespace Sequencer.Command.MousePointCommand
             deleteNotesCommand = new DeleteNotesCommand(sequencerNotes);
         }
 
-        protected override bool CanExecute()
-        {
-            return true;
-        }
+        protected override bool CanExecute => true;
 
         protected override void DoExecute(Point mousePoint)
         {

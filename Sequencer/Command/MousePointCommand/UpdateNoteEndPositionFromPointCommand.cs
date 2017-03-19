@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
@@ -18,10 +17,7 @@ namespace Sequencer.Command.MousePointCommand
         {
         }
 
-        protected override bool CanExecute()
-        {
-            return (Mouse.LeftButton == MouseButtonState.Pressed) || (Mouse.RightButton == MouseButtonState.Pressed);
-        }
+        protected override bool CanExecute => MouseOperator.CanModifyNote;
 
         protected override void DoExecute(Point mousePosition)
         {

@@ -25,13 +25,13 @@ namespace Sequencer.Command.MousePointCommand
 
         public void Execute(Point mousePoint)
         {
-            if (CanExecute())
+            if (CanExecute)
             {
                 DoExecute(mousePoint);
             }
         }
 
-        protected abstract bool CanExecute();
+        protected abstract bool CanExecute { get; }
 
         protected abstract void DoExecute(Point mousePoint);
     }
