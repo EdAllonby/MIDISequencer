@@ -32,7 +32,9 @@ namespace Sequencer.Command
 
             noteCommandsForAllNotes = new Dictionary<KeyboardInput, INotesCommand>
             {
-                { new KeyboardInput(ModifierKeys.Control, Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) }
+                { new KeyboardInput(ModifierKeys.Control, Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) },
+                { new KeyboardInput(Key.Escape), new UpdateNoteStateCommand(notes, NoteState.Unselected) }
+
             };
 
             this.notes = notes;
