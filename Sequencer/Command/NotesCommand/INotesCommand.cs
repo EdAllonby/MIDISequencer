@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using Sequencer.View;
 
 namespace Sequencer.Command.NotesCommand
 {
     public interface INotesCommand
     {
-        void Execute(IEnumerable<VisualNote> notes);
+        void Execute([NotNull] IEnumerable<VisualNote> notes);
     }
 }

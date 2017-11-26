@@ -78,6 +78,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Command\MouseOperator.cs" />
+    <Compile Include="Command\NotesCommand\DecrementVelocityCommand.cs" />
+    <Compile Include="Command\NotesCommand\IncrementVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\ChangeVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\INotesCommand.cs" />
     <Compile Include="Command\MousePointCommand\CreateNoteFromPointCommand.cs" />
