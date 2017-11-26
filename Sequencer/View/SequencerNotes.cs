@@ -28,7 +28,7 @@ namespace Sequencer.View
         /// All the notes in the sequencer.
         /// </summary>
         [NotNull]
-        public IEnumerable<VisualNote> All => notes;
+        public IEnumerable<VisualNote> AllNotes => notes;
 
         /// <summary>
         /// Draw all the sequencewr notes on the screen.

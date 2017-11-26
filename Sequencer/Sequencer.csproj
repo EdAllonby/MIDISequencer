@@ -77,6 +77,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\KeyboardInput.cs" />
     <Compile Include="Command\MouseOperator.cs" />
     <Compile Include="Command\NotesCommand\DecrementVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\IncrementVelocityCommand.cs" />

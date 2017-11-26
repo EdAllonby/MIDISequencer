@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
-using Sequencer.Domain;
 using Sequencer.View;
 
 namespace Sequencer.Command
@@ -12,24 +11,28 @@ namespace Sequencer.Command
     /// </summary>
     public sealed class SequencerKeyPressCommandHandler
     {
-        private readonly IDictionary<Key, INotesCommand> noteCommandsForSelectedNotes;
+        private readonly IDictionary<KeyboardInput, INotesCommand> noteCommandsForAllNotes;
+        private readonly IDictionary<KeyboardInput, INotesCommand> noteCommandsForSelectedNotes;
+
         private readonly SequencerNotes notes;
-        private readonly UpdateNoteStateCommand selectNotesCommand;
 
         public SequencerKeyPressCommandHandler([NotNull] SequencerNotes notes)
         {
-            selectNotesCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
-
-            noteCommandsForSelectedNotes = new Dictionary<Key, INotesCommand>
+            noteCommandsForSelectedNotes = new Dictionary<KeyboardInput, INotesCommand>
             {
-                {Key.A, new UpdateNoteStateCommand(notes, NoteState.Selected)},
-                {Key.Right, new MoveNotePositionCommand(1)},
-                {Key.Add, new IncrementVelocityCommand(5)},
-                {Key.Subtract, new DecrementVelocityCommand(5)},
-                {Key.Left, new MoveNotePositionCommand(-1)},
-                {Key.Up, new MoveNotePitchCommand(1)},
-                {Key.Down, new MoveNotePitchCommand(-1)},
-                {Key.Delete, new DeleteNotesCommand(notes)}
+                { new KeyboardInput(Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) },
+                { new KeyboardInput(Key.Right), new MoveNotePositionCommand(1) },
+                { new KeyboardInput(Key.Add), new IncrementVelocityCommand(5) },
+                { new KeyboardInput(Key.Subtract), new DecrementVelocityCommand(5) },
+                { new KeyboardInput(Key.Left), new MoveNotePositionCommand(-1) },
+                { new KeyboardInput(Key.Up), new MoveNotePitchCommand(1) },
+                { new KeyboardInput(Key.Down), new MoveNotePitchCommand(-1) },
+                { new KeyboardInput(Key.Delete), new DeleteNotesCommand(notes) }
+            };
+
+            noteCommandsForAllNotes = new Dictionary<KeyboardInput, INotesCommand>
+            {
+                { new KeyboardInput(ModifierKeys.Control, Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) }
             };
 
             this.notes = notes;
@@ -41,15 +44,17 @@ namespace Sequencer.Command
         /// <param name="keyPressed">The key the user pressed.</param>
         public void HandleSequencerKeyPressed(Key keyPressed)
         {
-            if ((Keyboard.Modifiers == ModifierKeys.Control) && (keyPressed == Key.A))
-            {
-                selectNotesCommand.Execute(notes.All);
-                return;
-            }
+            var input = new KeyboardInput(Keyboard.Modifiers, keyPressed);
 
+            Handle(input, noteCommandsForSelectedNotes, notes.SelectedNotes);
+            Handle(input, noteCommandsForAllNotes, notes.AllNotes);
+        }
+
+        private static void Handle(KeyboardInput input, IDictionary<KeyboardInput, INotesCommand> noteCommands, IEnumerable<VisualNote> notesToExecute)
+        {
             INotesCommand noteCommand;
-            noteCommandsForSelectedNotes.TryGetValue(keyPressed, out noteCommand);
-            noteCommand?.Execute(notes.SelectedNotes);
+            noteCommands.TryGetValue(input, out noteCommand);
+            noteCommand?.Execute(notesToExecute);
         }
     }
 }

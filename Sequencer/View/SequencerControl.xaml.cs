@@ -100,7 +100,7 @@ namespace Sequencer.View
 
                 if (DragSelectionBox.IsDragging)
                 {
-                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes.All);
+                    IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes.AllNotes);
                     selectNoteCommand.Execute(containedNotes);
                 }
                 else
