@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
@@ -9,9 +10,9 @@ namespace Sequencer.Command.MousePointCommand
     /// <summary>
     /// Command to update a <see cref="VisualNote" />'s end position based on the current mouse position in the sequencer.
     /// </summary>
-    public sealed class UpdateNoteEndPositionFromPointCommand : MousePointNoteCommand
+    public sealed class UpdateNewlyCreatedNoteCommand : MousePointNoteCommand
     {
-        public UpdateNoteEndPositionFromPointCommand([NotNull] SequencerNotes sequencerNotes,
+        public UpdateNewlyCreatedNoteCommand([NotNull] SequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {

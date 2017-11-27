@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using log4net;
-using Sequencer.Command;
+using Sequencer.Input;
 
 namespace Sequencer.View
 {

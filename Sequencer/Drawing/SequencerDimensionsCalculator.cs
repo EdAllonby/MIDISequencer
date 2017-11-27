@@ -63,17 +63,20 @@ namespace Sequencer.Drawing
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }
 
-        /// <summary>
-        /// Finds a visual note relative to the sequencer.
-        /// </summary>
-        /// <param name="sequencerNotes">The notes in the sequencer.</param>
-        /// <param name="point">The position the mouse is relative to the sequencer.</param>
-        /// <returns>The note a mouse is over.</returns>
-        public VisualNote FindNoteFromPoint([NotNull] SequencerNotes sequencerNotes, Point point)
+        /// <summary>        /// Finds a visual note relative to the sequencer.        /// </summary>        /// <param name="sequencerNotes">The notes in the sequencer.</param>        /// <param name="point">The position the mouse is relative to the sequencer.</param>        /// <returns>The note a mouse is over.</returns>        public VisualNote FindNoteFromPoint([NotNull] SequencerNotes sequencerNotes, Point point)        {            Position mousePosition = FindPositionFromPoint(point);            Pitch mousePitch = FindPitchFromPoint(point);            return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);        }        public VisualNote NoteAtStartingPoint(SequencerNotes sequencerNotes, Point point)
         {
             Position mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);
-            return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);
+
+            return sequencerNotes.FindNoteFromStartingPositionAndPitch(mousePosition, mousePitch);
+        }
+
+        public VisualNote NoteAtEndingPoint(SequencerNotes sequencerNotes, Point point)
+        {
+            Position mousePosition = FindPositionFromPoint(point);
+            Pitch mousePitch = FindPitchFromPoint(point);
+
+            return sequencerNotes.FindNoteFromEndingPositionAndPitch(mousePosition, mousePitch);
         }
     }
 }

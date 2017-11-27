@@ -1,9 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using JetBrains.Annotations;
-using Sequencer.Domain;
-using Sequencer.Drawing;
-using Sequencer.View;
+﻿using System.Windows;using System.Windows.Controls;using JetBrains.Annotations;using Sequencer.Domain;using Sequencer.Drawing;using Sequencer.Input;using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
 {

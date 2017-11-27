@@ -74,6 +74,16 @@ namespace Sequencer.Domain
         {
             return PositionRelativeByBeats(1, timeSignature);
         }
+        
+        /// <summary>
+        /// Get the previous <see cref="Position" />.
+        /// </summary>
+        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the previous <see cref="Position" />.</param>
+        /// <returns>The previous <see cref="Position" />.</returns>
+        public Position PreviousPosition(TimeSignature timeSignature)
+        {
+            return PositionRelativeByBeats(-1, timeSignature);
+        }
 
         public Position PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature)
         {

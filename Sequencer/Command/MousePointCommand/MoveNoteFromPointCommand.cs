@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
@@ -12,13 +13,13 @@ namespace Sequencer.Command.MousePointCommand
     {
         private int beatsDelta;
         private Point initialMousePitch;
-        private Point initialMousePosition;
+        private Point initialMousePoint;
         private int lastHalfStepDifference;
 
         public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] SequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
-            initialMousePosition = initialMousePoint;
+            this.initialMousePoint = initialMousePoint;
             initialMousePitch = initialMousePoint;
         }
 
@@ -36,7 +37,7 @@ namespace Sequencer.Command.MousePointCommand
 
         private void MoveNotePositions(Point mousePoint)
         {
-            Position initialPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePosition);
+            Position initialPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
             Position newPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
             int newBeatsDelta = newPosition.SummedBeat(SequencerSettings.TimeSignature) -
@@ -46,7 +47,7 @@ namespace Sequencer.Command.MousePointCommand
             {
                 beatsDelta = newBeatsDelta;
 
-                initialMousePosition = mousePoint;
+                initialMousePoint = mousePoint;
 
                 var moveNotePositionCommand = new MoveNotePositionCommand(beatsDelta);
                 moveNotePositionCommand.Execute(SequencerNotes.SelectedNotes);

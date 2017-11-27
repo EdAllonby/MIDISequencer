@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace Sequencer.Command
+namespace Sequencer.Input
 {
     public static class MouseOperator
     {

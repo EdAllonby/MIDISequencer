@@ -12,11 +12,17 @@ namespace Sequencer.View
     /// </summary>
     public class SequencerNotes
     {
+        private readonly SequencerSettings sequencerSettings;
         private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerNotes));
 
         [NotNull] private readonly List<VisualNote> notes = new List<VisualNote>();
 
         public event EventHandler<IEnumerable<VisualNote>> SelectedNotesChanged;
+
+        public SequencerNotes(SequencerSettings sequencerSettings)
+        {
+            this.sequencerSettings = sequencerSettings;
+        }
 
         /// <summary>
         /// The currently selected sequencer notes.
@@ -85,21 +91,39 @@ namespace Sequencer.View
         {
             return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNote(position, pitch));
         }
+        
+        public VisualNote FindNoteFromStartingPositionAndPitch(Position position, Pitch pitch)
+        {
+            return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNoteStartingPosition(position, pitch));
+        }
+
+        public VisualNote FindNoteFromEndingPositionAndPitch(Position position, Pitch pitch)
+        {
+            return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNoteEndingPosition(position, pitch));
+        }
+
 
         public IEnumerable<VisualNote> FindAllOtherNotes([NotNull] IEnumerable<VisualNote> notesToIgnore)
         {
             return notes.Except(notesToIgnore);
         }
-
+        
         private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNote(Position mousePosition, Pitch mousePitch)
         {
             return visualNote => (visualNote.StartPosition <= mousePosition) && (visualNote.EndPosition > mousePosition) && visualNote.Pitch.Equals(mousePitch);
         }
 
-
-        public void NoteStateChanged()
+        private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNoteStartingPosition(Position mousePosition, Pitch mousePitch)
         {
-            SelectedNotesChanged?.Invoke(this, SelectedNotes);
+            return visualNote => visualNote.StartPosition.Equals(mousePosition) && visualNote.Pitch.Equals(mousePitch);
         }
+
+        private Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNoteEndingPosition(Position mousePosition, Pitch mousePitch)
+        {
+            return visualNote => visualNote.EndPosition.PreviousPosition(sequencerSettings.TimeSignature).Equals(mousePosition) && visualNote.Pitch.Equals(mousePitch);
+        }
+
+        public void NoteStateChanged()        {            SelectedNotesChanged?.Invoke(this, SelectedNotes);        }
+
     }
 }

@@ -50,12 +50,15 @@ namespace Sequencer.View
         public Position StartPosition
         {
             get { return Tone.StartPosition; }
-            private set
+            set
             {
                 if (value != null)
                 {
-                    Tone.StartPosition = value;
-                    Draw();
+                    if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature) < Tone.EndPosition)
+                    {
+                        Tone.StartPosition = value;
+                        Draw();
+                    }
                 }
             }
         }

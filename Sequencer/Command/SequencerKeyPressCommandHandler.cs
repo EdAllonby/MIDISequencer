@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Command
@@ -34,7 +35,6 @@ namespace Sequencer.Command
             {
                 { new KeyboardInput(ModifierKeys.Control, Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) },
                 { new KeyboardInput(Key.Escape), new UpdateNoteStateCommand(notes, NoteState.Unselected) }
-
             };
 
             this.notes = notes;

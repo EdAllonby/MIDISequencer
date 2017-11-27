@@ -64,10 +64,6 @@
       <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
       <Name>Sequencer.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sequencer\Sequencer.csproj">
-      <Project>{f891abd0-a37f-42a2-9b98-c1723d58ced3}</Project>
-      <Name>Sequencer</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
