@@ -10,7 +10,7 @@ namespace Sequencer.Tests.CommandTests.NotesCommandTests
     public class DeleteNotesCommandTests
     {
         [Test]
-        public void CreateNoteFromPoint_CreateNote()
+        public void DeleteNoteTest()
         {
             var mockSequencerNotes = new Mock<ISequencerNotes>();
 
@@ -25,7 +25,6 @@ namespace Sequencer.Tests.CommandTests.NotesCommandTests
             mockSequencerNotes.Verify(x => x.DeleteNote(deleteNote1.Object));
             mockSequencerNotes.Verify(x => x.DeleteNote(deleteNote2.Object));
             mockSequencerNotes.Verify(x => x.DeleteNote(deleteNote3.Object));
-
         }
     }
 }

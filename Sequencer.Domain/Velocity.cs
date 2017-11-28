@@ -6,7 +6,7 @@ namespace Sequencer.Domain
     /// <summary>
     /// Defines a note velocity.
     /// </summary>
-    public sealed class Velocity
+    public sealed class Velocity : IEquatable<Velocity>
     {
         private const int MinValue = 0;
         private const int MaxValue = 127;
@@ -43,6 +43,25 @@ namespace Sequencer.Domain
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public bool Equals(Velocity other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Value == other.Value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Velocity && Equals((Velocity) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value;
         }
     }
 }
