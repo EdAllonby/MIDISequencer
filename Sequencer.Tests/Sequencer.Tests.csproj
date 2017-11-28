@@ -60,6 +60,8 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CommandTests\NotesCommandTests\MoveNotePositionCommandTests.cs" />
+    <Compile Include="CommandTests\NotesCommandTests\MoveNotePitchCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\IncrementVelocityCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\DecrementVelocityCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\ChangeVelocityCommandTests.cs" />
