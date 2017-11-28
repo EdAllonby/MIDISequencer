@@ -12,7 +12,7 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public sealed class UpdateNewlyCreatedNoteCommand : MousePointNoteCommand
     {
-        public UpdateNewlyCreatedNoteCommand([NotNull] SequencerNotes sequencerNotes,
+        public UpdateNewlyCreatedNoteCommand([NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
@@ -20,7 +20,7 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute => MouseOperator.CanModifyNote;
 
-        protected override void DoExecute(Point mousePosition)
+        protected override void DoExecute(IMousePoint mousePosition)
         {
             Position currentEndPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
             Position nextPosition = currentEndPosition.NextPosition(SequencerSettings.TimeSignature);

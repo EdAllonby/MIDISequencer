@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using JetBrains.Annotations;
+using Sequencer.Command.MousePointCommand;
 
 namespace Sequencer.View
 {
@@ -25,7 +26,7 @@ namespace Sequencer.View
         /// <summary>
         /// Records the location of the mouse (relative to the window) when the left-mouse button has pressed down.
         /// </summary>
-        private Point origMouseDownPoint;
+        private IMousePoint origMouseDownPoint;
 
         public DragSelectionBox()
         {
@@ -43,7 +44,7 @@ namespace Sequencer.View
         /// Create a new selection box starting position.
         /// </summary>
         /// <param name="mouseDownPoint">The point to start the selection box.</param>
-        public void SetNewOriginMousePosition(Point mouseDownPoint)
+        public void SetNewOriginMousePosition(IMousePoint mouseDownPoint)
         {
             CaptureMouse();
 
@@ -56,7 +57,7 @@ namespace Sequencer.View
         /// Update the position of the selection box.
         /// </summary>
         /// <param name="newPosition">The new position to update the selection box dimensions with.</param>
-        public void UpdateDragSelectionBox(Point newPosition)
+        public void UpdateDragSelectionBox(IMousePoint newPosition)
         {
             if (IsDragging)
             {
@@ -64,7 +65,7 @@ namespace Sequencer.View
             }
             else if (isLeftMouseButtonDownOnWindow)
             {
-                Vector dragDelta = newPosition - origMouseDownPoint;
+                Vector dragDelta = newPosition.Point - origMouseDownPoint.Point;
                 double dragDistance = Math.Abs(dragDelta.Length);
                 if (dragDistance > DragThreshold)
                 {
@@ -116,7 +117,7 @@ namespace Sequencer.View
         /// <summary>
         /// Update the position and size of the rectangle used for drag selection.
         /// </summary>
-        private void UpdateDragSelectionRectSize(Point pt1, Point pt2)
+        private void UpdateDragSelectionRectSize(IMousePoint pt1, IMousePoint pt2)
         {
             double x;
             double y;
@@ -154,7 +155,7 @@ namespace Sequencer.View
         /// <summary>
         /// Initialize the rectangle used for drag selection.
         /// </summary>
-        private void InitDragSelectionRect(Point pt1, Point pt2)
+        private void InitDragSelectionRect(IMousePoint pt1, IMousePoint pt2)
         {
             UpdateDragSelectionRectSize(pt1, pt2);
 

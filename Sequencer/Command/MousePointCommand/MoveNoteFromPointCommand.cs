@@ -12,11 +12,11 @@ namespace Sequencer.Command.MousePointCommand
     public sealed class MoveNoteFromPointCommand : MousePointNoteCommand
     {
         private int beatsDelta;
-        private Point initialMousePitch;
-        private Point initialMousePoint;
+        private IMousePoint initialMousePitch;
+        private IMousePoint initialMousePoint;
         private int lastHalfStepDifference;
 
-        public MoveNoteFromPointCommand(Point initialMousePoint, [NotNull] SequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
+        public MoveNoteFromPointCommand(IMousePoint initialMousePoint, [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             this.initialMousePoint = initialMousePoint;
@@ -25,7 +25,7 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute => MouseOperator.CanModifyNote;
 
-        protected override void DoExecute(Point mousePoint)
+        protected override void DoExecute(IMousePoint mousePoint)
         {
             MoveNotePositions(mousePoint);
 
@@ -35,7 +35,7 @@ namespace Sequencer.Command.MousePointCommand
             }
         }
 
-        private void MoveNotePositions(Point mousePoint)
+        private void MoveNotePositions(IMousePoint mousePoint)
         {
             Position initialPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
             Position newPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
@@ -54,7 +54,7 @@ namespace Sequencer.Command.MousePointCommand
             }
         }
 
-        private void MoveNotePitch(Point mousePoint)
+        private void MoveNotePitch(IMousePoint mousePoint)
         {
             Pitch initialPitch = SequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
             Pitch newPitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);

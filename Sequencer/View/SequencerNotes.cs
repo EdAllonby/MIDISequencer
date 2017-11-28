@@ -10,14 +10,14 @@ namespace Sequencer.View
     /// <summary>
     /// The notes contained in the sequencer.
     /// </summary>
-    public class SequencerNotes
+    public class SequencerNotes : ISequencerNotes
     {
         private readonly SequencerSettings sequencerSettings;
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerNotes));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(ISequencerNotes));
 
-        [NotNull] private readonly List<VisualNote> notes = new List<VisualNote>();
+        [NotNull] private readonly List<IVisualNote> notes = new List<IVisualNote>();
 
-        public event EventHandler<IEnumerable<VisualNote>> SelectedNotesChanged;
+        public event EventHandler<IEnumerable<IVisualNote>> SelectedNotesChanged;
 
         public SequencerNotes(SequencerSettings sequencerSettings)
         {
@@ -28,20 +28,20 @@ namespace Sequencer.View
         /// The currently selected sequencer notes.
         /// </summary>
         [NotNull]
-        public IEnumerable<VisualNote> SelectedNotes => notes.Where(note => note.NoteState == NoteState.Selected).ToList();
+        public IEnumerable<IVisualNote> SelectedNotes => notes.Where(note => note.NoteState == NoteState.Selected).ToList();
 
         /// <summary>
         /// All the notes in the sequencer.
         /// </summary>
         [NotNull]
-        public IEnumerable<VisualNote> AllNotes => notes;
+        public IEnumerable<IVisualNote> AllNotes => notes;
 
         /// <summary>
         /// Draw all the sequencewr notes on the screen.
         /// </summary>
         public void DrawNotes()
         {
-            foreach (VisualNote visualNote in notes)
+            foreach (IVisualNote visualNote in notes)
             {
                 visualNote.Draw();
             }
@@ -59,7 +59,7 @@ namespace Sequencer.View
         /// Add a note to the sequencer.
         /// </summary>
         /// <param name="note">The note to add to the sequencer.</param>
-        public void AddNote([NotNull] VisualNote note)
+        public void AddNote(IVisualNote note)
         {
             note.Draw();
             notes.Add(note);
@@ -69,7 +69,7 @@ namespace Sequencer.View
         /// Delete a note from the sequencer.
         /// </summary>
         /// <param name="noteToDelete">The note to delete from the sequencer.</param>
-        public void DeleteNote(VisualNote noteToDelete)
+        public void DeleteNote(IVisualNote noteToDelete)
         {
             if (noteToDelete == null)
             {
@@ -86,44 +86,48 @@ namespace Sequencer.View
         /// </summary>
         /// <param name="position">The position of the note.</param>
         /// <param name="pitch">The pitch of the note.</param>
-        /// <returns>A <see cref="VisualNot" /> if note. Null if note.</returns>
-        public VisualNote FindNoteFromPositionAndPitch([NotNull] Position position, [NotNull] Pitch pitch)
+        /// <returns>A <see cref="VisualNote" /> if note. Null if note.</returns>
+        public IVisualNote FindNoteFromPositionAndPitch(Position position, Pitch pitch)
         {
             return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNote(position, pitch));
         }
         
-        public VisualNote FindNoteFromStartingPositionAndPitch(Position position, Pitch pitch)
+        public IVisualNote FindNoteFromStartingPositionAndPitch(Position position, Pitch pitch)
         {
             return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNoteStartingPosition(position, pitch));
         }
 
-        public VisualNote FindNoteFromEndingPositionAndPitch(Position position, Pitch pitch)
+        public IVisualNote FindNoteFromEndingPositionAndPitch(Position position, Pitch pitch)
         {
             return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNoteEndingPosition(position, pitch));
         }
 
 
-        public IEnumerable<VisualNote> FindAllOtherNotes([NotNull] IEnumerable<VisualNote> notesToIgnore)
+        public IEnumerable<IVisualNote> FindAllOtherNotes(IEnumerable<IVisualNote> notesToIgnore)
         {
             return notes.Except(notesToIgnore);
         }
         
-        private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNote(Position mousePosition, Pitch mousePitch)
+        private static Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNote(Position mousePosition, Pitch mousePitch)
         {
             return visualNote => (visualNote.StartPosition <= mousePosition) && (visualNote.EndPosition > mousePosition) && visualNote.Pitch.Equals(mousePitch);
         }
 
-        private static Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNoteStartingPosition(Position mousePosition, Pitch mousePitch)
+        private static Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteStartingPosition(Position mousePosition, Pitch mousePitch)
         {
             return visualNote => visualNote.StartPosition.Equals(mousePosition) && visualNote.Pitch.Equals(mousePitch);
         }
 
-        private Func<VisualNote, bool> DoesPitchAndPositionMatchCurrentNoteEndingPosition(Position mousePosition, Pitch mousePitch)
+        private Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteEndingPosition(Position mousePosition, Pitch mousePitch)
         {
             return visualNote => visualNote.EndPosition.PreviousPosition(sequencerSettings.TimeSignature).Equals(mousePosition) && visualNote.Pitch.Equals(mousePitch);
         }
 
-        public void NoteStateChanged()        {            SelectedNotesChanged?.Invoke(this, SelectedNotes);        }
+        public void NoteStateChanged()
+        {
+            SelectedNotesChanged?.Invoke(this, SelectedNotes);
+        }
+
 
     }
 }

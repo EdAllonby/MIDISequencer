@@ -11,17 +11,17 @@ namespace Sequencer.Command.NotesCommand
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
         private readonly NoteState newState;
 
-        private readonly SequencerNotes sequencerNotes;
+        private readonly ISequencerNotes sequencerNotes;
 
-        public UpdateNoteStateCommand([NotNull] SequencerNotes sequencerNotes, NoteState newState)
+        public UpdateNoteStateCommand([NotNull] ISequencerNotes sequencerNotes, NoteState newState)
         {
             this.sequencerNotes = sequencerNotes;
             this.newState = newState;
         }
 
-        public void Execute(IEnumerable<VisualNote> notesToChange)
+        public void Execute(IEnumerable<IVisualNote> notesToChange)
         {
-            foreach (VisualNote visualNote in notesToChange)
+            foreach (IVisualNote visualNote in notesToChange)
             {
                 if ((visualNote != null) && (visualNote.NoteState != newState))
                 {
@@ -33,7 +33,7 @@ namespace Sequencer.Command.NotesCommand
 
             if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                foreach (VisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesToChange))
+                foreach (IVisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesToChange))
                 {
                     if (visualNote.NoteState != NoteState.Unselected)
                     {

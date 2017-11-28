@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using log4net;
+using Sequencer.Command.MousePointCommand;
 using Sequencer.Input;
 
 namespace Sequencer.View
@@ -19,7 +20,7 @@ namespace Sequencer.View
 
         private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Point mouseDownPoint = SequencerMousePosition(e);
+            IMousePoint mouseDownPoint = SequencerMousePosition(e);
 
             switch (e.ChangedButton)
             {
@@ -38,7 +39,7 @@ namespace Sequencer.View
 
         private void SequencerMouseMoved(object sender, MouseEventArgs e)
         {
-            Point currentMousePosition = SequencerMousePosition(e);
+            IMousePoint currentMousePosition = SequencerMousePosition(e);
 
             if (MouseOperator.CanModifyContextMenu)
             {
@@ -75,9 +76,10 @@ namespace Sequencer.View
             e.Handled = true;
         }
 
-        private Point SequencerMousePosition(MouseEventArgs mouseEventArgs)
+        private IMousePoint SequencerMousePosition(MouseEventArgs mouseEventArgs)
         {
-            return mouseEventArgs.GetPosition(Sequencer);
+            Point point = mouseEventArgs.GetPosition(Sequencer);
+            return new MousePoint(point);
         }
     }
 }

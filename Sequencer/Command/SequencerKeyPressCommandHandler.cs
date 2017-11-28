@@ -15,9 +15,9 @@ namespace Sequencer.Command
         private readonly IDictionary<KeyboardInput, INotesCommand> noteCommandsForAllNotes;
         private readonly IDictionary<KeyboardInput, INotesCommand> noteCommandsForSelectedNotes;
 
-        private readonly SequencerNotes notes;
+        private readonly ISequencerNotes notes;
 
-        public SequencerKeyPressCommandHandler([NotNull] SequencerNotes notes)
+        public SequencerKeyPressCommandHandler([NotNull] ISequencerNotes notes)
         {
             noteCommandsForSelectedNotes = new Dictionary<KeyboardInput, INotesCommand>
             {
@@ -52,7 +52,7 @@ namespace Sequencer.Command
             Handle(input, noteCommandsForAllNotes, notes.AllNotes);
         }
 
-        private static void Handle(KeyboardInput input, IDictionary<KeyboardInput, INotesCommand> noteCommands, IEnumerable<VisualNote> notesToExecute)
+        private static void Handle(KeyboardInput input, IDictionary<KeyboardInput, INotesCommand> noteCommands, IEnumerable<IVisualNote> notesToExecute)
         {
             INotesCommand noteCommand;
             noteCommands.TryGetValue(input, out noteCommand);

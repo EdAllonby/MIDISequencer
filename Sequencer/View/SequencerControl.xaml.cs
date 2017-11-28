@@ -21,12 +21,12 @@ namespace Sequencer.View
                 new FrameworkPropertyMetadata(null));
 
         public static readonly DependencyProperty SelectedNotesProperty =
-                        DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
+            DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
         private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
         private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
-        private readonly SequencerNotes notes;
+        private readonly ISequencerNotes notes;
         private readonly UpdateNoteStateCommand selectNoteCommand;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerDrawer sequencerDrawer;
@@ -44,16 +44,11 @@ namespace Sequencer.View
 
 
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
-            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(SequencerCanvas, notes, sequencerSettings, sequencerDimensionsCalculator);
+            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(new SequencerCanvasWrapper(SequencerCanvas), notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes);
-        }
-
-        private void SelectedNotesChanged(object sender, IEnumerable<VisualNote> e)
-        {
-            SelectedNotes = e.Select(x => x.Tone);
         }
 
         public NoteAction NoteAction
@@ -68,10 +63,20 @@ namespace Sequencer.View
             set { SetValue(SelectedNotesProperty, value); }
         }
 
-        public void HandleLeftMouseDown(Point mouseDownPoint)
+        public void AddChild(UIElement child)
+        {
+            SequencerCanvas.Children.Add(child);
+        }
+
+        public void RemoveChild(UIElement child)
+        {
+            SequencerCanvas.Children.Remove(child);
+        }
+
+        public void HandleLeftMouseDown(IMousePoint mouseDownPoint)
         {
             if (!sequencerDimensionsCalculator.IsPointInsideNote(notes, mouseDownPoint)
-                && (NoteAction == NoteAction.Select))
+                && NoteAction == NoteAction.Select)
             {
                 DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
             }
@@ -83,35 +88,12 @@ namespace Sequencer.View
             noteCommand.Execute(mouseDownPoint);
         }
 
-        private IMousePointNoteCommand GetMovementCommand(Point mouseDownPoint)
-        {
-            VisualNote noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, mouseDownPoint);
-            if (noteAtEndingPoint != null)
-            {
-                return new UpdateNoteEndPositionFromInitialPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
-            }
-
-            VisualNote noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, mouseDownPoint);
-            if (noteAtStartingPoint != null)
-            {
-                return new UpdateNoteStartPositionFromInitialPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
-            }
-            
-            VisualNote noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, mouseDownPoint);
-            if (noteUnderMouse != null)
-            {
-                return new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
-            }
-
-            return null;
-        }
-
         public void HandleKeyPress(Key keyPressed)
         {
             keyPressCommandHandler.HandleSequencerKeyPressed(keyPressed);
         }
 
-        public void HandleMouseMovement(Point newMousePoint)
+        public void HandleMouseMovement(IMousePoint newMousePoint)
         {
             if (NoteAction == NoteAction.Create)
             {
@@ -124,13 +106,41 @@ namespace Sequencer.View
             }
         }
 
-        private void HandleMouseSelectMovement(Point newMousePoint)
+        private void SelectedNotesChanged(object sender, IEnumerable<IVisualNote> e)
+        {
+            SelectedNotes = e.Select(x => x.Tone);
+        }
+
+        private IMousePointNoteCommand GetMovementCommand(IMousePoint mouseDownPoint)
+        {
+            IVisualNote noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, mouseDownPoint);
+            if (noteAtEndingPoint != null)
+            {
+                return new UpdateNoteEndPositionFromInitialPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+            }
+
+            IVisualNote noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, mouseDownPoint);
+            if (noteAtStartingPoint != null)
+            {
+                return new UpdateNoteStartPositionFromInitialPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+            }
+
+            IVisualNote noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, mouseDownPoint);
+            if (noteUnderMouse != null)
+            {
+                return new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+            }
+
+            return null;
+        }
+
+        private void HandleMouseSelectMovement(IMousePoint newMousePoint)
         {
             DragSelectionBox.UpdateDragSelectionBox(newMousePoint);
 
             if (DragSelectionBox.IsDragging)
             {
-                IEnumerable<VisualNote> containedNotes = DragSelectionBox.FindMatches(notes.AllNotes);
+                IEnumerable<IVisualNote> containedNotes = DragSelectionBox.FindMatches(notes.AllNotes);
                 selectNoteCommand.Execute(containedNotes);
             }
             else
@@ -141,24 +151,23 @@ namespace Sequencer.View
             }
         }
 
-        private void SetCursor(Point newMousePoint)
+        private void SetCursor(IMousePoint newMousePoint)
         {
-            var noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, newMousePoint);
+            IVisualNote noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, newMousePoint);
             if (noteAtStartingPoint != null)
             {
                 Mouse.OverrideCursor = Cursors.No;
                 return;
             }
 
-            var noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, newMousePoint);
+            IVisualNote noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, newMousePoint);
             if (noteAtEndingPoint != null)
             {
                 Mouse.OverrideCursor = Cursors.ArrowCD;
                 return;
-
             }
 
-            VisualNote noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, newMousePoint);
+            IVisualNote noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, newMousePoint);
 
             if (noteUnderMouse != null)
             {

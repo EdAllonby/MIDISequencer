@@ -1,4 +1,10 @@
-﻿using System.Windows;using System.Windows.Controls;using JetBrains.Annotations;using Sequencer.Domain;using Sequencer.Drawing;using Sequencer.Input;using Sequencer.View;
+﻿using System.Windows;
+using System.Windows.Controls;
+using JetBrains.Annotations;
+using Sequencer.Domain;
+using Sequencer.Drawing;
+using Sequencer.Input;
+using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
 {
@@ -7,19 +13,19 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public class CreateNoteFromPointCommand : MousePointNoteCommand
     {
-        private readonly Canvas sequencerCanvas;
+        private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
 
-        public CreateNoteFromPointCommand([NotNull] Canvas sequencerCanvas, [NotNull] SequencerNotes sequencerNotes,
+        public CreateNoteFromPointCommand([NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings,
-            [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
-            this.sequencerCanvas = sequencerCanvas;
+            this.sequencerCanvasWrapper = sequencerCanvasWrapper;
         }
 
         protected override bool CanExecute => MouseOperator.CanModifyNote;
 
-        protected override void DoExecute(Point mousePoint)
+        protected override void DoExecute(IMousePoint mousePoint)
         {
             SequencerNotes.MakeAllUnselected();
             Position notePosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
@@ -30,7 +36,7 @@ namespace Sequencer.Command.MousePointCommand
 
             var  tone = new Tone(pitch, defaultVelocity, notePosition, defaultEndPosition);
 
-            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvas, SequencerSettings, tone);
+            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvasWrapper, SequencerSettings, tone);
 
             SequencerNotes.AddNote(newNote);
         }

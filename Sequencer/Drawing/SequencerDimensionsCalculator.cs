@@ -2,12 +2,13 @@
 using System.Windows;
 using System.Windows.Controls;
 using JetBrains.Annotations;
+using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
 using Sequencer.View;
 
 namespace Sequencer.Drawing
 {
-    public sealed class SequencerDimensionsCalculator
+    public sealed class SequencerDimensionsCalculator : ISequencerDimensionsCalculator
     {
         private readonly IDigitalAudioProtocol protocol;
         private readonly Canvas sequencerCanvas;
@@ -40,12 +41,12 @@ namespace Sequencer.Drawing
         /// </summary>
         public double BeatWidth => BarWidth/sequencerSettings.TimeSignature.BeatsPerBar;
 
-        public bool IsPointInsideNote(SequencerNotes sequencerNotes, Point mousePoint)
+        public bool IsPointInsideNote(ISequencerNotes sequencerNotes, IMousePoint mousePoint)
         {
             return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
         }
 
-        public Position FindPositionFromPoint(Point mousePosition)
+        public Position FindPositionFromPoint(IMousePoint mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
             return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
@@ -56,14 +57,21 @@ namespace Sequencer.Drawing
         /// </summary>
         /// <param name="mousePosition">The position the mouse is relative to the sequencer.</param>
         /// <returns>The pitch the mouse is over.</returns>
-        public Pitch FindPitchFromPoint(Point mousePosition)
+        public Pitch FindPitchFromPoint(IMousePoint mousePosition)
         {
             int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
             int absoluteMidiNumber = protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch) + relativeMidiNumber;
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }
 
-        /// <summary>        /// Finds a visual note relative to the sequencer.        /// </summary>        /// <param name="sequencerNotes">The notes in the sequencer.</param>        /// <param name="point">The position the mouse is relative to the sequencer.</param>        /// <returns>The note a mouse is over.</returns>        public VisualNote FindNoteFromPoint([NotNull] SequencerNotes sequencerNotes, Point point)        {            Position mousePosition = FindPositionFromPoint(point);            Pitch mousePitch = FindPitchFromPoint(point);            return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);        }        public VisualNote NoteAtStartingPoint(SequencerNotes sequencerNotes, Point point)
+        /// <summary>        /// Finds a visual note relative to the sequencer.        /// </summary>        /// <param name="sequencerNotes">The notes in the sequencer.</param>        /// <param name="point">The position the mouse is relative to the sequencer.</param>        /// <returns>The note a mouse is over.</returns>        public IVisualNote FindNoteFromPoint(ISequencerNotes sequencerNotes, IMousePoint point)
+        {
+            Position mousePosition = FindPositionFromPoint(point);
+            Pitch mousePitch = FindPitchFromPoint(point);
+            return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);
+        }
+
+        public IVisualNote NoteAtStartingPoint(ISequencerNotes sequencerNotes, IMousePoint point)
         {
             Position mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);
@@ -71,7 +79,7 @@ namespace Sequencer.Drawing
             return sequencerNotes.FindNoteFromStartingPositionAndPitch(mousePosition, mousePitch);
         }
 
-        public VisualNote NoteAtEndingPoint(SequencerNotes sequencerNotes, Point point)
+        public IVisualNote NoteAtEndingPoint(ISequencerNotes sequencerNotes, IMousePoint point)
         {
             Position mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);

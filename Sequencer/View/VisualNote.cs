@@ -1,19 +1,18 @@
-﻿using System.Windows.Controls;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 
 namespace Sequencer.View
 {
-    public sealed class VisualNote : IPositionAware
+    public sealed class VisualNote : IVisualNote
     {
         [NotNull] private readonly NoteDrawer noteDrawer;
         private readonly IDigitalAudioProtocol protocol;
         private readonly SequencerSettings sequencerSettings;
         private NoteState noteState = NoteState.Selected;
 
-        public VisualNote([NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] Canvas sequencer, [NotNull] SequencerSettings sequencerSettings, Tone tone)
+        public VisualNote([NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, Tone tone)
         {
             protocol = sequencerSettings.Protocol;
             this.sequencerSettings = sequencerSettings;

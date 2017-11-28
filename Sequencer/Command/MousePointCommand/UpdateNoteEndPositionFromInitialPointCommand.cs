@@ -15,8 +15,8 @@ namespace Sequencer.Command.MousePointCommand
         private Position initialEndPosition;
         private int beatsDelta;
 
-        public UpdateNoteEndPositionFromInitialPointCommand(Point initialMousePoint, [NotNull] SequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public UpdateNoteEndPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] ISequencerNotes sequencerNotes,
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             initialEndPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
@@ -24,12 +24,12 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute => MouseOperator.CanModifyNote;
 
-        protected override void DoExecute(Point mousePoint)
+        protected override void DoExecute(IMousePoint mousePoint)
         {
             MoveNotePositions(mousePoint);
         }
 
-        private void MoveNotePositions(Point mousePoint)
+        private void MoveNotePositions(IMousePoint mousePoint)
         {
             Position newEndPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 

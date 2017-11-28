@@ -18,10 +18,10 @@ namespace Sequencer.Drawing
 
         private readonly Canvas sequencerCanvas;
         private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly SequencerNotes sequencerNotes;
+        private readonly ISequencerNotes sequencerNotes;
         private readonly SequencerSettings sequencerSettings;
 
-        public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] SequencerNotes sequencerNotes,
+        public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
         {
             protocol = sequencerSettings.Protocol;

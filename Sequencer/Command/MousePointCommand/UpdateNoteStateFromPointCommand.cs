@@ -15,7 +15,7 @@ namespace Sequencer.Command.MousePointCommand
         private readonly UpdateNoteStateCommand noteStateSelectedCommand;
         private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
 
-        public UpdateNoteStateFromPointCommand([NotNull] SequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             noteStateSelectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Selected);
@@ -24,9 +24,9 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute => MouseOperator.CanModifyNote;
 
-        protected override void DoExecute(Point mousePoint)
+        protected override void DoExecute(IMousePoint mousePoint)
         {
-            VisualNote actionableNote = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
+            IVisualNote actionableNote = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
 
             if (actionableNote != null)
             {

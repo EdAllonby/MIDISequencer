@@ -13,13 +13,13 @@ namespace Sequencer.Drawing
         private static readonly ILog Log = LogManager.GetLogger(typeof(NoteDrawer));
 
         private readonly Rectangle noteRectangle;
-        private readonly Canvas sequencer;
-        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
+        private readonly ISequencerCanvasWrapper sequencer;
+        private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly SequencerSettings sequencerSettings;
         private readonly TimeSignature timeSignature;
         private readonly Rectangle velocityRectangle;
 
-        public NoteDrawer(Canvas sequencer, SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public NoteDrawer(ISequencerCanvasWrapper sequencer, SequencerSettings sequencerSettings, ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
@@ -37,8 +37,8 @@ namespace Sequencer.Drawing
                 Fill = new SolidColorBrush(sequencerSettings.LineColour)
             };
 
-            sequencer.Children.Add(noteRectangle);
-            sequencer.Children.Add(velocityRectangle);
+            sequencer.AddChild(noteRectangle);
+            sequencer.AddChild(velocityRectangle);
 
             // We always want the notes to be in the foreground.
             Panel.SetZIndex(noteRectangle, 99);
@@ -53,7 +53,7 @@ namespace Sequencer.Drawing
             double noteHeight = sequencerDimensionsCalculator.NoteHeight;
 
             double noteWidth = ActualWidthBetweenPositions(startPosition, endPosition, beatWidth);
-            double noteStartHeight = GetPointFromPitch(pitch, sequencer.ActualHeight, noteHeight);
+            double noteStartHeight = GetPointFromPitch(pitch, sequencer.Height, noteHeight);
 
             noteRectangle.Height = noteHeight;
             noteRectangle.Width = noteWidth;
@@ -95,8 +95,8 @@ namespace Sequencer.Drawing
 
         public void RemoveNote()
         {
-            sequencer.Children.Remove(noteRectangle);
-            sequencer.Children.Remove(velocityRectangle);
+            sequencer.RemoveChild(noteRectangle);
+            sequencer.RemoveChild(velocityRectangle);
         }
 
         private double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight)

@@ -76,8 +76,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\MousePointCommand\IMousePoint.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteStartPositionFromInitialPointCommand.cs" />
+    <Compile Include="Drawing\ISequencerCanvasWrapper.cs" />
+    <Compile Include="Drawing\ISequencerDimensionsCalculator.cs" />
+    <Compile Include="Drawing\SequencerCanvasWrapper.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\MouseOperator.cs" />
     <Compile Include="Command\NotesCommand\DecrementVelocityCommand.cs" />
@@ -102,6 +106,8 @@
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\IPositionAware.cs" />
+    <Compile Include="View\ISequencerNotes.cs" />
+    <Compile Include="View\IVisualNote.cs" />
     <Compile Include="View\NoteState.cs" />
     <Compile Include="Drawing\SequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerDrawer.cs" />

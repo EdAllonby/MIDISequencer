@@ -13,9 +13,9 @@ namespace Sequencer.Command.NotesCommand
             this.velocity = velocity;
         }
 
-        public void Execute(IEnumerable<VisualNote> notes)
+        public void Execute(IEnumerable<IVisualNote> notes)
         {
-            foreach (VisualNote visualNote in notes)
+            foreach (IVisualNote visualNote in notes)
             {
                 visualNote.Velocity = velocity;
             }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Controls;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.View;
@@ -11,12 +10,12 @@ namespace Sequencer.Command.MousePointCommand
     {
         private readonly Dictionary<NoteAction, MousePointNoteCommand> noteCommandRegistry;
 
-        public MousePointNoteCommandFactory(Canvas sequencerCanvas, SequencerNotes sequencerNotes,
+        public MousePointNoteCommandFactory(ISequencerCanvasWrapper sequencerCanvasWrapper, ISequencerNotes sequencerNotes,
             SequencerSettings sequencerSettings, SequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             noteCommandRegistry = new Dictionary<NoteAction, MousePointNoteCommand>
             {
-                {NoteAction.Create, new CreateNoteFromPointCommand(sequencerCanvas, sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
+                {NoteAction.Create, new CreateNoteFromPointCommand(sequencerCanvasWrapper, sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
                 {NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)},
                 {NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)}
             };

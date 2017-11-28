@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
 using Sequencer.Utilities;
 using Sequencer.ViewModel;
@@ -30,7 +31,7 @@ namespace Sequencer.View.RadialContextMenu
         private readonly List<Line> menuSeperators = new List<Line>();
         private readonly List<ContextMenuSegment<TMenuItem>> segments = new List<ContextMenuSegment<TMenuItem>>();
 
-        private Point centre;
+        private IMousePoint centre;
         private bool isActive;
 
         private RadialCursorLine radialCursorLine;
@@ -50,7 +51,7 @@ namespace Sequencer.View.RadialContextMenu
 
         private static double AngleSize => (double) 360/EnumerableType<TMenuItem>.Count;
 
-        public void SetCursorPosition(Point point)
+        public void SetCursorPosition(IMousePoint point)
         {
             if (!isActive)
             {
@@ -61,7 +62,7 @@ namespace Sequencer.View.RadialContextMenu
 
             foreach (ContextMenuSegment<TMenuItem> contextMenuSegment in segments)
             {
-                var segment = new LineGeometry(centre, point);
+                var segment = new LineGeometry(centre.Point, point.Point);
 
                 if (contextMenuSegment.IntersectsWith(segment))
                 {
@@ -74,7 +75,7 @@ namespace Sequencer.View.RadialContextMenu
             }
         }
 
-        public void BuildPopup(Point point)
+        public void BuildPopup(IMousePoint point)
         {
             isActive = true;
             centre = point;
@@ -87,11 +88,11 @@ namespace Sequencer.View.RadialContextMenu
                 // We want to start calculating where the azimuth is on the Y axis.
                 // So, we tranlate all angles by -90 degrees to rotate from X to Y.
                 double startAngle = angle - 90;
-                Point lineEndPoint = MathsUtilities.PolarToRectangular(point, MenuRadius, startAngle);
+                Point lineEndPoint = MathsUtilities.PolarToRectangular(point.Point, MenuRadius, startAngle);
 
-                Line seperatorLine = CreateSeperatorLine(point, lineEndPoint);
+                Line seperatorLine = CreateSeperatorLine(point.Point, lineEndPoint);
 
-                segments.Add(new ContextMenuSegment<TMenuItem>(menuItem, point, MenuRadius, startAngle, AngleSize));
+                segments.Add(new ContextMenuSegment<TMenuItem>(menuItem, point.Point, MenuRadius, startAngle, AngleSize));
 
                 menuSeperators.Add(seperatorLine);
             }

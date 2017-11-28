@@ -11,11 +11,11 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public abstract class MousePointNoteCommand : IMousePointNoteCommand
     {
-        protected readonly SequencerDimensionsCalculator SequencerDimensionsCalculator;
-        protected readonly SequencerNotes SequencerNotes;
+        protected readonly ISequencerDimensionsCalculator SequencerDimensionsCalculator;
+        protected readonly ISequencerNotes SequencerNotes;
         protected readonly SequencerSettings SequencerSettings;
 
-        protected MousePointNoteCommand([NotNull] SequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        protected MousePointNoteCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             SequencerNotes = sequencerNotes;
             SequencerSettings = sequencerSettings;
@@ -23,7 +23,7 @@ namespace Sequencer.Command.MousePointCommand
         }
 
 
-        public void Execute(Point mousePoint)
+        public void Execute(IMousePoint mousePoint)
         {
             if (CanExecute)
             {
@@ -33,6 +33,6 @@ namespace Sequencer.Command.MousePointCommand
 
         protected abstract bool CanExecute { get; }
 
-        protected abstract void DoExecute(Point mousePoint);
+        protected abstract void DoExecute(IMousePoint mousePoint);
     }
 }

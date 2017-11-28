@@ -12,9 +12,9 @@ namespace Sequencer.Command.NotesCommand
             this.halfStepsToMove = halfStepsToMove;
         }
 
-        public void Execute(IEnumerable<VisualNote> notes)
+        public void Execute(IEnumerable<IVisualNote> notes)
         {
-            foreach (VisualNote visualNote in notes)
+            foreach (IVisualNote visualNote in notes)
             {
                 visualNote.MovePitchRelativeTo(halfStepsToMove);
             }

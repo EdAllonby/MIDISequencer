@@ -12,8 +12,8 @@ namespace Sequencer.Command.MousePointCommand
     {
         private readonly DeleteNotesCommand deleteNotesCommand;
 
-        public DeleteNoteFromPointCommand([NotNull] SequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public DeleteNoteFromPointCommand([NotNull] ISequencerNotes sequencerNotes,
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
             deleteNotesCommand = new DeleteNotesCommand(sequencerNotes);
@@ -21,10 +21,11 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute => true;
 
-        protected override void DoExecute(Point mousePoint)
+        protected override void DoExecute(IMousePoint mousePoint)
         {
-            VisualNote noteToDelete = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
+            IVisualNote noteToDelete = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
             deleteNotesCommand.Execute(noteToDelete.Yield());
         }
+
     }
 }
