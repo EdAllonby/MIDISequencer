@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
-using Sequencer.Domain;
 
-namespace Sequencer.Tests
+namespace Sequencer.Domain.Tests
 {
     [TestFixture]
     internal class PitchFrequencyTests
