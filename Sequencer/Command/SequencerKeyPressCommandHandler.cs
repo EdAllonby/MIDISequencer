@@ -17,11 +17,11 @@ namespace Sequencer.Command
 
         private readonly ISequencerNotes notes;
 
-        public SequencerKeyPressCommandHandler([NotNull] ISequencerNotes notes)
+        public SequencerKeyPressCommandHandler([NotNull] ISequencerNotes notes, IKeyboardStateProcessor keyboardStateProcessor)
         {
             noteCommandsForSelectedNotes = new Dictionary<KeyboardInput, INotesCommand>
             {
-                { new KeyboardInput(Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) },
+                { new KeyboardInput(Key.A), new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected) },
                 { new KeyboardInput(Key.Right), new MoveNotePositionCommand(1) },
                 { new KeyboardInput(Key.Add), new IncrementVelocityCommand(5) },
                 { new KeyboardInput(Key.Subtract), new DecrementVelocityCommand(5) },
@@ -33,8 +33,8 @@ namespace Sequencer.Command
 
             noteCommandsForAllNotes = new Dictionary<KeyboardInput, INotesCommand>
             {
-                { new KeyboardInput(ModifierKeys.Control, Key.A), new UpdateNoteStateCommand(notes, NoteState.Selected) },
-                { new KeyboardInput(Key.Escape), new UpdateNoteStateCommand(notes, NoteState.Unselected) }
+                { new KeyboardInput(ModifierKeys.Control, Key.A), new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected) },
+                { new KeyboardInput(Key.Escape), new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Unselected) }
             };
 
             this.notes = notes;

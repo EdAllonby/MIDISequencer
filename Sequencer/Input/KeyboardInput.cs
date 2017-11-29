@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace Sequencer.Input
 {
-    public sealed class KeyboardInput : IEquatable<KeyboardInput>
+    public sealed class KeyboardInput : IEquatable<KeyboardInput>, IKeyboardInput
     {
         public KeyboardInput(ModifierKeys modifiers, Key keyPress)
         {

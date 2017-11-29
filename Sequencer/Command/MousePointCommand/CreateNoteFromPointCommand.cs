@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;

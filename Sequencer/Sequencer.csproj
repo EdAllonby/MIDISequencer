@@ -82,7 +82,10 @@
     <Compile Include="Drawing\ISequencerCanvasWrapper.cs" />
     <Compile Include="Drawing\ISequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerCanvasWrapper.cs" />
+    <Compile Include="Input\IKeyboardStateProcessor.cs" />
+    <Compile Include="Input\IKeyboardInput.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
+    <Compile Include="Input\KeyboardStateProcessor.cs" />
     <Compile Include="Input\MouseOperator.cs" />
     <Compile Include="Command\NotesCommand\DecrementVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\IncrementVelocityCommand.cs" />

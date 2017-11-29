@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Command.NotesCommand
@@ -12,10 +13,12 @@ namespace Sequencer.Command.NotesCommand
         private readonly NoteState newState;
 
         private readonly ISequencerNotes sequencerNotes;
+        private readonly IKeyboardStateProcessor keyboardStateProcessor;
 
-        public UpdateNoteStateCommand([NotNull] ISequencerNotes sequencerNotes, NoteState newState)
+        public UpdateNoteStateCommand([NotNull] ISequencerNotes sequencerNotes, IKeyboardStateProcessor keyboardStateProcessor, NoteState newState)
         {
             this.sequencerNotes = sequencerNotes;
+            this.keyboardStateProcessor = keyboardStateProcessor;
             this.newState = newState;
         }
 
@@ -31,7 +34,7 @@ namespace Sequencer.Command.NotesCommand
                 }
             }
 
-            if (!Keyboard.IsKeyDown(Key.LeftCtrl))
+            if (!keyboardStateProcessor.IsKeyDown(Key.LeftCtrl))
             {
                 foreach (IVisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesToChange))
                 {

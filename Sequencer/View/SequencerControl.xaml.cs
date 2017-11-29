@@ -7,6 +7,7 @@ using Sequencer.Command.MousePointCommand;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
+using Sequencer.Input;
 using Sequencer.ViewModel;
 
 namespace Sequencer.View
@@ -33,7 +34,7 @@ namespace Sequencer.View
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
         private IMousePointNoteCommand moveNoteFromPointCommand;
-
+        
         public SequencerControl()
         {
             InitializeComponent();
@@ -42,13 +43,14 @@ namespace Sequencer.View
             notes = new SequencerNotes(sequencerSettings);
             notes.SelectedNotesChanged += SelectedNotesChanged;
 
+            var keyboardStateProcessor = new KeyboardStateProcessor();
 
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
-            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(new SequencerCanvasWrapper(SequencerCanvas), notes, sequencerSettings, sequencerDimensionsCalculator);
+            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(new SequencerCanvasWrapper(SequencerCanvas), keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
-            selectNoteCommand = new UpdateNoteStateCommand(notes, NoteState.Selected);
+            selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
-            keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes);
+            keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);
         }
 
         public NoteAction NoteAction

@@ -15,11 +15,11 @@ namespace Sequencer.Command.MousePointCommand
         private readonly UpdateNoteStateCommand noteStateSelectedCommand;
         private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
 
-        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
             : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
         {
-            noteStateSelectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Selected);
-            noteStateUnselectedCommand = new UpdateNoteStateCommand(sequencerNotes, NoteState.Unselected);
+            noteStateSelectedCommand = new UpdateNoteStateCommand(sequencerNotes, keyboardStateProcessor, NoteState.Selected);
+            noteStateUnselectedCommand = new UpdateNoteStateCommand(sequencerNotes, keyboardStateProcessor, NoteState.Unselected);
         }
 
         protected override bool CanExecute => MouseOperator.CanModifyNote;

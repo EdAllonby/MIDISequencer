@@ -66,12 +66,17 @@
     <Compile Include="CommandTests\NotesCommandTests\DecrementVelocityCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\ChangeVelocityCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\DeleteNotesCommandTests.cs" />
+    <Compile Include="CommandTests\NotesCommandTests\UpdateNoteStateCommandTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
       <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
       <Name>Sequencer.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
+      <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
+      <Name>Sequencer.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sequencer\Sequencer.csproj">
       <Project>{F891ABD0-A37F-42A2-9B98-C1723D58CED3}</Project>
