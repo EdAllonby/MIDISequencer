@@ -9,7 +9,7 @@ namespace Sequencer.View
     public partial class MainWindow
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
-
+        private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
 
         public MainWindow()
         {
@@ -41,7 +41,7 @@ namespace Sequencer.View
         {
             IMousePoint currentMousePosition = SequencerMousePosition(e);
 
-            if (MouseOperator.CanModifyContextMenu)
+            if (mouseOperator.CanModifyContextMenu)
             {
                 RadialContextMenu.SetCursorPosition(currentMousePosition);
             }

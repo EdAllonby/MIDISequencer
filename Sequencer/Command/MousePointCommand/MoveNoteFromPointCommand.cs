@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
@@ -16,8 +15,8 @@ namespace Sequencer.Command.MousePointCommand
         private IMousePoint initialMousePoint;
         private int lastHalfStepDifference;
 
-        public MoveNoteFromPointCommand(IMousePoint initialMousePoint, [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
-            [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
+        public MoveNoteFromPointCommand(IMousePoint initialMousePoint, IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
         {
             this.initialMousePoint = initialMousePoint;
             initialMousePitch = initialMousePoint;

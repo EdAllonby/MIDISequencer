@@ -33,6 +33,8 @@ namespace Sequencer.View
         private readonly SequencerDrawer sequencerDrawer;
         private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
+        private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
+
         private IMousePointNoteCommand moveNoteFromPointCommand;
         
         public SequencerControl()
@@ -46,8 +48,8 @@ namespace Sequencer.View
             var keyboardStateProcessor = new KeyboardStateProcessor();
 
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
-            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(new SequencerCanvasWrapper(SequencerCanvas), keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
-            updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, sequencerSettings, sequencerDimensionsCalculator);
+            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(new SequencerCanvasWrapper(SequencerCanvas), mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
+            updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);
@@ -118,19 +120,19 @@ namespace Sequencer.View
             IVisualNote noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, mouseDownPoint);
             if (noteAtEndingPoint != null)
             {
-                return new UpdateNoteEndPositionFromInitialPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+                return new UpdateNoteEndPositionFromInitialPointCommand(mouseDownPoint, mouseOperator, notes, sequencerSettings, sequencerDimensionsCalculator);
             }
 
             IVisualNote noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, mouseDownPoint);
             if (noteAtStartingPoint != null)
             {
-                return new UpdateNoteStartPositionFromInitialPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+                return new UpdateNoteStartPositionFromInitialPointCommand(mouseDownPoint, mouseOperator, notes, sequencerSettings, sequencerDimensionsCalculator);
             }
 
             IVisualNote noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, mouseDownPoint);
             if (noteUnderMouse != null)
             {
-                return new MoveNoteFromPointCommand(mouseDownPoint, notes, sequencerSettings, sequencerDimensionsCalculator);
+                return new MoveNoteFromPointCommand(mouseDownPoint, mouseOperator, notes, sequencerSettings, sequencerDimensionsCalculator);
             }
 
             return null;

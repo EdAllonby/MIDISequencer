@@ -12,9 +12,9 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public sealed class UpdateNewlyCreatedNoteCommand : MousePointNoteCommand
     {
-        public UpdateNewlyCreatedNoteCommand([NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
+        public UpdateNewlyCreatedNoteCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
         {
         }
 

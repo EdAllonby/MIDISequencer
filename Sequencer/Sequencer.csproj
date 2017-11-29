@@ -84,6 +84,8 @@
     <Compile Include="Drawing\SequencerCanvasWrapper.cs" />
     <Compile Include="Input\IKeyboardStateProcessor.cs" />
     <Compile Include="Input\IKeyboardInput.cs" />
+    <Compile Include="Input\IMouseOperator.cs" />
+    <Compile Include="Input\IMouseStateProcessor.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\KeyboardStateProcessor.cs" />
     <Compile Include="Input\MouseOperator.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromInitialPointCommand.cs" />
     <Compile Include="Console\ConsoleManager.cs" />
+    <Compile Include="Input\MouseStateProcessor.cs" />
     <Compile Include="View\DrawingUtilities.cs" />
     <Compile Include="View\DragSelectionBox.xaml.cs">
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>

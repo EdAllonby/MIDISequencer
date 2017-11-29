@@ -2,10 +2,17 @@
 
 namespace Sequencer.Input
 {
-    public static class MouseOperator
+    public class MouseOperator : IMouseOperator
     {
-        public static bool CanModifyNote => Mouse.LeftButton == MouseButtonState.Pressed;
+        private readonly IMouseStateProcessor mouseStateProcessor;
 
-        public static bool CanModifyContextMenu => Mouse.RightButton == MouseButtonState.Pressed;
+        public MouseOperator(IMouseStateProcessor mouseStateProcessor)
+        {
+            this.mouseStateProcessor = mouseStateProcessor;
+        }
+
+        public bool CanModifyNote => mouseStateProcessor.IsButtonPressed(Mouse.LeftButton);
+
+        public bool CanModifyContextMenu => mouseStateProcessor.IsButtonPressed(Mouse.RightButton);
     }
 }

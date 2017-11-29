@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
@@ -15,9 +14,9 @@ namespace Sequencer.Command.MousePointCommand
         private Position initialEndPosition;
         private int beatsDelta;
 
-        public UpdateNoteEndPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] ISequencerNotes sequencerNotes,
+        public UpdateNoteEndPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
+            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
         {
             initialEndPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
         }

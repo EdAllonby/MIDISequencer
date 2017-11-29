@@ -14,9 +14,9 @@ namespace Sequencer.Command.MousePointCommand
         private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
 
         public CreateNoteFromPointCommand([NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper, [NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings,
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] IMouseOperator mouseOperator,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, sequencerSettings, sequencerDimensionsCalculator)
+            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
         {
             this.sequencerCanvasWrapper = sequencerCanvasWrapper;
         }

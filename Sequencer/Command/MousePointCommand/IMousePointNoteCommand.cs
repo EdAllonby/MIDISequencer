@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace Sequencer.Command.MousePointCommand
+﻿namespace Sequencer.Command.MousePointCommand
 {
     public interface IMousePointNoteCommand
     {

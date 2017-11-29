@@ -1,7 +1,7 @@
-﻿using System.Windows;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand
@@ -13,11 +13,13 @@ namespace Sequencer.Command.MousePointCommand
     {
         protected readonly ISequencerDimensionsCalculator SequencerDimensionsCalculator;
         protected readonly ISequencerNotes SequencerNotes;
+        protected readonly IMouseOperator MouseOperator;
         protected readonly SequencerSettings SequencerSettings;
 
-        protected MousePointNoteCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+        protected MousePointNoteCommand([NotNull] ISequencerNotes sequencerNotes, IMouseOperator mouseOperator, [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             SequencerNotes = sequencerNotes;
+            this.MouseOperator = mouseOperator;
             SequencerSettings = sequencerSettings;
             SequencerDimensionsCalculator = sequencerDimensionsCalculator;
         }
