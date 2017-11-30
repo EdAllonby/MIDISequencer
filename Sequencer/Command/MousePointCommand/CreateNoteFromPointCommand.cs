@@ -11,37 +11,44 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public class CreateNoteFromPointCommand : MousePointNoteCommand
     {
-        private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
+        [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
 
         public CreateNoteFromPointCommand([NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] IMouseOperator mouseOperator,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
         {
             this.sequencerCanvasWrapper = sequencerCanvasWrapper;
+            this.sequencerNotes = sequencerNotes;
+            this.sequencerSettings = sequencerSettings;
+            this.mouseOperator = mouseOperator;
+            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
         }
 
-        protected override bool CanExecute => MouseOperator.CanModifyNote;
+        protected override bool CanExecute => mouseOperator.CanModifyNote;
 
         protected override void DoExecute(IMousePoint mousePoint)
         {
-            SequencerNotes.MakeAllUnselected();
-            Position notePosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
-            Pitch pitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
+            sequencerNotes.MakeAllUnselected();
+            Position notePosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            Pitch pitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
             Position defaultEndPosition = GetDefaultEndPosition(notePosition);
             var defaultVelocity = new Velocity(64);
 
-            var  tone = new Tone(pitch, defaultVelocity, notePosition, defaultEndPosition);
+            var tone = new Tone(pitch, defaultVelocity, notePosition, defaultEndPosition);
 
-            var newNote = new VisualNote(SequencerDimensionsCalculator, sequencerCanvasWrapper, SequencerSettings, tone);
+            var newNote = new VisualNote(sequencerDimensionsCalculator, sequencerCanvasWrapper, sequencerSettings, tone);
 
-            SequencerNotes.AddNote(newNote);
+            sequencerNotes.AddNote(newNote);
         }
 
         private Position GetDefaultEndPosition(Position notePosition)
         {
-            return notePosition.NextPosition(SequencerSettings.TimeSignature);
+            return notePosition.NextPosition(sequencerSettings.TimeSignature);
         }
     }
 }

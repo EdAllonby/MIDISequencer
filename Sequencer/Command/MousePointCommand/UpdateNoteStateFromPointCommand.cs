@@ -11,21 +11,28 @@ namespace Sequencer.Command.MousePointCommand
 {
     public sealed class UpdateNoteStateFromPointCommand : MousePointNoteCommand
     {
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly UpdateNoteStateCommand noteStateSelectedCommand;
         private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
 
-        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator, [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
+        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator, 
+            [NotNull] IKeyboardStateProcessor keyboardStateProcessor, 
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
+            this.sequencerNotes = sequencerNotes;
+            this.mouseOperator = mouseOperator;
+            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
             noteStateSelectedCommand = new UpdateNoteStateCommand(sequencerNotes, keyboardStateProcessor, NoteState.Selected);
             noteStateUnselectedCommand = new UpdateNoteStateCommand(sequencerNotes, keyboardStateProcessor, NoteState.Unselected);
         }
 
-        protected override bool CanExecute => MouseOperator.CanModifyNote;
+        protected override bool CanExecute => mouseOperator.CanModifyNote;
 
         protected override void DoExecute(IMousePoint mousePoint)
         {
-            IVisualNote actionableNote = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
+            IVisualNote actionableNote = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
 
             if (actionableNote != null)
             {
@@ -40,7 +47,7 @@ namespace Sequencer.Command.MousePointCommand
             }
             else if (!Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                noteStateUnselectedCommand.Execute(SequencerNotes.SelectedNotes);
+                noteStateUnselectedCommand.Execute(sequencerNotes.SelectedNotes);
             }
         }
     }

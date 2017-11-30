@@ -11,17 +11,24 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public sealed class UpdateNoteStartPositionFromInitialPointCommand : MousePointNoteCommand
     {
+        [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         private Position initialStartPosition;
         private int beatsDelta;
 
         public UpdateNoteStartPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
         {
-            initialStartPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
+            this.mouseOperator = mouseOperator;
+            this.sequencerNotes = sequencerNotes;
+            this.sequencerSettings = sequencerSettings;
+            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
+            initialStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
         }
 
-        protected override bool CanExecute => MouseOperator.CanModifyNote;
+        protected override bool CanExecute => mouseOperator.CanModifyNote;
 
         protected override void DoExecute(IMousePoint mousePoint)
         {
@@ -30,20 +37,20 @@ namespace Sequencer.Command.MousePointCommand
 
         private void MoveNotePositions(IMousePoint mousePoint)
         {
-            Position newStartPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            Position newStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-            int newBeatsDelta = newStartPosition.SummedBeat(SequencerSettings.TimeSignature) -
-                                initialStartPosition.SummedBeat(SequencerSettings.TimeSignature);
+            int newBeatsDelta = newStartPosition.SummedBeat(sequencerSettings.TimeSignature) -
+                                initialStartPosition.SummedBeat(sequencerSettings.TimeSignature);
 
             if (newBeatsDelta != beatsDelta)
             {
                 beatsDelta = newBeatsDelta;
 
-                initialStartPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+                initialStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-                foreach (VisualNote selectedNote in SequencerNotes.SelectedNotes)
+                foreach (VisualNote selectedNote in sequencerNotes.SelectedNotes)
                 {
-                    selectedNote.StartPosition = selectedNote.StartPosition.PositionRelativeByBeats(beatsDelta, SequencerSettings.TimeSignature);
+                    selectedNote.StartPosition = selectedNote.StartPosition.PositionRelativeByBeats(beatsDelta, sequencerSettings.TimeSignature);
                 }
             }
         }

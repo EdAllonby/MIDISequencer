@@ -10,37 +10,36 @@ namespace Sequencer.Command.MousePointCommand
 {
     public sealed class MoveNoteFromPointCommand : MousePointNoteCommand
     {
+        [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
         private int beatsDelta;
         private IMousePoint initialMousePitch;
         private IMousePoint initialMousePoint;
         private int lastHalfStepDifference;
 
-        public MoveNoteFromPointCommand(IMousePoint initialMousePoint, IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
-            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator) : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
+        public MoveNoteFromPointCommand([NotNull] IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator,
+            [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.initialMousePoint = initialMousePoint;
+            this.mouseOperator = mouseOperator;
+            this.sequencerNotes = sequencerNotes;
+            this.sequencerSettings = sequencerSettings;
+            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
             initialMousePitch = initialMousePoint;
         }
 
-        protected override bool CanExecute => MouseOperator.CanModifyNote;
-
-        protected override void DoExecute(IMousePoint mousePoint)
-        {
-            MoveNotePositions(mousePoint);
-
-            if (!Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                MoveNotePitch(mousePoint);
-            }
-        }
+        protected override bool CanExecute => mouseOperator.CanModifyNote;
 
         private void MoveNotePositions(IMousePoint mousePoint)
         {
-            Position initialPosition = SequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
-            Position newPosition = SequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            Position initialPosition = sequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
+            Position newPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-            int newBeatsDelta = newPosition.SummedBeat(SequencerSettings.TimeSignature) -
-                                initialPosition.SummedBeat(SequencerSettings.TimeSignature);
+            int newBeatsDelta = newPosition.SummedBeat(sequencerSettings.TimeSignature) -
+                                initialPosition.SummedBeat(sequencerSettings.TimeSignature);
 
             if (newBeatsDelta != beatsDelta)
             {
@@ -49,14 +48,14 @@ namespace Sequencer.Command.MousePointCommand
                 initialMousePoint = mousePoint;
 
                 var moveNotePositionCommand = new MoveNotePositionCommand(beatsDelta);
-                moveNotePositionCommand.Execute(SequencerNotes.SelectedNotes);
+                moveNotePositionCommand.Execute(sequencerNotes.SelectedNotes);
             }
         }
 
         private void MoveNotePitch(IMousePoint mousePoint)
         {
-            Pitch initialPitch = SequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
-            Pitch newPitch = SequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
+            Pitch initialPitch = sequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
+            Pitch newPitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
             int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(initialPitch, newPitch);
 
@@ -67,7 +66,17 @@ namespace Sequencer.Command.MousePointCommand
                 initialMousePitch = mousePoint;
 
                 var moveNotePitchCommand = new MoveNotePitchCommand(lastHalfStepDifference);
-                moveNotePitchCommand.Execute(SequencerNotes.SelectedNotes);
+                moveNotePitchCommand.Execute(sequencerNotes.SelectedNotes);
+            }
+        }
+
+        protected override void DoExecute(IMousePoint mousePoint)
+        {
+            MoveNotePositions(mousePoint);
+
+            if (!Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                MoveNotePitch(mousePoint);
             }
         }
     }

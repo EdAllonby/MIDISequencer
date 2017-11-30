@@ -1,8 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
-using Sequencer.Domain;
 using Sequencer.Drawing;
-using Sequencer.Input;
 using Sequencer.Utilities;
 using Sequencer.View;
 
@@ -10,12 +8,15 @@ namespace Sequencer.Command.MousePointCommand
 {
     public sealed class DeleteNoteFromPointCommand : MousePointNoteCommand
     {
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly DeleteNotesCommand deleteNotesCommand;
 
-        public DeleteNoteFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
-            : base(sequencerNotes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator)
+        public DeleteNoteFromPointCommand([NotNull] ISequencerNotes sequencerNotes,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
+            this.sequencerNotes = sequencerNotes;
+            this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
             deleteNotesCommand = new DeleteNotesCommand(sequencerNotes);
         }
 
@@ -23,9 +24,8 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override void DoExecute(IMousePoint mousePoint)
         {
-            IVisualNote noteToDelete = SequencerDimensionsCalculator.FindNoteFromPoint(SequencerNotes, mousePoint);
+            IVisualNote noteToDelete = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
             deleteNotesCommand.Execute(noteToDelete.Yield());
         }
-
     }
 }
