@@ -10,14 +10,14 @@ namespace Sequencer.Command.MousePointCommand
     {
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly DeleteNotesCommand deleteNotesCommand;
+        private readonly IDeleteNotesCommand deleteNotesCommand;
 
         public DeleteNoteFromPointCommand([NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, IDeleteNotesCommand deleteNotesCommand)
         {
             this.sequencerNotes = sequencerNotes;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
-            deleteNotesCommand = new DeleteNotesCommand(sequencerNotes);
+            this.deleteNotesCommand = deleteNotesCommand;
         }
 
         protected override bool CanExecute => true;

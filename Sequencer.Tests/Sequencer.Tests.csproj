@@ -60,6 +60,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CommandTests\MousePointCommandTests\DeleteNoteFromPointCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\MoveNotePositionCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\MoveNotePitchCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\IncrementVelocityCommandTests.cs" />
@@ -86,9 +87,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CommandTests\MousePointCommandTests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

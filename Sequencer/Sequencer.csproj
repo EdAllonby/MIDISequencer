@@ -79,6 +79,7 @@
     <Compile Include="Command\MousePointCommand\IMousePoint.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteStartPositionFromInitialPointCommand.cs" />
+    <Compile Include="Command\NotesCommand\IDeleteNotesCommand.cs" />
     <Compile Include="Drawing\ISequencerCanvasWrapper.cs" />
     <Compile Include="Drawing\ISequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerCanvasWrapper.cs" />

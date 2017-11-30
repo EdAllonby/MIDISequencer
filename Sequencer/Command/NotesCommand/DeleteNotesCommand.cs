@@ -4,7 +4,7 @@ using Sequencer.View;
 
 namespace Sequencer.Command.NotesCommand
 {
-    public sealed class DeleteNotesCommand : INotesCommand
+    public sealed class DeleteNotesCommand : IDeleteNotesCommand, INotesCommand
     {
         private readonly ISequencerNotes sequencerNotes;
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
@@ -20,7 +21,7 @@ namespace Sequencer.Command.MousePointCommand
             {
                 {NoteAction.Create, new CreateNoteFromPointCommand(sequencerCanvasWrapper, sequencerNotes, sequencerSettings, mouseOperator, sequencerDimensionsCalculator)},
                 {NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, mouseOperator, keyboardStateProcessor, sequencerDimensionsCalculator)},
-                {NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerDimensionsCalculator)}
+                {NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerDimensionsCalculator, new DeleteNotesCommand(sequencerNotes))}
             };
         }
 
