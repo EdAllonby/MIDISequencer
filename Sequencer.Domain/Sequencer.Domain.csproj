@@ -40,6 +40,9 @@
   <ItemGroup>
     <Compile Include="EnumerableType.cs" />
     <Compile Include="FrequencyCalculator.cs" />
+    <Compile Include="IGreaterThanOrEqualComparable.cs" />
+    <Compile Include="ILessThanOrEqualComparable.cs" />
+    <Compile Include="IPosition.cs" />
     <Compile Include="PitchStepCalculator.cs" />
     <Compile Include="IDigitalAudioProtocol.cs" />
     <Compile Include="MidiProtocol.cs" />

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Sequencer.Domain
+﻿namespace Sequencer.Domain
 {
     /// <summary>
     /// Represents a musical position.
@@ -169,35 +167,5 @@ namespace Sequencer.Domain
         {
             return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}";
         }
-    }
-
-    public interface IPosition : IGreaterThanOrEqualComparable<IPosition>, ILessThanOrEqualComparable<IPosition>
-    {
-        int Measure { get; }
-
-        int Bar { get; }
-
-        int Beat { get; }
-        IPosition PreviousPosition(TimeSignature timeSignature);
-
-        IPosition NextPosition(TimeSignature timeSignature);
-        IPosition PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature);
-
-        int SummedBeat(TimeSignature timeSignature);
-    }
-
-    public interface ILessThanOrEqualComparable<in T> : IComparable<T>
-    {
-        bool IsLessThan(T other);
-
-        bool IsLessThanOrEqual(T other);
-    }
-
-    public interface IGreaterThanOrEqualComparable<in T> : IComparable<T>
-    {
-        bool IsGreaterThan(T other);
-
-        bool IsGreaterThanOrEqual(T other);
-
     }
 }
