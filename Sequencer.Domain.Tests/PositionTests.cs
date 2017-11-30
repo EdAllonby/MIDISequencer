@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;namespace Sequencer.Domain.Tests
+﻿using NUnit.Framework;
+
+namespace Sequencer.Domain.Tests
 {
     [TestFixture]
     public class PositionTests
@@ -38,16 +40,16 @@
         };
 
         [Test, TestCaseSource(nameof(BeatPositionCases))]
-        public void BeatShouldReturnCorrectPosition(int beat, Position expectedPosition)
+        public void BeatShouldReturnCorrectPosition(int beat, IPosition expectedPosition)
         {
-            Position actualPosition = Position.PositionFromBeat(beat, standardTimeSignature);
+            IPosition actualPosition = Position.PositionFromBeat(beat, standardTimeSignature);
             Assert.AreEqual(expectedPosition, actualPosition);
         }
 
         [Test, TestCaseSource(nameof(NextPositionCases))]
-        public void NextPositionShouldBeCorrect(Position initialPosition, Position expectedNextPosition)
+        public void NextPositionShouldBeCorrect(IPosition initialPosition, IPosition expectedNextPosition)
         {
-            Position actualNextPosition = initialPosition.NextPosition(standardTimeSignature);
+            IPosition actualNextPosition = initialPosition.NextPosition(standardTimeSignature);
 
             Assert.AreEqual(expectedNextPosition, actualNextPosition);
         }
@@ -116,7 +118,7 @@
         }
 
         [Test, TestCaseSource(nameof(PositionSumCases))]
-        public void PositionShouldReturnCorrectSummedBeat(Position position, int expectedSum)
+        public void PositionShouldReturnCorrectSummedBeat(IPosition position, int expectedSum)
         {
             int actual = position.SummedBeat(standardTimeSignature);
             Assert.AreEqual(expectedSum, actual);

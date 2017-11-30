@@ -20,5 +20,6 @@ namespace Sequencer.Domain
         public Color LineColour = Colors.Black;
         public Color SelectedNoteColour = Colors.DarkRed;
         public Color UnselectedNoteColour = Colors.Crimson;
+        public Velocity DefaultVelocity = new Velocity(64);
     }
 }

@@ -29,8 +29,8 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override void DoExecute(IMousePoint mousePosition)
         {
-            Position currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
-            Position nextPosition = currentEndPosition.NextPosition(sequencerSettings.TimeSignature);
+            IPosition currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
+            IPosition nextPosition = currentEndPosition.NextPosition(sequencerSettings.TimeSignature);
 
             foreach (VisualNote selectedNote in sequencerNotes.SelectedNotes)
             {

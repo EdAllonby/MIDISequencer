@@ -45,7 +45,7 @@ namespace Sequencer.Drawing
             Panel.SetZIndex(velocityRectangle, 100);
         }
 
-        public void DrawNote(Pitch pitch, Velocity velocity, Position startPosition, Position endPosition, NoteState noteState)
+        public void DrawNote(Pitch pitch, Velocity velocity, IPosition startPosition, IPosition endPosition, NoteState noteState)
         {
             Log.InfoFormat("Drawing note length with start position {0} to end position {1}", startPosition, endPosition);
 
@@ -106,7 +106,7 @@ namespace Sequencer.Drawing
             return sequencerHeight - relativePitchPosition;
         }
 
-        private double ActualWidthBetweenPositions(Position startPosition, Position endPosition, double beatWidth)
+        private double ActualWidthBetweenPositions(IPosition startPosition, IPosition endPosition, double beatWidth)
         {
             double noteStartingPoint = GetPointFromPosition(startPosition, beatWidth);
             double noteEndingPoint = GetPointFromPosition(endPosition, beatWidth);
@@ -115,7 +115,7 @@ namespace Sequencer.Drawing
             return newNoteWidth >= 0 ? newNoteWidth : 0;
         }
 
-        private double GetPointFromPosition(Position position, double beatWidth)
+        private double GetPointFromPosition(IPosition position, double beatWidth)
         {
             return (position.SummedBeat(timeSignature)*beatWidth) - beatWidth;
         }

@@ -46,14 +46,14 @@ namespace Sequencer.View
         /// <summary>
         /// The note's starting position.
         /// </summary>
-        public Position StartPosition
+        public IPosition StartPosition
         {
             get { return Tone.StartPosition; }
             set
             {
                 if (value != null)
                 {
-                    if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature) < Tone.EndPosition)
+                    if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature).IsLessThan(Tone.EndPosition))
                     {
                         Tone.StartPosition = value;
                         Draw();
@@ -65,12 +65,12 @@ namespace Sequencer.View
         /// <summary>
         /// The note's ending position.
         /// </summary>
-        public Position EndPosition
+        public IPosition EndPosition
         {
             get { return Tone.EndPosition; }
             set
             {
-                if ((value != null) && !EndPosition.Equals(value) && (value > StartPosition))
+                if ((value != null) && !EndPosition.Equals(value) && (value.IsGreaterThan(StartPosition)))
                 {
                     Tone.EndPosition = value;
                     Draw();
@@ -119,7 +119,7 @@ namespace Sequencer.View
 
         public override string ToString()
         {
-            return $"Pitch: {Pitch}, Start Position: {StartPosition}, End Position: {EndPosition}";
+            return $"Pitch: {Pitch}, Start IPosition: {StartPosition}, End IPosition: {EndPosition}";
         }
 
         /// <summary>

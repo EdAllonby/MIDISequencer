@@ -115,6 +115,7 @@
     <Compile Include="View\IPositionAware.cs" />
     <Compile Include="View\ISequencerNotes.cs" />
     <Compile Include="View\IVisualNote.cs" />
+    <Compile Include="View\IVisualNoteFactory.cs" />
     <Compile Include="View\NoteState.cs" />
     <Compile Include="Drawing\SequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerDrawer.cs" />
@@ -128,6 +129,7 @@
     </Compile>
     <Compile Include="View\SequencerNotes.cs" />
     <Compile Include="Console\UnsafeNativeMethods.cs" />
+    <Compile Include="View\VisualNoteFactory.cs" />
     <Page Include="View\DragSelectionBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

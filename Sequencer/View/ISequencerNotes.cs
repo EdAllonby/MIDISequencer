@@ -47,10 +47,10 @@ namespace Sequencer.View
         /// <param name="position">The position of the note.</param>
         /// <param name="pitch">The pitch of the note.</param>
         /// <returns>A <see cref="VisualNote" /> if note. Null if note.</returns>
-        IVisualNote FindNoteFromPositionAndPitch([NotNull] Position position, [NotNull] Pitch pitch);
+        IVisualNote FindNoteFromPositionAndPitch([NotNull] IPosition position, [NotNull] Pitch pitch);
 
-        IVisualNote FindNoteFromStartingPositionAndPitch(Position position, Pitch pitch);
-        IVisualNote FindNoteFromEndingPositionAndPitch(Position position, Pitch pitch);
+        IVisualNote FindNoteFromStartingPositionAndPitch(IPosition position, Pitch pitch);
+        IVisualNote FindNoteFromEndingPositionAndPitch(IPosition position, Pitch pitch);
         IEnumerable<IVisualNote> FindAllOtherNotes([NotNull] IEnumerable<IVisualNote> notesToIgnore);
         void NoteStateChanged();
     }

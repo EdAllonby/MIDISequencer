@@ -11,17 +11,17 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public class CreateNoteFromPointCommand : MousePointNoteCommand
     {
-        [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
+        [NotNull] private readonly IVisualNoteFactory visualNoteFactory;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly IMouseOperator mouseOperator;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
 
-        public CreateNoteFromPointCommand([NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper, [NotNull] ISequencerNotes sequencerNotes,
+        public CreateNoteFromPointCommand([NotNull] IVisualNoteFactory visualNoteFactory, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] IMouseOperator mouseOperator,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
-            this.sequencerCanvasWrapper = sequencerCanvasWrapper;
+            this.visualNoteFactory = visualNoteFactory;
             this.sequencerNotes = sequencerNotes;
             this.sequencerSettings = sequencerSettings;
             this.mouseOperator = mouseOperator;
@@ -33,22 +33,19 @@ namespace Sequencer.Command.MousePointCommand
         protected override void DoExecute(IMousePoint mousePoint)
         {
             sequencerNotes.MakeAllUnselected();
-            Position notePosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            IPosition notePosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
             Pitch pitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);
 
-            Position defaultEndPosition = GetDefaultEndPosition(notePosition);
-            var defaultVelocity = new Velocity(64);
+            IPosition defaultEndPosition = GetDefaultEndPosition(notePosition);
 
-            var tone = new Tone(pitch, defaultVelocity, notePosition, defaultEndPosition);
-
-            var newNote = new VisualNote(sequencerDimensionsCalculator, sequencerCanvasWrapper, sequencerSettings, tone);
+            IVisualNote newNote = visualNoteFactory.CreateNote(pitch, notePosition, defaultEndPosition);
 
             sequencerNotes.AddNote(newNote);
         }
 
-        private Position GetDefaultEndPosition(Position notePosition)
+        private IPosition GetDefaultEndPosition(IPosition notePosition)
         {
             return notePosition.NextPosition(sequencerSettings.TimeSignature);
         }
     }
-}
+} 

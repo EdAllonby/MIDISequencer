@@ -4,10 +4,10 @@ namespace Sequencer.View
 {
     public interface IVisualNote : IPositionAware
     {
-        Position EndPosition { get; }
+        IPosition EndPosition { get; }
         NoteState NoteState { get; set; }
         Pitch Pitch { get; }
-        Position StartPosition { get; }
+        IPosition StartPosition { get; }
         Tone Tone { get; }
         Velocity Velocity { get; set; }
         void Draw();

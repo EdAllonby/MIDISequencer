@@ -47,8 +47,12 @@ namespace Sequencer.View
 
             var keyboardStateProcessor = new KeyboardStateProcessor();
 
+            ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
-            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(new SequencerCanvasWrapper(SequencerCanvas), mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
+
+            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings,sequencerDimensionsCalculator, sequencerCanvasWrapper);
+
+            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);

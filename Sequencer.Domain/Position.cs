@@ -5,7 +5,7 @@ namespace Sequencer.Domain
     /// <summary>
     /// Represents a musical position.
     /// </summary>
-    public sealed class Position : IComparable<Position>, IEquatable<Position>
+    public sealed class Position : IPosition
     {
         /// <summary>
         /// A position based on current measure, bar and beat.
@@ -26,7 +26,7 @@ namespace Sequencer.Domain
 
         public int Beat { get; }
 
-        public int CompareTo(Position other)
+        public int CompareTo(IPosition other)
         {
             if (Equals(other))
             {
@@ -48,7 +48,7 @@ namespace Sequencer.Domain
             return -1;
         }
 
-        public bool Equals(Position other)
+        public bool Equals(IPosition other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -56,7 +56,7 @@ namespace Sequencer.Domain
         }
 
         /// <summary>
-        /// Gets the sum of beats for the <see cref="Position" />.
+        /// Gets the sum of beats for the <see cref="IPosition" />.
         /// </summary>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use when calculating the sum of beats.</param>
         /// <returns></returns>
@@ -66,26 +66,26 @@ namespace Sequencer.Domain
         }
 
         /// <summary>
-        /// Get the next <see cref="Position" />.
+        /// Get the next <see cref="IPosition" />.
         /// </summary>
-        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the next <see cref="Position" />.</param>
-        /// <returns>The next <see cref="Position" />.</returns>
-        public Position NextPosition(TimeSignature timeSignature)
+        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the next <see cref="IPosition" />.</param>
+        /// <returns>The next <see cref="IPosition" />.</returns>
+        public IPosition NextPosition(TimeSignature timeSignature)
         {
             return PositionRelativeByBeats(1, timeSignature);
         }
         
         /// <summary>
-        /// Get the previous <see cref="Position" />.
+        /// Get the previous <see cref="IPosition" />.
         /// </summary>
-        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the previous <see cref="Position" />.</param>
-        /// <returns>The previous <see cref="Position" />.</returns>
-        public Position PreviousPosition(TimeSignature timeSignature)
+        /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the previous <see cref="IPosition" />.</param>
+        /// <returns>The previous <see cref="IPosition" />.</returns>
+        public IPosition PreviousPosition(TimeSignature timeSignature)
         {
             return PositionRelativeByBeats(-1, timeSignature);
         }
 
-        public Position PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature)
+        public IPosition PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature)
         {
             int totalBeats = SummedBeat(timeSignature);
             return PositionFromBeat(totalBeats + beatDelta, timeSignature);
@@ -97,7 +97,7 @@ namespace Sequencer.Domain
         /// <param name="totalBeats">The summed beats to the particular position.</param>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use in calculation.</param>
         /// <returns>The position from origin of the summed beats.</returns>
-        public static Position PositionFromBeat(int totalBeats, TimeSignature timeSignature)
+        public static IPosition PositionFromBeat(int totalBeats, TimeSignature timeSignature)
         {
             int measures = 1 + ((totalBeats - 1)/timeSignature.BeatsPerMeasure);
             int remainingBeatsForBars = totalBeats - (timeSignature.BeatsPerMeasure*(measures - 1));
@@ -111,7 +111,7 @@ namespace Sequencer.Domain
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is Position && Equals((Position) obj);
+            return obj is IPosition && Equals((IPosition) obj);
         }
 
         public override int GetHashCode()
@@ -145,9 +145,59 @@ namespace Sequencer.Domain
             return Equals(first, second) || (first.CompareTo(second) > 0);
         }
 
+        public bool IsGreaterThan(IPosition other)
+        {
+            return CompareTo(other) > 0;
+        }
+
+        public bool IsGreaterThanOrEqual(IPosition other)
+        {
+            return Equals(this, other) || (CompareTo(other) > 0);
+        }
+
+        public bool IsLessThan(IPosition other)
+        {
+            return CompareTo(other) < 0;
+        }
+
+        public bool IsLessThanOrEqual(IPosition other)
+        {
+            return Equals(this, other) || (CompareTo(other) < 0);
+        }
+
         public override string ToString()
         {
             return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}";
         }
+    }
+
+    public interface IPosition : IGreaterThanOrEqualComparable<IPosition>, ILessThanOrEqualComparable<IPosition>
+    {
+        int Measure { get; }
+
+        int Bar { get; }
+
+        int Beat { get; }
+        IPosition PreviousPosition(TimeSignature timeSignature);
+
+        IPosition NextPosition(TimeSignature timeSignature);
+        IPosition PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature);
+
+        int SummedBeat(TimeSignature timeSignature);
+    }
+
+    public interface ILessThanOrEqualComparable<in T> : IComparable<T>
+    {
+        bool IsLessThan(T other);
+
+        bool IsLessThanOrEqual(T other);
+    }
+
+    public interface IGreaterThanOrEqualComparable<in T> : IComparable<T>
+    {
+        bool IsGreaterThan(T other);
+
+        bool IsGreaterThanOrEqual(T other);
+
     }
 }

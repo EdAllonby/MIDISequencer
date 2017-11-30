@@ -14,6 +14,6 @@ namespace Sequencer.Drawing
 
         IVisualNote FindNoteFromPoint([NotNull] ISequencerNotes sequencerNotes, IMousePoint point);
         Pitch FindPitchFromPoint(IMousePoint mousePosition);
-        Position FindPositionFromPoint(IMousePoint mousePosition);
+        IPosition FindPositionFromPoint(IMousePoint mousePosition);
     }
 }

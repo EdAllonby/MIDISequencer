@@ -15,7 +15,7 @@ namespace Sequencer.Command.MousePointCommand
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private Position initialEndPosition;
+        private IPosition initialEndPosition;
         private int beatsDelta;
 
         public UpdateNoteEndPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
@@ -37,7 +37,7 @@ namespace Sequencer.Command.MousePointCommand
 
         private void MoveNotePositions(IMousePoint mousePoint)
         {
-            Position newEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
+            IPosition newEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
             int newBeatsDelta = newEndPosition.SummedBeat(sequencerSettings.TimeSignature) -
                                 initialEndPosition.SummedBeat(sequencerSettings.TimeSignature);

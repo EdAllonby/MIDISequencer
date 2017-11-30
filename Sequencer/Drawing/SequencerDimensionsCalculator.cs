@@ -46,7 +46,7 @@ namespace Sequencer.Drawing
             return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
         }
 
-        public Position FindPositionFromPoint(IMousePoint mousePosition)
+        public IPosition FindPositionFromPoint(IMousePoint mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
             return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
@@ -64,16 +64,22 @@ namespace Sequencer.Drawing
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }
 
-        /// <summary>        /// Finds a visual note relative to the sequencer.        /// </summary>        /// <param name="sequencerNotes">The notes in the sequencer.</param>        /// <param name="point">The position the mouse is relative to the sequencer.</param>        /// <returns>The note a mouse is over.</returns>        public IVisualNote FindNoteFromPoint(ISequencerNotes sequencerNotes, IMousePoint point)
+        /// <summary>
+        /// Finds a visual note relative to the sequencer.
+        /// </summary>
+        /// <param name="sequencerNotes">The notes in the sequencer.</param>
+        /// <param name="point">The position the mouse is relative to the sequencer.</param>
+        /// <returns>The note a mouse is over.</returns>
+        public IVisualNote FindNoteFromPoint(ISequencerNotes sequencerNotes, IMousePoint point)
         {
-            Position mousePosition = FindPositionFromPoint(point);
+            IPosition mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);
             return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);
         }
 
         public IVisualNote NoteAtStartingPoint(ISequencerNotes sequencerNotes, IMousePoint point)
         {
-            Position mousePosition = FindPositionFromPoint(point);
+            IPosition mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);
 
             return sequencerNotes.FindNoteFromStartingPositionAndPitch(mousePosition, mousePitch);
@@ -81,7 +87,7 @@ namespace Sequencer.Drawing
 
         public IVisualNote NoteAtEndingPoint(ISequencerNotes sequencerNotes, IMousePoint point)
         {
-            Position mousePosition = FindPositionFromPoint(point);
+            IPosition mousePosition = FindPositionFromPoint(point);
             Pitch mousePitch = FindPitchFromPoint(point);
 
             return sequencerNotes.FindNoteFromEndingPositionAndPitch(mousePosition, mousePitch);

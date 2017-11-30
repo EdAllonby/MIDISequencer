@@ -2,18 +2,18 @@
 {
     /// <summary>
     /// This domain has a concept of a 'Note' which doesn't include positions and velocity.
-    /// This <see cref="Tone" /> class unites the concepts of <see cref="Pitch" />, <see cref="Velocity" /> and <see cref="Position" />,
+    /// This <see cref="Tone" /> class unites the concepts of <see cref="Pitch" />, <see cref="Velocity" /> and <see cref="IPosition" />,
     /// all of which make a 'tone'.
     /// </summary>
     public sealed class Tone
     {
-        private Position endPosition;
+        private IPosition endPosition;
         private Pitch pitch;
-        private Position startPosition;
+        private IPosition startPosition;
         private Velocity velocity;
 
 
-        public Tone(Pitch pitch, Velocity velocity, Position startPosition, Position endPosition)
+        public Tone(Pitch pitch, Velocity velocity, IPosition startPosition, IPosition endPosition)
         {
             this.pitch = pitch;
             this.velocity = velocity;
@@ -45,7 +45,7 @@
             }
         }
 
-        public Position StartPosition
+        public IPosition StartPosition
         {
             get { return startPosition; }
             set
@@ -57,12 +57,12 @@
             }
         }
 
-        public Position EndPosition
+        public IPosition EndPosition
         {
             get { return endPosition; }
             set
             {
-                if ((value != null) && (value > StartPosition))
+                if ((value != null) && (value.IsGreaterThan(StartPosition)))
                 {
                     endPosition = value;
                 }
