@@ -10,21 +10,18 @@ namespace Sequencer.Utilities
         [NotNull]
         public static ILog GetLoggerSafe([NotNull] Type type)
         {
-            var logger = LogManager.GetLogger(type);
+            ILog logger = LogManager.GetLogger(type);
 
             return logger ?? new NullLogger();
         }
 
         private class NullLogger : ILog
         {
-
-
             // ReSharper disable once UnassignedGetOnlyAutoProperty
             public ILogger Logger { get; }
 
             public void Debug(object message)
             {
-
             }
 
             public void Debug(object message, Exception exception)
@@ -125,7 +122,6 @@ namespace Sequencer.Utilities
 
             public void ErrorFormat(string format, object arg0, object arg1)
             {
-
             }
 
             public void ErrorFormat(string format, object arg0, object arg1, object arg2)
