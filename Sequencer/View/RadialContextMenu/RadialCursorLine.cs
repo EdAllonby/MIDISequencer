@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using JetBrains.Annotations;
-using Sequencer.Command.MousePointCommand;
+using Sequencer.Input;
 
 namespace Sequencer.View.RadialContextMenu
 {
@@ -14,15 +14,15 @@ namespace Sequencer.View.RadialContextMenu
     public class RadialCursorLine
     {
         private const int FadeOutDuration = 200;
-        private readonly Line cursorLine;
-        private readonly Canvas ownerCanvas;
+        [NotNull] private readonly Line cursorLine;
+        [NotNull] private readonly Canvas ownerCanvas;
 
         /// <summary>
         /// Create a cursor line with a fixed starting point to be displayed on a <see cref="Canvas" />.
         /// </summary>
         /// <param name="canvas">The canvas to display this cursor line on.</param>
         /// <param name="startingPosition">The fixed starting point of this cursor line.</param>
-        public RadialCursorLine([NotNull] Canvas canvas, IMousePoint startingPosition)
+        public RadialCursorLine([NotNull] Canvas canvas, [NotNull] IMousePoint startingPosition)
         {
             ownerCanvas = canvas;
 
@@ -43,7 +43,7 @@ namespace Sequencer.View.RadialContextMenu
         /// Give the cursor line a new end point.
         /// </summary>
         /// <param name="endPosition">The new end point.</param>
-        public void NewEndPoint(IMousePoint endPosition)
+        public void NewEndPoint([NotNull] IMousePoint endPosition)
         {
             cursorLine.X2 = endPosition.X;
             cursorLine.Y2 = endPosition.Y;

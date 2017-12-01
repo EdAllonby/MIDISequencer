@@ -1,15 +1,7 @@
 ﻿using System.Windows;
 
-namespace Sequencer.Command.MousePointCommand
+namespace Sequencer.Input
 {
-    public interface IMousePoint
-    {
-        double X { get; }
-        double Y { get; }
-
-        Point Point { get; }
-    }
-
     public class MousePoint : IMousePoint
     {
         public MousePoint(Point point)

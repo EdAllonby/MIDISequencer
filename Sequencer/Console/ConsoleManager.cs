@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -65,16 +64,21 @@ namespace Sequencer.Console
 
             MethodInfo consoleInitializeStdOutError = type.GetMethod("InitializeStdOutError",
                 BindingFlags.Static | BindingFlags.NonPublic);
+            
+            if (consoleOut != null)
+            {
+                consoleOut.SetValue(null, null);
+            }
 
-            Debug.Assert(consoleOut != null);
-            Debug.Assert(consoleError != null);
+            if (consoleError != null)
+            {
+                consoleError.SetValue(null, null);
+            }
 
-            Debug.Assert(consoleInitializeStdOutError != null);
-
-            consoleOut.SetValue(null, null);
-            consoleError.SetValue(null, null);
-
-            consoleInitializeStdOutError.Invoke(null, new object[] {true});
+            if (consoleInitializeStdOutError != null)
+            {
+                consoleInitializeStdOutError.Invoke(null, new object[] { true });
+            }
         }
 
         private static void SetOutAndErrorNull()

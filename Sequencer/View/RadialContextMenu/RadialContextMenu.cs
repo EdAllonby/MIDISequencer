@@ -5,8 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Sequencer.Command.MousePointCommand;
+using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Input;
 using Sequencer.Utilities;
 using Sequencer.ViewModel;
 
@@ -17,24 +18,24 @@ namespace Sequencer.View.RadialContextMenu
         /// <summary>
         /// The Items selected Dependency Property.
         /// </summary>
-        public static readonly DependencyProperty SelectedMenuItemProperty =
+        [NotNull] public static readonly DependencyProperty SelectedMenuItemProperty =
             DependencyProperty.Register(nameof(SelectedMenuItem), typeof(EnumerableType<TMenuItem>), typeof(RadialContextMenu<TMenuItem>),
                 new FrameworkPropertyMetadata(null));
 
         /// <summary>
         /// The Items selected Dependency Property.
         /// </summary>
-        public static readonly DependencyProperty MenuRadiusProperty =
+        [NotNull] public static readonly DependencyProperty MenuRadiusProperty =
             DependencyProperty.Register(nameof(MenuRadius), typeof(double), typeof(RadialContextMenu<TMenuItem>),
                 new FrameworkPropertyMetadata(null));
 
-        private readonly List<Line> menuSeperators = new List<Line>();
-        private readonly List<ContextMenuSegment<TMenuItem>> segments = new List<ContextMenuSegment<TMenuItem>>();
+        [NotNull] [ItemNotNull] private readonly List<Line> menuSeperators = new List<Line>();
+        [NotNull] [ItemNotNull] private readonly List<ContextMenuSegment<TMenuItem>> segments = new List<ContextMenuSegment<TMenuItem>>();
 
         private IMousePoint centre;
         private bool isActive;
 
-        private RadialCursorLine radialCursorLine;
+        [CanBeNull] private RadialCursorLine radialCursorLine;
 
 
         public EnumerableType<TMenuItem> SelectedMenuItem
@@ -45,13 +46,22 @@ namespace Sequencer.View.RadialContextMenu
 
         public double MenuRadius
         {
-            get { return (double) GetValue(MenuRadiusProperty); }
+            get
+            {
+                object value = GetValue(MenuRadiusProperty);
+                if (value == null)
+                {
+                    return 0;
+                }
+
+                return (double) value;
+            }
             set { SetValue(MenuRadiusProperty, value); }
         }
 
-        private static double AngleSize => (double) 360/EnumerableType<TMenuItem>.Count;
+        private static double AngleSize => (double) 360 / EnumerableType<TMenuItem>.Count;
 
-        public void SetCursorPosition(IMousePoint point)
+        public void SetCursorPosition([NotNull] IMousePoint point)
         {
             if (!isActive)
             {
@@ -62,7 +72,7 @@ namespace Sequencer.View.RadialContextMenu
 
             foreach (ContextMenuSegment<TMenuItem> contextMenuSegment in segments)
             {
-                var segment = new LineGeometry(centre.Point, point.Point);
+                var segment = new LineGeometry(centre?.Point ?? new Point(), point.Point);
 
                 if (contextMenuSegment.IntersectsWith(segment))
                 {
@@ -75,7 +85,7 @@ namespace Sequencer.View.RadialContextMenu
             }
         }
 
-        public void BuildPopup(IMousePoint point)
+        public void BuildPopup([NotNull] IMousePoint point)
         {
             isActive = true;
             centre = point;
@@ -83,7 +93,7 @@ namespace Sequencer.View.RadialContextMenu
 
             foreach (TMenuItem menuItem in EnumerableType<TMenuItem>.All)
             {
-                double angle = (AngleSize/2) + (AngleSize*menuItem.Value);
+                double angle = AngleSize / 2 + AngleSize * menuItem.Value;
 
                 // We want to start calculating where the azimuth is on the Y axis.
                 // So, we tranlate all angles by -90 degrees to rotate from X to Y.
@@ -99,28 +109,6 @@ namespace Sequencer.View.RadialContextMenu
 
             AddElementsToCanvas(segments);
             AddElementsToCanvas(menuSeperators);
-        }
-
-        private void AddElementsToCanvas(IEnumerable<FrameworkElement> elements)
-        {
-            foreach (FrameworkElement element in elements)
-            {
-                if (!Children.Contains(element))
-                {
-                    Children.Add(element);
-                }
-            }
-        }
-
-        private void RemoveElementToCanvas(IEnumerable<FrameworkElement> elements)
-        {
-            foreach (FrameworkElement element in elements.ToList())
-            {
-                if (Children.Contains(element))
-                {
-                    Children.Remove(element);
-                }
-            }
         }
 
         public void ClosePopup()
@@ -146,9 +134,31 @@ namespace Sequencer.View.RadialContextMenu
                 segment.BeginAnimation(OpacityProperty, animation);
             }
 
-            radialCursorLine.RemoveWithFade(OpacityProperty);
+            radialCursorLine?.RemoveWithFade(OpacityProperty);
 
             isActive = false;
+        }
+
+        private void AddElementsToCanvas([NotNull] [ItemNotNull] IEnumerable<FrameworkElement> elements)
+        {
+            foreach (FrameworkElement element in elements)
+            {
+                if (!Children.Contains(element))
+                {
+                    Children.Add(element);
+                }
+            }
+        }
+
+        private void RemoveElementToCanvas([NotNull] [ItemNotNull] IEnumerable<FrameworkElement> elements)
+        {
+            foreach (FrameworkElement element in elements.ToList())
+            {
+                if (Children.Contains(element))
+                {
+                    Children.Remove(element);
+                }
+            }
         }
 
         private void AfterRemoveAnimation()

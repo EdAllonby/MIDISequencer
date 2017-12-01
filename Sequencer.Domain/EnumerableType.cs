@@ -43,7 +43,7 @@ namespace Sequencer.Domain
         [NotNull]
         public string DisplayName { get; }
 
-        public static IEnumerable<TElement> All => ElementsById.Values;
+        [NotNull] public static IEnumerable<TElement> All => ElementsById.Values;
 
         [NotNull]
         public static TElement FromValue(int value)

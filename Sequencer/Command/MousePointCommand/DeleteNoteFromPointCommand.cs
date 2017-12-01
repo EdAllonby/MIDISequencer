@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Drawing;
+using Sequencer.Input;
 using Sequencer.Utilities;
 using Sequencer.View;
 
@@ -25,7 +26,11 @@ namespace Sequencer.Command.MousePointCommand
         protected override void DoExecute(IMousePoint mousePoint)
         {
             IVisualNote noteToDelete = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
-            deleteNotesCommand.Execute(noteToDelete.Yield());
+
+            if (noteToDelete != null)
+            {
+                deleteNotesCommand.Execute(noteToDelete.Yield());
+            }
         }
     }
 }

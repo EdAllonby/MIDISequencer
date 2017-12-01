@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Sequencer.Command.MousePointCommand;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Drawing;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Tests.CommandTests.MousePointCommandTests
@@ -26,7 +27,9 @@ namespace Sequencer.Tests.CommandTests.MousePointCommandTests
             var command = new DeleteNoteFromPointCommand(mockSequencerNotes.Object, sequencerCalculatorStub.Object, mockDeleteCommand.Object);
             command.Execute(mockMousePoint.Object);
 
+            // ReSharper disable PossibleMultipleEnumeration
             mockDeleteCommand.Verify(x => x.Execute(It.Is<IEnumerable<IVisualNote>>(m => m.Contains(mockNoteToDelete.Object) && m.Count() == 1)), Times.Once);
+            // ReSharper restore PossibleMultipleEnumeration
         }
     }
 }

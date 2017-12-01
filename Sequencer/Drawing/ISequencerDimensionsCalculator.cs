@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
-using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
+using Sequencer.Input;
 using Sequencer.View;
 
 namespace Sequencer.Drawing

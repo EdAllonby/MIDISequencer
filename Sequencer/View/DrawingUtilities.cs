@@ -39,6 +39,8 @@ namespace Sequencer.View
         /// </summary>
         /// <param name="fadeOutDuration">How long the fade out animation should last, in milliseconds.</param>
         /// <returns>A fade out animation.</returns>
+        [NotNull]
+        [Pure]
         public static DoubleAnimation CreateFadeOutAnimation(int fadeOutDuration)
         {
             return new DoubleAnimation

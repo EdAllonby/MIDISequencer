@@ -80,7 +80,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Command\MousePointCommand\IMousePoint.cs" />
+    <Compile Include="Input\IMousePoint.cs" />
+    <Compile Include="Input\MousePoint.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteStartPositionFromInitialPointCommand.cs" />
     <Compile Include="Command\NotesCommand\IDeleteNotesCommand.cs" />

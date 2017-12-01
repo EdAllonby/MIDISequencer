@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using JetBrains.Annotations;
 using log4net.Config;
+// ReSharper disable once RedundantUsingDirective
 using Sequencer.Console;
 
 namespace Sequencer

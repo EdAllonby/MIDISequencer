@@ -4,7 +4,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using JetBrains.Annotations;
-using Sequencer.Command.MousePointCommand;
+using log4net;
+using Sequencer.Domain;
+using Sequencer.Input;
 
 namespace Sequencer.View
 {
@@ -13,6 +15,8 @@ namespace Sequencer.View
     /// </summary>
     public partial class DragSelectionBox
     {
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(DragSelectionBox));
+
         /// <summary>
         /// The threshold distance the mouse-cursor must move before drag-selection begins.
         /// </summary>
@@ -59,20 +63,27 @@ namespace Sequencer.View
         /// <param name="newPosition">The new position to update the selection box dimensions with.</param>
         public void UpdateDragSelectionBox([NotNull] IMousePoint newPosition)
         {
-            if (IsDragging)
+            if (origMouseDownPoint != null)
             {
-                UpdateDragSelectionRectSize(origMouseDownPoint, newPosition);
-            }
-            else if (isLeftMouseButtonDownOnWindow)
-            {
-                Vector? dragDelta = newPosition.Point - origMouseDownPoint?.Point;
-                double dragDistance = Math.Abs(dragDelta.GetValueOrDefault().Length);
-                if (dragDistance > DragThreshold)
+                if (IsDragging)
                 {
-                    IsDragging = true;
-
-                    InitDragSelectionRect(origMouseDownPoint, newPosition);
+                    UpdateDragSelectionRectSize(origMouseDownPoint, newPosition);
                 }
+                else if (isLeftMouseButtonDownOnWindow)
+                {
+                    Vector? dragDelta = newPosition.Point - origMouseDownPoint?.Point;
+                    double dragDistance = Math.Abs(dragDelta.GetValueOrDefault().Length);
+                    if (dragDistance > DragThreshold)
+                    {
+                        IsDragging = true;
+
+                        InitDragSelectionRect(origMouseDownPoint, newPosition);
+                    }
+                }
+            }
+            else
+            {
+                Log.Warn($"{nameof(origMouseDownPoint)} is null");
             }
         }
 
@@ -119,7 +130,7 @@ namespace Sequencer.View
         /// <summary>
         /// Update the position and size of the rectangle used for drag selection.
         /// </summary>
-        private void UpdateDragSelectionRectSize(IMousePoint pt1, IMousePoint pt2)
+        private void UpdateDragSelectionRectSize([NotNull] IMousePoint pt1, [NotNull] IMousePoint pt2)
         {
             double x;
             double y;
@@ -148,6 +159,11 @@ namespace Sequencer.View
                 height = pt2.Y - y;
             }
 
+            if (DragSelectionBorder == null)
+            {
+                throw new NullReferenceException("DragSelectionBorder is null");
+            }
+
             SetLeft(DragSelectionBorder, x);
             SetTop(DragSelectionBorder, y);
             DragSelectionBorder.Width = width;
@@ -157,7 +173,7 @@ namespace Sequencer.View
         /// <summary>
         /// Initialize the rectangle used for drag selection.
         /// </summary>
-        private void InitDragSelectionRect(IMousePoint pt1, IMousePoint pt2)
+        private void InitDragSelectionRect([NotNull] IMousePoint pt1, [NotNull] IMousePoint pt2)
         {
             UpdateDragSelectionRectSize(pt1, pt2);
 
@@ -166,6 +182,11 @@ namespace Sequencer.View
 
         private Rect GetSelectionBox()
         {
+            if (DragSelectionBorder == null)
+            {
+                throw new NullReferenceException("DragSelectionBorder is null");
+            }
+
             double x = GetLeft(DragSelectionBorder);
             double y = GetTop(DragSelectionBorder);
             double width = DragSelectionBorder.Width;

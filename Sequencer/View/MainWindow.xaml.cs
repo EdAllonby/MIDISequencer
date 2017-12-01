@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
-using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
 using Sequencer.Input;
 
@@ -11,7 +10,7 @@ namespace Sequencer.View
     public partial class MainWindow
     {
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(MainWindow));
-        private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
+        [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
 
         public MainWindow()
         {
@@ -20,65 +19,66 @@ namespace Sequencer.View
             Log.Info("Main Window loaded");
         }
 
-        private void SequencerMouseDown(object sender, [NotNull] MouseButtonEventArgs e)
+        private void SequencerMouseDown([NotNull] object sender, [NotNull] MouseButtonEventArgs e)
         {
             IMousePoint mouseDownPoint = SequencerMousePosition(e);
 
             switch (e.ChangedButton)
             {
                 case MouseButton.Left:
-                    Sequencer.HandleLeftMouseDown(mouseDownPoint);
+                    Sequencer?.HandleLeftMouseDown(mouseDownPoint);
                     break;
 
                 case MouseButton.Right:
-                    RadialContextMenu.BuildPopup(mouseDownPoint);
+                    RadialContextMenu?.BuildPopup(mouseDownPoint);
                     break;
             }
 
-            Sequencer.CaptureMouse();
+            Sequencer?.CaptureMouse();
             e.Handled = true;
         }
 
-        private void SequencerMouseMoved(object sender, MouseEventArgs e)
+        private void SequencerMouseMoved([NotNull] object sender, [NotNull] MouseEventArgs e)
         {
             IMousePoint currentMousePosition = SequencerMousePosition(e);
 
             if (mouseOperator.CanModifyContextMenu)
             {
-                RadialContextMenu.SetCursorPosition(currentMousePosition);
+                RadialContextMenu?.SetCursorPosition(currentMousePosition);
             }
             else
             {
-                Sequencer.HandleMouseMovement(currentMousePosition);
+                Sequencer?.HandleMouseMovement(currentMousePosition);
             }
 
             e.Handled = true;
         }
 
-        private void SequencerKeyPressed(object sender, KeyEventArgs e)
+        private void SequencerKeyPressed([NotNull] object sender, [NotNull] KeyEventArgs e)
         {
-            Sequencer.HandleKeyPress(e.Key);
+            Sequencer?.HandleKeyPress(e.Key);
         }
 
-        private void SequencerMouseUp(object sender, MouseButtonEventArgs e)
+        private void SequencerMouseUp([NotNull] object sender, [NotNull] MouseButtonEventArgs e)
         {
             MouseButton changedButton = e.ChangedButton;
 
             switch (changedButton)
             {
                 case MouseButton.Left:
-                    Sequencer.DragSelectionBox.CloseSelectionBox();
+                    Sequencer?.DragSelectionBox?.CloseSelectionBox();
                     break;
                 case MouseButton.Right:
-                    RadialContextMenu.ClosePopup();
+                    RadialContextMenu?.ClosePopup();
                     break;
             }
 
-            Sequencer.ReleaseMouseCapture();
+            Sequencer?.ReleaseMouseCapture();
             e.Handled = true;
         }
 
-        private IMousePoint SequencerMousePosition(MouseEventArgs mouseEventArgs)
+        [NotNull]
+        private IMousePoint SequencerMousePosition([NotNull] MouseEventArgs mouseEventArgs)
         {
             Point point = mouseEventArgs.GetPosition(Sequencer);
             return new MousePoint(point);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -49,6 +50,11 @@ namespace Sequencer.View
 
             var keyboardStateProcessor = new KeyboardStateProcessor();
 
+            if (SequencerCanvas == null)
+            {
+                throw new NullReferenceException($"{nameof(SequencerCanvas)} is null.");
+            }
+
             ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
 
@@ -67,30 +73,31 @@ namespace Sequencer.View
             set { SetValue(NoteActionProperty, value); }
         }
 
+        [NotNull]
+        [ItemNotNull]
         public IEnumerable<Tone> SelectedNotes
         {
-            get { return (IEnumerable<Tone>) GetValue(SelectedNotesProperty); }
+            get { return (IEnumerable<Tone>) GetValue(SelectedNotesProperty) ?? throw new InvalidOperationException(); }
             set { SetValue(SelectedNotesProperty, value); }
         }
 
-        public void AddChild(UIElement child)
+        public void HandleLeftMouseDown([NotNull] IMousePoint mouseDownPoint)
         {
-            SequencerCanvas.Children.Add(child);
-        }
+            if (DragSelectionBox == null)
+            {
+                throw new NullReferenceException($"{nameof(DragSelectionBox)} is null.");
+            }
+            if (NoteAction == null)
+            {
+                throw new NullReferenceException($"{nameof(NoteAction)} is null.");
+            }
 
-        public void RemoveChild(UIElement child)
-        {
-            SequencerCanvas.Children.Remove(child);
-        }
-
-        public void HandleLeftMouseDown(IMousePoint mouseDownPoint)
-        {
             if (!sequencerDimensionsCalculator.IsPointInsideNote(notes, mouseDownPoint)
                 && NoteAction == NoteAction.Select)
             {
                 DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
             }
-
+            
             IMousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
 
             moveNoteFromPointCommand = GetMovementCommand(mouseDownPoint);
@@ -103,7 +110,7 @@ namespace Sequencer.View
             keyPressCommandHandler.HandleSequencerKeyPressed(keyPressed);
         }
 
-        public void HandleMouseMovement(IMousePoint newMousePoint)
+        public void HandleMouseMovement([NotNull] IMousePoint newMousePoint)
         {
             if (NoteAction == NoteAction.Create)
             {
@@ -147,6 +154,11 @@ namespace Sequencer.View
 
         private void HandleMouseSelectMovement([NotNull] IMousePoint newMousePoint)
         {
+            if (DragSelectionBox == null)
+            {
+                throw new NullReferenceException($"{nameof(DragSelectionBox)} is null.");
+            }
+
             DragSelectionBox.UpdateDragSelectionBox(newMousePoint);
 
             if (DragSelectionBox.IsDragging)
@@ -162,7 +174,7 @@ namespace Sequencer.View
             }
         }
 
-        private void SetCursor(IMousePoint newMousePoint)
+        private void SetCursor([NotNull] IMousePoint newMousePoint)
         {
             IVisualNote noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, newMousePoint);
             if (noteAtStartingPoint != null)
