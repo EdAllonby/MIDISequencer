@@ -81,6 +81,10 @@
       <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
       <Name>Sequencer.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj">
+      <Project>{68A8D4A6-B8EE-4684-8F1B-21B686014069}</Project>
+      <Name>Sequencer.ViewModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sequencer\Sequencer.csproj">
       <Project>{F891ABD0-A37F-42A2-9B98-C1723D58CED3}</Project>
       <Name>Sequencer</Name>

@@ -5,36 +5,49 @@ using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
 using Sequencer.View;
+using Sequencer.ViewModel;
 
 namespace Sequencer.Tests.CommandTests.MousePointCommandTests
 {
     [TestFixture]
     public sealed class MousePointNoteCommandFactoryTests
     {
-        [Test]
-        public void CreateNoteTest()
+        private MousePointNoteCommandFactory factory;
+
+        [SetUp]
+        public void BeforeEachTest()
         {
             var mockVisualNoteFactory = new Mock<IVisualNoteFactory>();
             var mockSequencerNotes = new Mock<ISequencerNotes>();
+            var keyboardStateStub = new Mock<IKeyboardStateProcessor>();
             var mockSequencerCalculator = new Mock<ISequencerDimensionsCalculator>();
-            var mockMousePoint = new Mock<IMousePoint>();
-            var mockNoteToDelete = new Mock<IVisualNote>();
             var mockMouseOperator = new Mock<IMouseOperator>();
-            var mockNotePosition = new Mock<IPosition>();
-            var mockNextPosition = new Mock<IPosition>();
-            var mockCreatedNote = new Mock<IVisualNote>();
 
-            mockNotePosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
-            mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
-            mockSequencerCalculator.Setup(x => x.FindNoteFromPoint(mockSequencerNotes.Object, mockMousePoint.Object)).Returns(mockNoteToDelete.Object);
-            mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockMousePoint.Object)).Returns(mockNotePosition.Object);
-            mockVisualNoteFactory.Setup(x => x.CreateNote(It.IsAny<Pitch>(), mockNotePosition.Object, mockNextPosition.Object)).Returns(mockCreatedNote.Object);
+            factory = new MousePointNoteCommandFactory(mockVisualNoteFactory.Object, mockMouseOperator.Object, keyboardStateStub.Object, mockSequencerNotes.Object, new SequencerSettings(), mockSequencerCalculator.Object);
+        }
 
-            var command = new CreateNoteFromPointCommand(mockVisualNoteFactory.Object, mockSequencerNotes.Object, new SequencerSettings(), mockMouseOperator.Object, mockSequencerCalculator.Object);
-            command.Execute(mockMousePoint.Object);
+        [Test]
+        public void CreateReturnsCreateCommand()
+        {
+            IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.Create);
 
-            mockSequencerNotes.Verify(x => x.MakeAllUnselected(), Times.Once);
-            mockSequencerNotes.Verify(x => x.AddNote(mockCreatedNote.Object), Times.Once);
+            Assert.IsInstanceOf<CreateNoteFromPointCommand>(mouseCommand);
+        }
+
+        [Test]
+        public void SelectReturnsCreateCommand()
+        {
+            IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.Select);
+
+            Assert.IsInstanceOf<UpdateNoteStateFromPointCommand>(mouseCommand);
+        }
+
+        [Test]
+        public void DeleteReturnsCreateCommand()
+        {
+            IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.Delete);
+
+            Assert.IsInstanceOf<DeleteNoteFromPointCommand>(mouseCommand);
         }
     }
 }

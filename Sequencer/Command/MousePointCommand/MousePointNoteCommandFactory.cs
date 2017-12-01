@@ -29,9 +29,7 @@ namespace Sequencer.Command.MousePointCommand
         [NotNull]
         public IMousePointNoteCommand FindCommand([NotNull] NoteAction noteAction)
         {
-            IMousePointNoteCommand matchingCommand;
-
-            bool commandFound = noteCommandRegistry.TryGetValue(noteAction, out matchingCommand);
+            bool commandFound = noteCommandRegistry.TryGetValue(noteAction, out IMousePointNoteCommand matchingCommand);
 
             return commandFound ? matchingCommand : new EmptyMousePointCommand();
         }
