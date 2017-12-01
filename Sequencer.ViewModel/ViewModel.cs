@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Sequencer.ViewModel.Properties;
+using JetBrains.Annotations;
 
 namespace Sequencer.ViewModel
 {

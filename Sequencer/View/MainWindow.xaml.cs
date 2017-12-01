@@ -1,14 +1,16 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using log4net;
 using Sequencer.Command.MousePointCommand;
+using Sequencer.Domain;
 using Sequencer.Input;
 
 namespace Sequencer.View
 {
     public partial class MainWindow
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MainWindow));
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(MainWindow));
         private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
 
         public MainWindow()
@@ -18,7 +20,7 @@ namespace Sequencer.View
             Log.Info("Main Window loaded");
         }
 
-        private void SequencerMouseDown(object sender, MouseButtonEventArgs e)
+        private void SequencerMouseDown(object sender, [NotNull] MouseButtonEventArgs e)
         {
             IMousePoint mouseDownPoint = SequencerMousePosition(e);
 

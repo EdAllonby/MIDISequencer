@@ -6,7 +6,7 @@ namespace Sequencer.Command.NotesCommand
 {
     public sealed class DeleteNotesCommand : IDeleteNotesCommand, INotesCommand
     {
-        private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
 
         public DeleteNotesCommand([NotNull] ISequencerNotes sequencerNotes)
         {

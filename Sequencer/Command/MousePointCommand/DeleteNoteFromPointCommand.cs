@@ -10,10 +10,10 @@ namespace Sequencer.Command.MousePointCommand
     {
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly IDeleteNotesCommand deleteNotesCommand;
+        [NotNull] private readonly IDeleteNotesCommand deleteNotesCommand;
 
         public DeleteNoteFromPointCommand([NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, IDeleteNotesCommand deleteNotesCommand)
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] IDeleteNotesCommand deleteNotesCommand)
         {
             this.sequencerNotes = sequencerNotes;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;

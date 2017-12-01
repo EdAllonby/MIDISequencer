@@ -15,10 +15,11 @@ namespace Sequencer.Command.MousePointCommand
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private IPosition initialEndPosition;
+        [NotNull] private IPosition initialEndPosition;
         private int beatsDelta;
 
-        public UpdateNoteEndPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
+        public UpdateNoteEndPositionFromInitialPointCommand([NotNull] IMousePoint initialMousePoint,
+            [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.mouseOperator = mouseOperator;
@@ -35,7 +36,7 @@ namespace Sequencer.Command.MousePointCommand
             MoveNotePositions(mousePoint);
         }
 
-        private void MoveNotePositions(IMousePoint mousePoint)
+        private void MoveNotePositions([NotNull] IMousePoint mousePoint)
         {
             IPosition newEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
@@ -48,7 +49,7 @@ namespace Sequencer.Command.MousePointCommand
 
                 initialEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-                foreach (VisualNote selectedNote in sequencerNotes.SelectedNotes)
+                foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
                 {
                     selectedNote.EndPosition = selectedNote.EndPosition.PositionRelativeByBeats(beatsDelta, sequencerSettings.TimeSignature);
                 }

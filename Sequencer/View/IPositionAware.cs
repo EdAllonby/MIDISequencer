@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using JetBrains.Annotations;
 
 namespace Sequencer.View
 {
@@ -12,6 +13,6 @@ namespace Sequencer.View
         /// </summary>
         /// <param name="geometry">The rectangle to check intersection.</param>
         /// <returns>If the element intersects with the rectangle.</returns>
-        bool IntersectsWith(Geometry geometry);
+        bool IntersectsWith([NotNull] Geometry geometry);
     }
 }

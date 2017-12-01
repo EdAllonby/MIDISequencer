@@ -43,7 +43,8 @@ namespace Sequencer.Command.MousePointCommand
             sequencerNotes.AddNote(newNote);
         }
 
-        private IPosition GetDefaultEndPosition(IPosition notePosition)
+        [NotNull]
+        private IPosition GetDefaultEndPosition([NotNull] IPosition notePosition)
         {
             return notePosition.NextPosition(sequencerSettings.TimeSignature);
         }

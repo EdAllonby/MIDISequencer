@@ -1,12 +1,13 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Sequencer.Domain
 {
     public interface IGreaterThanOrEqualComparable<in T> : IComparable<T>
     {
-        bool IsGreaterThan(T other);
+        bool IsGreaterThan([NotNull] T other);
 
-        bool IsGreaterThanOrEqual(T other);
+        bool IsGreaterThanOrEqual([NotNull] T other);
 
     }
 }

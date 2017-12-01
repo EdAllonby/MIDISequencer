@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
 using Sequencer.View;
@@ -12,8 +11,24 @@ namespace Sequencer.Drawing
 
         double NoteHeight { get; }
 
-        IVisualNote FindNoteFromPoint([NotNull] ISequencerNotes sequencerNotes, IMousePoint point);
-        Pitch FindPitchFromPoint(IMousePoint mousePosition);
-        IPosition FindPositionFromPoint(IMousePoint mousePosition);
+        double MeasureWidth { get; }
+        double BarWidth { get; }
+
+        [CanBeNull]
+        IVisualNote FindNoteFromPoint([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMousePoint point);
+
+        [NotNull]
+        Pitch FindPitchFromPoint([NotNull] IMousePoint mousePosition);
+
+        [NotNull]
+        IPosition FindPositionFromPoint([NotNull] IMousePoint mousePosition);
+
+        bool IsPointInsideNote([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
+
+        [CanBeNull]
+        IVisualNote NoteAtEndingPoint([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
+
+        [CanBeNull]
+        IVisualNote NoteAtStartingPoint([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
     }
 }

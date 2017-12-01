@@ -1,7 +1,6 @@
 ﻿using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Command.NotesCommand;
-using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
 using Sequencer.Utilities;
@@ -14,11 +13,11 @@ namespace Sequencer.Command.MousePointCommand
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly IMouseOperator mouseOperator;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly UpdateNoteStateCommand noteStateSelectedCommand;
-        private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
+        [NotNull] private readonly UpdateNoteStateCommand noteStateSelectedCommand;
+        [NotNull] private readonly UpdateNoteStateCommand noteStateUnselectedCommand;
 
-        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator, 
-            [NotNull] IKeyboardStateProcessor keyboardStateProcessor, 
+        public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
+            [NotNull] IKeyboardStateProcessor keyboardStateProcessor,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencerNotes = sequencerNotes;

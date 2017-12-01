@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using JetBrains.Annotations;
 using log4net.Config;
 using Sequencer.Console;
 
@@ -31,9 +32,9 @@ namespace Sequencer
             base.OnStartup(e);
         }
 
-        private static void SetupLogging(string logConfigName)
+        private static void SetupLogging([NotNull] string logConfigName)
         {
-            string assemblyPath = Assembly.GetAssembly(typeof(App)).Location;
+            string assemblyPath = Assembly.GetAssembly(typeof(App))?.Location;
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
 
             if (assemblyDirectory != null)

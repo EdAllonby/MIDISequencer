@@ -9,12 +9,12 @@ namespace Sequencer.Domain
     public sealed class MidiProtocol : IDigitalAudioProtocol
     {
         private const int NotesPerOctave = 12;
-        private static readonly Pitch LowestMidiNote = new Pitch(Note.C, 0);
+        [NotNull] private static readonly Pitch LowestMidiNote = new Pitch(Note.C, 0);
 
         /// <summary>
         /// The MIDI equivalent of this pitch.
         /// </summary>
-        public int ProtocolNoteNumber([NotNull] Pitch pitch)
+        public int ProtocolNoteNumber(Pitch pitch)
         {
             return PitchStepCalculator.FindStepsFromPitches(LowestMidiNote, pitch);
         }
@@ -26,9 +26,9 @@ namespace Sequencer.Domain
         /// <returns>The pitch from the Midi value.</returns>
         public Pitch CreatePitchFromProtocolNumber(int midiValue)
         {
-            int noteValue = midiValue%NotesPerOctave;
+            int noteValue = midiValue % NotesPerOctave;
 
-            int octave = (midiValue - noteValue)/NotesPerOctave;
+            int octave = (midiValue - noteValue) / NotesPerOctave;
 
             Note note = Note.FromValue(noteValue);
 

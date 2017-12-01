@@ -1,7 +1,9 @@
-﻿namespace Sequencer.Command.MousePointCommand
+﻿using JetBrains.Annotations;
+
+namespace Sequencer.Command.MousePointCommand
 {
     public interface IMousePointNoteCommand
     {
-        void Execute(IMousePoint mousePoint);
+        void Execute([NotNull] IMousePoint mousePoint);
     }
 }

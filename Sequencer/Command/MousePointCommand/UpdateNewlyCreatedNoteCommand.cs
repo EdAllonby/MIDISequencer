@@ -32,7 +32,7 @@ namespace Sequencer.Command.MousePointCommand
             IPosition currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
             IPosition nextPosition = currentEndPosition.NextPosition(sequencerSettings.TimeSignature);
 
-            foreach (VisualNote selectedNote in sequencerNotes.SelectedNotes)
+            foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
             {
                 selectedNote.EndPosition = nextPosition;
             }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using log4net;
 using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
@@ -11,23 +12,38 @@ namespace Sequencer.Command.MousePointCommand
 {
     public sealed class MousePointNoteCommandFactory
     {
-        private readonly Dictionary<NoteAction, MousePointNoteCommand> noteCommandRegistry;
+        [NotNull] private readonly Dictionary<NoteAction, IMousePointNoteCommand> noteCommandRegistry;
 
-        public MousePointNoteCommandFactory(IVisualNoteFactory visualNoteFactory, [NotNull] IMouseOperator mouseOperator, 
-            IKeyboardStateProcessor keyboardStateProcessor, ISequencerNotes sequencerNotes,
-            SequencerSettings sequencerSettings, ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public MousePointNoteCommandFactory([NotNull] IVisualNoteFactory visualNoteFactory, [NotNull] IMouseOperator mouseOperator,
+            [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] ISequencerNotes sequencerNotes,
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
-            noteCommandRegistry = new Dictionary<NoteAction, MousePointNoteCommand>
+            noteCommandRegistry = new Dictionary<NoteAction, IMousePointNoteCommand>
             {
-                {NoteAction.Create, new CreateNoteFromPointCommand(visualNoteFactory, sequencerNotes, sequencerSettings, mouseOperator, sequencerDimensionsCalculator)},
-                {NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, mouseOperator, keyboardStateProcessor, sequencerDimensionsCalculator)},
-                {NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerDimensionsCalculator, new DeleteNotesCommand(sequencerNotes))}
+                { NoteAction.Create, new CreateNoteFromPointCommand(visualNoteFactory, sequencerNotes, sequencerSettings, mouseOperator, sequencerDimensionsCalculator) },
+                { NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, mouseOperator, keyboardStateProcessor, sequencerDimensionsCalculator) },
+                { NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerDimensionsCalculator, new DeleteNotesCommand(sequencerNotes)) }
             };
         }
 
-        public MousePointNoteCommand FindCommand(NoteAction noteAction)
+        [NotNull]
+        public IMousePointNoteCommand FindCommand([NotNull] NoteAction noteAction)
         {
-            return noteCommandRegistry[noteAction];
+            IMousePointNoteCommand matchingCommand;
+
+            bool commandFound = noteCommandRegistry.TryGetValue(noteAction, out matchingCommand);
+
+            return commandFound ? matchingCommand : new EmptyMousePointCommand();
+        }
+
+        private class EmptyMousePointCommand : IMousePointNoteCommand
+        {
+            [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(EmptyMousePointCommand));
+
+            public void Execute(IMousePoint mousePoint)
+            {
+                Log.Warn("Null Mouse Point Command Execute.");
+            }
         }
     }
 }

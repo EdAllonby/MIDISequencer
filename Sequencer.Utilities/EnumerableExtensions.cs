@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Sequencer.Utilities
 {
@@ -10,7 +11,8 @@ namespace Sequencer.Utilities
         /// <typeparam name="T"> Type of the object. </typeparam>
         /// <param name="item"> The instance that will be wrapped. </param>
         /// <returns> An <see cref="IEnumerable{T}" /> consisting of a single item. </returns>
-        public static IEnumerable<T> Yield<T>(this T item)
+        [NotNull]
+        public static IEnumerable<T> Yield<T>([NotNull] this T item)
         {
             yield return item;
         }

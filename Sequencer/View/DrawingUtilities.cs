@@ -13,7 +13,7 @@ namespace Sequencer.View
 {
     public static class DrawingUtilities
     {
-        public static BitmapImage ToBitmapImage(this Bitmap bitmap)
+        public static BitmapImage ToBitmapImage([NotNull] this Bitmap bitmap)
         {
             using (var memory = new MemoryStream())
             {

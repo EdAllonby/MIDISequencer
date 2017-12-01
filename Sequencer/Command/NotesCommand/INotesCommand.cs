@@ -6,6 +6,6 @@ namespace Sequencer.Command.NotesCommand
 {
     public interface INotesCommand
     {
-        void Execute([NotNull] IEnumerable<IVisualNote> notes);
+        void Execute([NotNull] [ItemNotNull] IEnumerable<IVisualNote> notes);
     }
 }

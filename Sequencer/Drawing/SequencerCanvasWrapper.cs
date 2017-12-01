@@ -1,13 +1,14 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using JetBrains.Annotations;
 
 namespace Sequencer.Drawing
 {
     public class SequencerCanvasWrapper : ISequencerCanvasWrapper
     {
-        private readonly Canvas canvas;
+        [NotNull] private readonly Canvas canvas;
 
-        public SequencerCanvasWrapper(Canvas canvas)
+        public SequencerCanvasWrapper([NotNull] Canvas canvas)
         {
             this.canvas = canvas;
         }

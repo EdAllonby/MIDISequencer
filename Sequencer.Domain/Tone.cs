@@ -1,68 +1,42 @@
-﻿namespace Sequencer.Domain
+﻿using JetBrains.Annotations;
+
+namespace Sequencer.Domain
 {
     /// <summary>
     /// This domain has a concept of a 'Note' which doesn't include positions and velocity.
-    /// This <see cref="Tone" /> class unites the concepts of <see cref="Pitch" />, <see cref="Velocity" /> and <see cref="IPosition" />,
+    /// This <see cref="Tone" /> class unites the concepts of <see cref="Pitch" />, <see cref="Velocity" /> and
+    /// <see cref="IPosition" />,
     /// all of which make a 'tone'.
     /// </summary>
     public sealed class Tone
     {
-        private IPosition endPosition;
-        private Pitch pitch;
-        private IPosition startPosition;
-        private Velocity velocity;
+        [NotNull] private IPosition endPosition;
 
 
-        public Tone(Pitch pitch, Velocity velocity, IPosition startPosition, IPosition endPosition)
+        public Tone([NotNull] Pitch pitch, [NotNull] Velocity velocity, [NotNull] IPosition startPosition, [NotNull] IPosition endPosition)
         {
-            this.pitch = pitch;
-            this.velocity = velocity;
-            this.startPosition = startPosition;
+            Pitch = pitch;
+            Velocity = velocity;
+            StartPosition = startPosition;
             this.endPosition = endPosition;
         }
 
-        public Pitch Pitch
-        {
-            get { return pitch; }
-            set
-            {
-                if (value != null)
-                {
-                    pitch = value;
-                }
-            }
-        }
+        [NotNull]
+        public Pitch Pitch { get; set; }
 
-        public Velocity Velocity
-        {
-            get { return velocity; }
-            set
-            {
-                if (value != null)
-                {
-                    velocity = value;
-                }
-            }
-        }
+        [NotNull]
+        public Velocity Velocity { get; set; }
 
-        public IPosition StartPosition
-        {
-            get { return startPosition; }
-            set
-            {
-                if (value != null)
-                {
-                    startPosition = value;
-                }
-            }
-        }
+        [NotNull]
+        public IPosition StartPosition { get; set; }
 
+        [NotNull]
         public IPosition EndPosition
         {
             get { return endPosition; }
             set
             {
-                if ((value != null) && (value.IsGreaterThan(StartPosition)))
+                if (value.IsGreaterThan(StartPosition))
                 {
                     endPosition = value;
                 }

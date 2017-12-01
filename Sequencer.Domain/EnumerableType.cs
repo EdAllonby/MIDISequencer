@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace Sequencer.Domain
 {
@@ -13,7 +14,7 @@ namespace Sequencer.Domain
     /// <typeparam name="TElement">The enumerable element.</typeparam>
     public abstract class EnumerableType<TElement> where TElement : EnumerableType<TElement>
     {
-        private static readonly Dictionary<int, TElement> ElementsById = new Dictionary<int, TElement>();
+        [NotNull] private static readonly Dictionary<int, TElement> ElementsById = new Dictionary<int, TElement>();
 
         static EnumerableType()
         {
@@ -22,7 +23,7 @@ namespace Sequencer.Domain
             info[1]?.GetValue(null);
         }
 
-        protected EnumerableType(int value, string displayName)
+        protected EnumerableType(int value, [NotNull] string displayName)
         {
             Value = value;
             DisplayName = displayName;
@@ -39,26 +40,30 @@ namespace Sequencer.Domain
 
         public int Value { get; }
 
+        [NotNull]
         public string DisplayName { get; }
 
         public static IEnumerable<TElement> All => ElementsById.Values;
 
+        [NotNull]
         public static TElement FromValue(int value)
         {
-            return Parse(value, "value", item => item.Value == value);
+            return Parse(value, "value", item => item?.Value == value);
         }
 
-        public static TElement FromDisplayName(string displayName)
+        public static TElement FromDisplayName([NotNull] string displayName)
         {
-            return Parse(displayName, "display name", item => item.DisplayName == displayName);
+            return Parse(displayName, "display name", item => item?.DisplayName == displayName);
         }
 
-        public static TElement GetNextElement(TElement element)
+        [NotNull]
+        public static TElement GetNextElement([NotNull] TElement element)
         {
-            return ElementsById[(element.Value + 1)%ElementsById.Count];
+            return ElementsById[(element.Value + 1)%ElementsById.Count] ?? throw new InvalidOperationException();
         }
 
-        private static TElement Parse<TValue>(TValue value, string description, Func<TElement, bool> predicate)
+        [NotNull]
+        private static TElement Parse<TValue>([NotNull] TValue value, [NotNull] string description, [NotNull] Func<TElement, bool> predicate)
         {
             TElement matchingItem = ElementsById.Values.FirstOrDefault(predicate);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Sequencer.Utilities;
 
 namespace Sequencer.Domain
@@ -23,33 +24,35 @@ namespace Sequencer.Domain
         /// <summary>
         /// The velocity value.
         /// </summary>
-        public int Value { get; }
-
-        public static Velocity operator +(Velocity velocity, int addition)
-        {
-            return new Velocity(velocity.Value + addition);
-        }
-
-        public static Velocity operator -(Velocity velocity, int addition)
-        {
-            return new Velocity(velocity.Value - addition);
-        }
+        private int Value { get; }
 
         /// <summary>
         /// The velocity as a percentage, ranging from 0 to 1.
         /// </summary>
         public double Volume => (double) Value / MaxValue;
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
-
         public bool Equals(Velocity other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
+        }
+
+        [NotNull]
+        public static Velocity operator +([NotNull] Velocity velocity, int addition)
+        {
+            return new Velocity(velocity.Value + addition);
+        }
+
+        [NotNull]
+        public static Velocity operator -([NotNull] Velocity velocity, int addition)
+        {
+            return new Velocity(velocity.Value - addition);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
 
         public override bool Equals(object obj)

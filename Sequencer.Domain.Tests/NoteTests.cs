@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;namespace Sequencer.Domain.Tests
+﻿using NUnit.Framework;
+
+namespace Sequencer.Domain.Tests
 {
     [TestFixture]
     public class NoteTests

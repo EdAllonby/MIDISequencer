@@ -8,11 +8,12 @@ namespace Sequencer.View
     public sealed class VisualNote : IVisualNote
     {
         [NotNull] private readonly NoteDrawer noteDrawer;
-        private readonly IDigitalAudioProtocol protocol;
-        private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly IDigitalAudioProtocol protocol;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
         private NoteState noteState = NoteState.Selected;
 
-        public VisualNote([NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, Tone tone)
+        public VisualNote([NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
+            [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone)
         {
             protocol = sequencerSettings.Protocol;
             this.sequencerSettings = sequencerSettings;
@@ -51,13 +52,10 @@ namespace Sequencer.View
             get { return Tone.StartPosition; }
             set
             {
-                if (value != null)
+                if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature).IsLessThan(Tone.EndPosition))
                 {
-                    if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature).IsLessThan(Tone.EndPosition))
-                    {
-                        Tone.StartPosition = value;
-                        Draw();
-                    }
+                    Tone.StartPosition = value;
+                    Draw();
                 }
             }
         }
@@ -70,7 +68,7 @@ namespace Sequencer.View
             get { return Tone.EndPosition; }
             set
             {
-                if ((value != null) && !EndPosition.Equals(value) && (value.IsGreaterThan(StartPosition)))
+                if (!EndPosition.Equals(value) && (value.IsGreaterThan(StartPosition)))
                 {
                     Tone.EndPosition = value;
                     Draw();

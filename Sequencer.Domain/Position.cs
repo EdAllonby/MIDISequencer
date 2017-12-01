@@ -1,4 +1,6 @@
-﻿namespace Sequencer.Domain
+﻿using JetBrains.Annotations;
+
+namespace Sequencer.Domain
 {
     /// <summary>
     /// Represents a musical position.
@@ -24,7 +26,7 @@
 
         public int Beat { get; }
 
-        public int CompareTo(IPosition other)
+        public int CompareTo([NotNull] IPosition other)
         {
             if (Equals(other))
             {
@@ -95,7 +97,8 @@
         /// <param name="totalBeats">The summed beats to the particular position.</param>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use in calculation.</param>
         /// <returns>The position from origin of the summed beats.</returns>
-        public static IPosition PositionFromBeat(int totalBeats, TimeSignature timeSignature)
+        [NotNull]
+        public static IPosition PositionFromBeat(int totalBeats, [NotNull] TimeSignature timeSignature)
         {
             int measures = 1 + ((totalBeats - 1)/timeSignature.BeatsPerMeasure);
             int remainingBeatsForBars = totalBeats - (timeSignature.BeatsPerMeasure*(measures - 1));
@@ -123,22 +126,22 @@
             }
         }
 
-        public static bool operator <(Position first, Position second)
+        public static bool operator <([NotNull] Position first, [NotNull] Position second)
         {
             return first.CompareTo(second) < 0;
         }
 
-        public static bool operator >(Position first, Position second)
+        public static bool operator >([NotNull] Position first, [NotNull] Position second)
         {
             return first.CompareTo(second) > 0;
         }
 
-        public static bool operator <=(Position first, Position second)
+        public static bool operator <=([NotNull] Position first, [NotNull] Position second)
         {
             return Equals(first, second) || (first.CompareTo(second) < 0);
         }
 
-        public static bool operator >=(Position first, Position second)
+        public static bool operator >=([NotNull] Position first, [NotNull] Position second)
         {
             return Equals(first, second) || (first.CompareTo(second) > 0);
         }

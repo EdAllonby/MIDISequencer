@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using JetBrains.Annotations;
 using Sequencer.Utilities;
 using Sequencer.ViewModel;
 
@@ -15,7 +16,7 @@ namespace Sequencer.View.RadialContextMenu
     public sealed class ContextMenuSegment<TMenuItem> : Canvas, IPositionAware
         where TMenuItem : VisualEnumerableType<TMenuItem>
     {
-        private readonly Path segmentShape = new Path();
+        [NotNull] private readonly Path segmentShape = new Path();
         private readonly Color selectedColor = Colors.CornflowerBlue;
         private readonly Color unselectedColor = Colors.LightSteelBlue;
 
@@ -27,7 +28,7 @@ namespace Sequencer.View.RadialContextMenu
         /// <param name="menuRadius">The radius of the menu.</param>
         /// <param name="startAngle">The starting angle to start drawing.</param>
         /// <param name="angle">The size of the segment in degrees.</param>
-        public ContextMenuSegment(TMenuItem menuItem, Point startingPoint, double menuRadius, double startAngle, double angle)
+        public ContextMenuSegment([NotNull] TMenuItem menuItem, Point startingPoint, double menuRadius, double startAngle, double angle)
         {
             // This uses 3 points to create the segment. The starting point, the beginning of the arc point, and the end of the arc point.
             // This will create the segment geometry we can use to draw the shape.
@@ -47,7 +48,7 @@ namespace Sequencer.View.RadialContextMenu
 
             var lineToArc = new LineSegment {Point = arcStartPosition};
 
-            pathData.Segments.Add(lineToArc);
+            pathData.Segments?.Add(lineToArc);
 
             // outer arc
             Point arcEndPosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius, endAngle);
@@ -62,7 +63,7 @@ namespace Sequencer.View.RadialContextMenu
                 SweepDirection = SweepDirection.Clockwise
             };
 
-            pathData.Segments.Add(arc);
+            pathData.Segments?.Add(arc);
 
             var pathGeometry = new PathGeometry
             {
@@ -100,7 +101,7 @@ namespace Sequencer.View.RadialContextMenu
         /// <summary>
         /// The <see cref="TMenuItem" /> this segment represents.
         /// </summary>
-        public TMenuItem MenuItem { get; }
+        [NotNull] public TMenuItem MenuItem { get; }
 
         /// <summary>
         /// Whether this segment is selected.
@@ -114,7 +115,7 @@ namespace Sequencer.View.RadialContextMenu
         /// <returns>Whether this segment intersects with the other geometry.</returns>
         public bool IntersectsWith(Geometry geometry)
         {
-            return segmentShape.Data.FillContainsWithDetail(geometry) != IntersectionDetail.Empty;
+            return segmentShape.Data?.FillContainsWithDetail(geometry) != IntersectionDetail.Empty;
         }
 
         /// <summary>

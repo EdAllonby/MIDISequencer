@@ -1,15 +1,16 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Sequencer.Domain
 {
     public class FrequencyCalculator
     {
         private const double TwelthRootOfTwo = 1.05946309;
-        private readonly Pitch originPitch;
+        [NotNull] private readonly Pitch originPitch;
         private readonly double standardFrequency;
 
 
-        public FrequencyCalculator(Pitch originPitch, double standardFrequency)
+        public FrequencyCalculator([NotNull] Pitch originPitch, double standardFrequency)
         {
             this.originPitch = originPitch;
             this.standardFrequency = standardFrequency;
@@ -20,11 +21,11 @@ namespace Sequencer.Domain
         /// </summary>
         /// <param name="pitch">The pitch to find the frequency of.</param>
         /// <returns>the frequency of the given pitch in hertz.</returns>
-        public double PitchFrequency(Pitch pitch)
+        public double PitchFrequency([NotNull] Pitch pitch)
         {
             int halfStepsFromOrigin = PitchStepCalculator.FindStepsFromPitches(originPitch, pitch);
 
-            return standardFrequency*Math.Pow(TwelthRootOfTwo, halfStepsFromOrigin);
+            return standardFrequency * Math.Pow(TwelthRootOfTwo, halfStepsFromOrigin);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.View;
 
@@ -6,9 +7,9 @@ namespace Sequencer.Command.NotesCommand
 {
     public sealed class ChangeVelocityCommand : INotesCommand
     {
-        private readonly Velocity velocity;
+        [NotNull] private readonly Velocity velocity;
 
-        public ChangeVelocityCommand(Velocity velocity)
+        public ChangeVelocityCommand([NotNull] Velocity velocity)
         {
             this.velocity = velocity;
         }

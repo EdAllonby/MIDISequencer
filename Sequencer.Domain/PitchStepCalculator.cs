@@ -15,6 +15,7 @@ namespace Sequencer.Domain
         /// <param name="firstPitch">The first pitch to set the origin.</param>
         /// <param name="secondPitch">The second pitch to find the half step difference from origin.</param>
         /// <returns>The half steps between two <see cref="Pitch" />es.</returns>
+        [Pure]
         public static int FindStepsFromPitches([NotNull] Pitch firstPitch, [NotNull] Pitch secondPitch)
         {
             int firstPitchSteps = firstPitch.Note.Value + (firstPitch.Octave*NotesPerOctave);

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using JetBrains.Annotations;
 
 namespace Sequencer.Domain
 {
@@ -8,11 +9,13 @@ namespace Sequencer.Domain
     public sealed class SequencerSettings
     {
         // Musical definitions
-        public const int TotalNotes = 32;
-        public const int TotalMeasures = 4;
-        public readonly Pitch LowestPitch = new Pitch(Note.A, 2);
-        public readonly IDigitalAudioProtocol Protocol = new MidiProtocol();
-        public readonly TimeSignature TimeSignature = new TimeSignature(4, 4);
+        [NotNull] public const int TotalNotes = 32;
+
+        [NotNull] public const int TotalMeasures = 4;
+        [NotNull] public readonly Velocity DefaultVelocity = new Velocity(64);
+        [NotNull] public readonly Pitch LowestPitch = new Pitch(Note.A, 2);
+        [NotNull] public readonly IDigitalAudioProtocol Protocol = new MidiProtocol();
+        [NotNull] public readonly TimeSignature TimeSignature = new TimeSignature(4, 4);
 
         // Colour definitions
         public Color AccidentalKeyColour = Colors.Gray;
@@ -20,6 +23,5 @@ namespace Sequencer.Domain
         public Color LineColour = Colors.Black;
         public Color SelectedNoteColour = Colors.DarkRed;
         public Color UnselectedNoteColour = Colors.Crimson;
-        public Velocity DefaultVelocity = new Velocity(64);
     }
 }

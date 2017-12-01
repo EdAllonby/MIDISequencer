@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 using Sequencer.View;
@@ -10,16 +11,17 @@ namespace Sequencer.Drawing
 {
     public sealed class NoteDrawer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(NoteDrawer));
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(NoteDrawer));
 
-        private readonly Rectangle noteRectangle;
-        private readonly ISequencerCanvasWrapper sequencer;
-        private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly SequencerSettings sequencerSettings;
-        private readonly TimeSignature timeSignature;
-        private readonly Rectangle velocityRectangle;
+        [NotNull] private readonly Rectangle noteRectangle;
+        [NotNull] private readonly ISequencerCanvasWrapper sequencer;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly TimeSignature timeSignature;
+        [NotNull] private readonly Rectangle velocityRectangle;
 
-        public NoteDrawer(ISequencerCanvasWrapper sequencer, SequencerSettings sequencerSettings, ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public NoteDrawer([NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
@@ -45,7 +47,7 @@ namespace Sequencer.Drawing
             Panel.SetZIndex(velocityRectangle, 100);
         }
 
-        public void DrawNote(Pitch pitch, Velocity velocity, IPosition startPosition, IPosition endPosition, NoteState noteState)
+        public void DrawNote([NotNull] Pitch pitch, [NotNull] Velocity velocity, [NotNull] IPosition startPosition, [NotNull] IPosition endPosition, NoteState noteState)
         {
             Log.InfoFormat("Drawing note length with start position {0} to end position {1}", startPosition, endPosition);
 
@@ -99,14 +101,14 @@ namespace Sequencer.Drawing
             sequencer.RemoveChild(velocityRectangle);
         }
 
-        private double GetPointFromPitch(Pitch pitch, double sequencerHeight, double noteHeight)
+        private double GetPointFromPitch([NotNull] Pitch pitch, double sequencerHeight, double noteHeight)
         {
             int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
             double relativePitchPosition = (noteHeight*halfStepDifference) + noteHeight;
             return sequencerHeight - relativePitchPosition;
         }
 
-        private double ActualWidthBetweenPositions(IPosition startPosition, IPosition endPosition, double beatWidth)
+        private double ActualWidthBetweenPositions([NotNull] IPosition startPosition, [NotNull] IPosition endPosition, double beatWidth)
         {
             double noteStartingPoint = GetPointFromPosition(startPosition, beatWidth);
             double noteEndingPoint = GetPointFromPosition(endPosition, beatWidth);
@@ -115,12 +117,12 @@ namespace Sequencer.Drawing
             return newNoteWidth >= 0 ? newNoteWidth : 0;
         }
 
-        private double GetPointFromPosition(IPosition position, double beatWidth)
+        private double GetPointFromPosition([NotNull] IPosition position, double beatWidth)
         {
             return (position.SummedBeat(timeSignature)*beatWidth) - beatWidth;
         }
 
-        private static void SetRectanglePosition(Rectangle rectangle, double leftPosition, double topPosition)
+        private static void SetRectanglePosition([NotNull] UIElement rectangle, double leftPosition, double topPosition)
         {
             Canvas.SetLeft(rectangle, leftPosition);
             Canvas.SetTop(rectangle, topPosition);

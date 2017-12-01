@@ -12,17 +12,17 @@ namespace Sequencer.Drawing
 {
     public sealed class SequencerDrawer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerDrawer));
-        private readonly List<UIElement> elementCache = new List<UIElement>();
-        private readonly IDigitalAudioProtocol protocol;
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerDrawer));
+        [NotNull] [ItemNotNull] private readonly List<UIElement> elementCache = new List<UIElement>();
+        [NotNull] private readonly IDigitalAudioProtocol protocol;
 
-        private readonly Canvas sequencerCanvas;
-        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly ISequencerNotes sequencerNotes;
-        private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly Canvas sequencerCanvas;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
 
         public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] SequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
         {
             protocol = sequencerSettings.Protocol;
             this.sequencerCanvas = sequencerCanvas;
@@ -94,7 +94,7 @@ namespace Sequencer.Drawing
             elementCache.Add(sequencerLine);
         }
 
-        private void DrawNoteBackground(double currentNotePosition, double noteSize, Pitch pitch)
+        private void DrawNoteBackground(double currentNotePosition, double noteSize, [NotNull] Pitch pitch)
         {
             Color backgroundColour = pitch.Note.IsAccidental ? sequencerSettings.AccidentalKeyColour : sequencerSettings.KeyColour;
 

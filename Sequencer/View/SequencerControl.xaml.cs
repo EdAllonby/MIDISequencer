@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using Sequencer.Command;
 using Sequencer.Command.MousePointCommand;
 using Sequencer.Command.NotesCommand;
@@ -17,25 +18,26 @@ namespace Sequencer.View
         /// <summary>
         /// The NoteAction Dependency Property.
         /// </summary>
+        [NotNull]
         public static readonly DependencyProperty NoteActionProperty =
             DependencyProperty.Register(nameof(NoteAction), typeof(NoteAction), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
+        [NotNull]
         public static readonly DependencyProperty SelectedNotesProperty =
             DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
-        private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
-        private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
-        private readonly ISequencerNotes notes;
-        private readonly UpdateNoteStateCommand selectNoteCommand;
-        private readonly SequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly SequencerDrawer sequencerDrawer;
-        private readonly SequencerSettings sequencerSettings = new SequencerSettings();
-        private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
-        private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
-
-        private IMousePointNoteCommand moveNoteFromPointCommand;
+        [NotNull] private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
+        [NotNull] private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
+        [NotNull] private readonly ISequencerNotes notes;
+        [NotNull] private readonly UpdateNoteStateCommand selectNoteCommand;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly SequencerDrawer sequencerDrawer;
+        [NotNull] private readonly SequencerSettings sequencerSettings = new SequencerSettings();
+        [NotNull] private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
+        [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
+        [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
         
         public SequencerControl()
         {
@@ -50,7 +52,7 @@ namespace Sequencer.View
             ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
 
-            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings,sequencerDimensionsCalculator, sequencerCanvasWrapper);
+            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, sequencerDimensionsCalculator, sequencerCanvasWrapper);
 
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator);
@@ -89,7 +91,7 @@ namespace Sequencer.View
                 DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
             }
 
-            MousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
+            IMousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
 
             moveNoteFromPointCommand = GetMovementCommand(mouseDownPoint);
 
@@ -114,12 +116,13 @@ namespace Sequencer.View
             }
         }
 
-        private void SelectedNotesChanged(object sender, IEnumerable<IVisualNote> e)
+        private void SelectedNotesChanged(object sender, [NotNull] [ItemNotNull] IEnumerable<IVisualNote> e)
         {
             SelectedNotes = e.Select(x => x.Tone);
         }
 
-        private IMousePointNoteCommand GetMovementCommand(IMousePoint mouseDownPoint)
+        [CanBeNull]
+        private IMousePointNoteCommand GetMovementCommand([NotNull] IMousePoint mouseDownPoint)
         {
             IVisualNote noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, mouseDownPoint);
             if (noteAtEndingPoint != null)
@@ -142,7 +145,7 @@ namespace Sequencer.View
             return null;
         }
 
-        private void HandleMouseSelectMovement(IMousePoint newMousePoint)
+        private void HandleMouseSelectMovement([NotNull] IMousePoint newMousePoint)
         {
             DragSelectionBox.UpdateDragSelectionBox(newMousePoint);
 

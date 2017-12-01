@@ -1,15 +1,17 @@
-﻿using Sequencer.Domain;
+﻿using JetBrains.Annotations;
+using Sequencer.Domain;
 using Sequencer.Drawing;
 
 namespace Sequencer.View
 {
     public class VisualNoteFactory : IVisualNoteFactory
     {
-        private readonly SequencerSettings sequencerSettings;
-        private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
 
-        public VisualNoteFactory(SequencerSettings sequencerSettings, ISequencerDimensionsCalculator sequencerDimensionsCalculator, ISequencerCanvasWrapper sequencerCanvasWrapper)
+        public VisualNoteFactory([NotNull] SequencerSettings sequencerSettings,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper)
         {
             this.sequencerSettings = sequencerSettings;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;

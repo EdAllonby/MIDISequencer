@@ -1,12 +1,13 @@
 ﻿using System.Windows.Input;
+using JetBrains.Annotations;
 
 namespace Sequencer.Input
 {
     public class MouseOperator : IMouseOperator
     {
-        private readonly IMouseStateProcessor mouseStateProcessor;
+        [NotNull] private readonly IMouseStateProcessor mouseStateProcessor;
 
-        public MouseOperator(IMouseStateProcessor mouseStateProcessor)
+        public MouseOperator([NotNull] IMouseStateProcessor mouseStateProcessor)
         {
             this.mouseStateProcessor = mouseStateProcessor;
         }

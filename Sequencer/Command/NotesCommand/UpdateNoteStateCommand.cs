@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
+using Sequencer.Domain;
 using Sequencer.Input;
 using Sequencer.View;
 
@@ -9,13 +11,13 @@ namespace Sequencer.Command.NotesCommand
 {
     public sealed class UpdateNoteStateCommand : INotesCommand
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(UpdateNoteStateCommand));
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(UpdateNoteStateCommand));
         private readonly NoteState newState;
 
-        private readonly ISequencerNotes sequencerNotes;
-        private readonly IKeyboardStateProcessor keyboardStateProcessor;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
 
-        public UpdateNoteStateCommand([NotNull] ISequencerNotes sequencerNotes, IKeyboardStateProcessor keyboardStateProcessor, NoteState newState)
+        public UpdateNoteStateCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IKeyboardStateProcessor keyboardStateProcessor, NoteState newState)
         {
             this.sequencerNotes = sequencerNotes;
             this.keyboardStateProcessor = keyboardStateProcessor;
@@ -24,7 +26,9 @@ namespace Sequencer.Command.NotesCommand
 
         public void Execute(IEnumerable<IVisualNote> notesToChange)
         {
-            foreach (IVisualNote visualNote in notesToChange)
+            IEnumerable<IVisualNote> notesList = notesToChange as IList<IVisualNote> ?? notesToChange.ToList();
+
+            foreach (IVisualNote visualNote in notesList)
             {
                 if ((visualNote != null) && (visualNote.NoteState != newState))
                 {
@@ -36,7 +40,7 @@ namespace Sequencer.Command.NotesCommand
 
             if (!keyboardStateProcessor.IsKeyDown(Key.LeftCtrl))
             {
-                foreach (IVisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesToChange))
+                foreach (IVisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesList))
                 {
                     if (visualNote.NoteState != NoteState.Unselected)
                     {

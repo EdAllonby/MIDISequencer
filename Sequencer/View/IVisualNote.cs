@@ -1,15 +1,28 @@
-﻿using Sequencer.Domain;
+﻿using JetBrains.Annotations;
+using Sequencer.Domain;
 
 namespace Sequencer.View
 {
     public interface IVisualNote : IPositionAware
     {
-        IPosition EndPosition { get; }
         NoteState NoteState { get; set; }
+
+        [NotNull]
         Pitch Pitch { get; }
-        IPosition StartPosition { get; }
+
+        [NotNull]
+        IPosition StartPosition { [NotNull] get; [NotNull] set; }
+
+        [NotNull]
+        IPosition EndPosition { [NotNull] get; [NotNull] set; }
+
+
+        [NotNull]
         Tone Tone { get; }
+
+        [NotNull]
         Velocity Velocity { get; set; }
+
         void Draw();
         void MovePitchRelativeTo(int halfStepsToMove);
         void MovePositionRelativeTo(int beatsToMove);

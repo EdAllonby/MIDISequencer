@@ -15,11 +15,12 @@ namespace Sequencer.Command.MousePointCommand
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private IPosition initialStartPosition;
+        [NotNull] private IPosition initialStartPosition;
         private int beatsDelta;
 
-        public UpdateNoteStartPositionFromInitialPointCommand(IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public UpdateNoteStartPositionFromInitialPointCommand([NotNull] IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator,
+            [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.mouseOperator = mouseOperator;
             this.sequencerNotes = sequencerNotes;
@@ -35,7 +36,7 @@ namespace Sequencer.Command.MousePointCommand
             MoveNotePositions(mousePoint);
         }
 
-        private void MoveNotePositions(IMousePoint mousePoint)
+        private void MoveNotePositions([NotNull] IMousePoint mousePoint)
         {
             IPosition newStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
@@ -48,7 +49,7 @@ namespace Sequencer.Command.MousePointCommand
 
                 initialStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-                foreach (VisualNote selectedNote in sequencerNotes.SelectedNotes)
+                foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
                 {
                     selectedNote.StartPosition = selectedNote.StartPosition.PositionRelativeByBeats(beatsDelta, sequencerSettings.TimeSignature);
                 }

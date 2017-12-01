@@ -12,11 +12,14 @@ namespace Sequencer.View
         /// <summary>
         /// The currently selected sequencer notes.
         /// </summary>
+        [NotNull]
+        [ItemNotNull]
         IEnumerable<IVisualNote> SelectedNotes { get; }
 
         /// <summary>
         /// All the notes in the sequencer.
         /// </summary>
+        [NotNull]
         IEnumerable<IVisualNote> AllNotes { get; }
 
         /// <summary>
@@ -39,7 +42,7 @@ namespace Sequencer.View
         /// Delete a note from the sequencer.
         /// </summary>
         /// <param name="noteToDelete">The note to delete from the sequencer.</param>
-        void DeleteNote(IVisualNote noteToDelete);
+        void DeleteNote([NotNull] IVisualNote noteToDelete);
 
         /// <summary>
         /// Gets the <see cref="IVisualNote" /> at a position and pitch in the sequencer.
@@ -47,11 +50,19 @@ namespace Sequencer.View
         /// <param name="position">The position of the note.</param>
         /// <param name="pitch">The pitch of the note.</param>
         /// <returns>A <see cref="VisualNote" /> if note. Null if note.</returns>
+        [CanBeNull]
         IVisualNote FindNoteFromPositionAndPitch([NotNull] IPosition position, [NotNull] Pitch pitch);
 
-        IVisualNote FindNoteFromStartingPositionAndPitch(IPosition position, Pitch pitch);
-        IVisualNote FindNoteFromEndingPositionAndPitch(IPosition position, Pitch pitch);
+        [CanBeNull]
+        IVisualNote FindNoteFromStartingPositionAndPitch([NotNull] IPosition position, [NotNull] Pitch pitch);
+
+        [CanBeNull]
+        IVisualNote FindNoteFromEndingPositionAndPitch([NotNull] IPosition position, [NotNull] Pitch pitch);
+
+        [NotNull]
+        [ItemNotNull]
         IEnumerable<IVisualNote> FindAllOtherNotes([NotNull] IEnumerable<IVisualNote> notesToIgnore);
+
         void NoteStateChanged();
     }
 }

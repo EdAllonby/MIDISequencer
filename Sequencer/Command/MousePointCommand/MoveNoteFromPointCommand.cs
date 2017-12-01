@@ -15,8 +15,8 @@ namespace Sequencer.Command.MousePointCommand
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         private int beatsDelta;
-        private IMousePoint initialMousePitch;
-        private IMousePoint initialMousePoint;
+        [NotNull] private IMousePoint initialMousePitch;
+        [NotNull] private IMousePoint initialMousePoint;
         private int lastHalfStepDifference;
 
         public MoveNoteFromPointCommand([NotNull] IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator,
@@ -33,7 +33,7 @@ namespace Sequencer.Command.MousePointCommand
 
         protected override bool CanExecute => mouseOperator.CanModifyNote;
 
-        private void MoveNotePositions(IMousePoint mousePoint)
+        private void MoveNotePositions([NotNull] IMousePoint mousePoint)
         {
             IPosition initialPosition = sequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
             IPosition newPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
@@ -52,7 +52,7 @@ namespace Sequencer.Command.MousePointCommand
             }
         }
 
-        private void MoveNotePitch(IMousePoint mousePoint)
+        private void MoveNotePitch([NotNull] IMousePoint mousePoint)
         {
             Pitch initialPitch = sequencerDimensionsCalculator.FindPitchFromPoint(initialMousePitch);
             Pitch newPitch = sequencerDimensionsCalculator.FindPitchFromPoint(mousePoint);

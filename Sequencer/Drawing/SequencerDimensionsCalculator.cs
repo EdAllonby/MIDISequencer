@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Controls;
 using JetBrains.Annotations;
 using Sequencer.Command.MousePointCommand;
@@ -10,9 +9,9 @@ namespace Sequencer.Drawing
 {
     public sealed class SequencerDimensionsCalculator : ISequencerDimensionsCalculator
     {
-        private readonly IDigitalAudioProtocol protocol;
-        private readonly Canvas sequencerCanvas;
-        private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly IDigitalAudioProtocol protocol;
+        [NotNull] private readonly Canvas sequencerCanvas;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
 
         public SequencerDimensionsCalculator([NotNull] Canvas sequencerCanvas, [NotNull] SequencerSettings sequencerSettings)
         {

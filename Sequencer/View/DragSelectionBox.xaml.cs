@@ -26,7 +26,7 @@ namespace Sequencer.View
         /// <summary>
         /// Records the location of the mouse (relative to the window) when the left-mouse button has pressed down.
         /// </summary>
-        private IMousePoint origMouseDownPoint;
+        [CanBeNull] private IMousePoint origMouseDownPoint;
 
         public DragSelectionBox()
         {
@@ -44,7 +44,7 @@ namespace Sequencer.View
         /// Create a new selection box starting position.
         /// </summary>
         /// <param name="mouseDownPoint">The point to start the selection box.</param>
-        public void SetNewOriginMousePosition(IMousePoint mouseDownPoint)
+        public void SetNewOriginMousePosition([NotNull] IMousePoint mouseDownPoint)
         {
             CaptureMouse();
 
@@ -57,7 +57,7 @@ namespace Sequencer.View
         /// Update the position of the selection box.
         /// </summary>
         /// <param name="newPosition">The new position to update the selection box dimensions with.</param>
-        public void UpdateDragSelectionBox(IMousePoint newPosition)
+        public void UpdateDragSelectionBox([NotNull] IMousePoint newPosition)
         {
             if (IsDragging)
             {
@@ -65,8 +65,8 @@ namespace Sequencer.View
             }
             else if (isLeftMouseButtonDownOnWindow)
             {
-                Vector dragDelta = newPosition.Point - origMouseDownPoint.Point;
-                double dragDistance = Math.Abs(dragDelta.Length);
+                Vector? dragDelta = newPosition.Point - origMouseDownPoint?.Point;
+                double dragDistance = Math.Abs(dragDelta.GetValueOrDefault().Length);
                 if (dragDistance > DragThreshold)
                 {
                     IsDragging = true;
@@ -82,10 +82,12 @@ namespace Sequencer.View
         /// <typeparam name="TElement">Elements which are <see cref="IPositionAware" />.</typeparam>
         /// <param name="possibleMatches"><see cref="IPositionAware" /> elements to check are inside selection.</param>
         /// <returns>A subset of <see cref="possibleMatches" /> inside the selection.</returns>
-        public IEnumerable<TElement> FindMatches<TElement>([NotNull] IEnumerable<TElement> possibleMatches)
+        [NotNull]
+        [ItemNotNull]
+        public IEnumerable<TElement> FindMatches<TElement>([NotNull] [ItemNotNull] IEnumerable<TElement> possibleMatches)
             where TElement : IPositionAware
         {
-            List<TElement> matches = new List<TElement>();
+            var matches = new List<TElement>();
             if (IsDragging)
             {
                 Rect selectionBox = GetSelectionBox();

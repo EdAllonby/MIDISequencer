@@ -1,4 +1,6 @@
-﻿namespace Sequencer.Domain
+﻿using JetBrains.Annotations;
+
+namespace Sequencer.Domain
 {
     public interface IPosition : IGreaterThanOrEqualComparable<IPosition>, ILessThanOrEqualComparable<IPosition>
     {
@@ -7,11 +9,16 @@
         int Bar { get; }
 
         int Beat { get; }
-        IPosition PreviousPosition(TimeSignature timeSignature);
 
-        IPosition NextPosition(TimeSignature timeSignature);
-        IPosition PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature);
+        [NotNull]
+        IPosition PreviousPosition([NotNull] TimeSignature timeSignature);
 
-        int SummedBeat(TimeSignature timeSignature);
+        [NotNull]
+        IPosition NextPosition([NotNull] TimeSignature timeSignature);
+
+        [NotNull]
+        IPosition PositionRelativeByBeats(int beatDelta, [NotNull] TimeSignature timeSignature);
+
+        int SummedBeat([NotNull] TimeSignature timeSignature);
     }
 }

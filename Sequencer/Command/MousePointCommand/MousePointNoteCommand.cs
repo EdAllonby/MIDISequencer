@@ -7,7 +7,7 @@ namespace Sequencer.Command.MousePointCommand
     /// </summary>
     public abstract class MousePointNoteCommand : IMousePointNoteCommand
     {
-        public void Execute([NotNull] IMousePoint mousePoint)
+        public void Execute(IMousePoint mousePoint)
         {
             if (CanExecute)
             {

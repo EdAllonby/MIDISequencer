@@ -79,8 +79,11 @@ namespace Sequencer.Console
 
         private static void SetOutAndErrorNull()
         {
-            System.Console.SetOut(TextWriter.Null);
-            System.Console.SetError(TextWriter.Null);
+            if (TextWriter.Null != null)
+            {
+                System.Console.SetOut(TextWriter.Null);
+                System.Console.SetError(TextWriter.Null);
+            }
         }
     }
 }

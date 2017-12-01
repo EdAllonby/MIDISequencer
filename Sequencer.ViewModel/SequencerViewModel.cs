@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 
@@ -7,20 +8,18 @@ namespace Sequencer.ViewModel
 {
     public sealed class SequencerViewModel : ViewModel
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SequencerViewModel));
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
 
-        private NoteAction noteAction;
-        private IEnumerable<Tone> selectedNotes;
-        private object selectedObject;
+        [NotNull] private NoteAction noteAction = NoteAction.Create;
+        [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
+        [CanBeNull] private object selectedObject;
 
-        public SequencerViewModel()
-        {
-            NoteAction = NoteAction.Create;
-        }
-
+        [NotNull]
         public NoteAction NoteAction
         {
-            get { return noteAction; }
+            [NotNull] get { return noteAction; }
+
+            [NotNull]
             set
             {
                 noteAction = value;
@@ -29,9 +28,11 @@ namespace Sequencer.ViewModel
             }
         }
 
+        [NotNull]
         public IEnumerable<Tone> SelectedNotes
         {
-            get { return selectedNotes; }
+            [NotNull] get { return selectedNotes; }
+            [NotNull]
             set
             {
                 selectedNotes = value;
@@ -48,6 +49,7 @@ namespace Sequencer.ViewModel
             }
         }
 
+        [CanBeNull]
         public object SelectedObject
         {
             get { return selectedObject; }

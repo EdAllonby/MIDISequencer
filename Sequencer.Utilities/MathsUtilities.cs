@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using JetBrains.Annotations;
 
 namespace Sequencer.Utilities
 {
@@ -13,7 +14,8 @@ namespace Sequencer.Utilities
         /// <param name="minimum">The minimum the value can be.</param>
         /// <param name="maximum">The maximum the value can be.</param>
         /// <returns>The clamped value between the minimum and maximum.</returns>
-        public static T Clamp<T>(this T value, T minimum, T maximum) where T : IComparable<T>
+        [Pure]
+        public static T Clamp<T>([NotNull] this T value, [NotNull] T minimum, [NotNull] T maximum) where T : IComparable<T>
         {
             return value.CompareTo(minimum) < 0 ? minimum : (value.CompareTo(maximum) > 0 ? maximum : value);
         }
@@ -26,6 +28,7 @@ namespace Sequencer.Utilities
         /// <param name="radius">The radius of the point in pixels.</param>
         /// <param name="degrees">The angle of the point in radians.</param>
         /// <returns>The point in rectangular coordinates.</returns>
+        [Pure]
         public static Point PolarToRectangular(Point origin, double radius, double degrees)
         {
             try
@@ -45,6 +48,7 @@ namespace Sequencer.Utilities
             }
         }
 
+        [Pure]
         private static double ToRadians(double degrees)
         {
             return (degrees*Math.PI)/180.0;
