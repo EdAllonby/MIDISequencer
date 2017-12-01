@@ -5,7 +5,7 @@ namespace Sequencer.Domain.Tests
     [TestFixture]
     internal class MidiProtocolTests
     {
-        private readonly IDigitalAudioProtocol protocol = new MidiProtocol();
+        private readonly IDigitalAudioProtocol protocol = new MidiProtocol(new PitchAndPositionCalculator(TimeSignature.FourFour));
 
         private static readonly object[] PitchMidiNumberCases =
         {

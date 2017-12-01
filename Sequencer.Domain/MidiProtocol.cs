@@ -10,13 +10,19 @@ namespace Sequencer.Domain
     {
         private const int NotesPerOctave = 12;
         [NotNull] private static readonly Pitch LowestMidiNote = new Pitch(Note.C, 0);
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
+
+        public MidiProtocol([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
+        {
+            this.pitchAndPositionCalculator = pitchAndPositionCalculator;
+        }
 
         /// <summary>
         /// The MIDI equivalent of this pitch.
         /// </summary>
         public int ProtocolNoteNumber(Pitch pitch)
         {
-            return PitchStepCalculator.FindStepsFromPitches(LowestMidiNote, pitch);
+            return pitchAndPositionCalculator.FindStepsFromPitches(LowestMidiNote, pitch);
         }
 
         /// <summary>

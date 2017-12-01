@@ -6,13 +6,15 @@ namespace Sequencer.View
 {
     public class VisualNoteFactory : IVisualNoteFactory
     {
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
 
-        public VisualNoteFactory([NotNull] SequencerSettings sequencerSettings,
+        public VisualNoteFactory([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper)
         {
+            this.pitchAndPositionCalculator = pitchAndPositionCalculator;
             this.sequencerSettings = sequencerSettings;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
             this.sequencerCanvasWrapper = sequencerCanvasWrapper;
@@ -22,7 +24,7 @@ namespace Sequencer.View
         {
             var tone = new Tone(pitch, sequencerSettings.DefaultVelocity, start, end);
 
-            return new VisualNote(sequencerDimensionsCalculator, sequencerCanvasWrapper, sequencerSettings, tone);
+            return new VisualNote(pitchAndPositionCalculator, sequencerDimensionsCalculator, sequencerCanvasWrapper, sequencerSettings, tone);
         }
     }
 }

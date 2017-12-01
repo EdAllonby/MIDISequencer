@@ -29,6 +29,7 @@ namespace Sequencer.View
             DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
+        [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor = new KeyboardStateProcessor();
         [NotNull] private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
         [NotNull] private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
         [NotNull] private readonly ISequencerNotes notes;
@@ -36,6 +37,8 @@ namespace Sequencer.View
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly SequencerDrawer sequencerDrawer;
         [NotNull] private readonly SequencerSettings sequencerSettings = new SequencerSettings();
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
+
         [NotNull] private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
         [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
         [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
@@ -48,8 +51,6 @@ namespace Sequencer.View
             notes = new SequencerNotes(sequencerSettings);
             notes.SelectedNotesChanged += SelectedNotesChanged;
 
-            var keyboardStateProcessor = new KeyboardStateProcessor();
-
             if (SequencerCanvas == null)
             {
                 throw new NullReferenceException($"{nameof(SequencerCanvas)} is null.");
@@ -57,8 +58,9 @@ namespace Sequencer.View
 
             ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
+            pitchAndPositionCalculator = new PitchAndPositionCalculator(sequencerSettings.TimeSignature);
 
-            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, sequencerDimensionsCalculator, sequencerCanvasWrapper);
+            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(pitchAndPositionCalculator, sequencerSettings, sequencerDimensionsCalculator, sequencerCanvasWrapper);
 
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator);
@@ -146,7 +148,7 @@ namespace Sequencer.View
             IVisualNote noteUnderMouse = sequencerDimensionsCalculator.FindNoteFromPoint(notes, mouseDownPoint);
             if (noteUnderMouse != null)
             {
-                return new MoveNoteFromPointCommand(mouseDownPoint, mouseOperator, notes, sequencerSettings, sequencerDimensionsCalculator);
+                return new MoveNoteFromPointCommand(keyboardStateProcessor, pitchAndPositionCalculator, mouseDownPoint, mouseOperator, notes, sequencerDimensionsCalculator);
             }
 
             return null;

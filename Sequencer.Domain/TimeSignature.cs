@@ -1,4 +1,6 @@
-﻿namespace Sequencer.Domain
+﻿using JetBrains.Annotations;
+
+namespace Sequencer.Domain
 {
     /// <summary>
     /// Holds the musical details for a time signature.
@@ -30,5 +32,8 @@
         /// Calculated value of the total beats per a measure using the current <see cref="TimeSignature" /> values.
         /// </summary>
         public int BeatsPerMeasure => BeatsPerBar*BarsPerMeasure;
+
+        [NotNull]
+        public static TimeSignature FourFour => new TimeSignature(4, 4);
     }
 }

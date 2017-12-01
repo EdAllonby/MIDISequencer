@@ -14,15 +14,17 @@ namespace Sequencer.Drawing
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(NoteDrawer));
 
         [NotNull] private readonly Rectangle noteRectangle;
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly ISequencerCanvasWrapper sequencer;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly TimeSignature timeSignature;
         [NotNull] private readonly Rectangle velocityRectangle;
 
-        public NoteDrawer([NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings,
+        public NoteDrawer([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
+            this.pitchAndPositionCalculator = pitchAndPositionCalculator;
             this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
@@ -103,7 +105,7 @@ namespace Sequencer.Drawing
 
         private double GetPointFromPitch([NotNull] Pitch pitch, double sequencerHeight, double noteHeight)
         {
-            int halfStepDifference = PitchStepCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
+            int halfStepDifference = pitchAndPositionCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
             double relativePitchPosition = (noteHeight*halfStepDifference) + noteHeight;
             return sequencerHeight - relativePitchPosition;
         }

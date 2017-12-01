@@ -45,9 +45,10 @@
     <Compile Include="FrequencyCalculator.cs" />
     <Compile Include="IGreaterThanOrEqualComparable.cs" />
     <Compile Include="ILessThanOrEqualComparable.cs" />
+    <Compile Include="IPitchAndPositionCalculator.cs" />
     <Compile Include="IPosition.cs" />
     <Compile Include="LogExtensions.cs" />
-    <Compile Include="PitchStepCalculator.cs" />
+    <Compile Include="PitchAndPositionCalculator.cs" />
     <Compile Include="IDigitalAudioProtocol.cs" />
     <Compile Include="MidiProtocol.cs" />
     <Compile Include="Note.cs" />

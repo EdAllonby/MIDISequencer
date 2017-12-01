@@ -14,8 +14,8 @@ namespace Sequencer.Domain
         [NotNull] public const int TotalMeasures = 4;
         [NotNull] public readonly Velocity DefaultVelocity = new Velocity(64);
         [NotNull] public readonly Pitch LowestPitch = new Pitch(Note.A, 2);
-        [NotNull] public readonly IDigitalAudioProtocol Protocol = new MidiProtocol();
-        [NotNull] public readonly TimeSignature TimeSignature = new TimeSignature(4, 4);
+        [NotNull] public readonly IDigitalAudioProtocol Protocol = new MidiProtocol(new PitchAndPositionCalculator(TimeSignature.FourFour));
+        [NotNull] public readonly TimeSignature TimeSignature = TimeSignature.FourFour;
 
         // Colour definitions
         public Color AccidentalKeyColour = Colors.Gray;
