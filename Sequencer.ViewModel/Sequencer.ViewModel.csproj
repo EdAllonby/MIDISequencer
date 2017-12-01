@@ -57,6 +57,10 @@
       <Project>{2F107EEB-5405-4D9A-A21E-866FBD9E697B}</Project>
       <Name>Sequencer.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
+      <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
+      <Name>Sequencer.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

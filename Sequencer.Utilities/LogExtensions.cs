@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using log4net;
 using log4net.Core;
 
-namespace Sequencer.Domain
+namespace Sequencer.Utilities
 {
     public static class LogExtensions
     {

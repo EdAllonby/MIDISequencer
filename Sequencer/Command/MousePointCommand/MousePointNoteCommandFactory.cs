@@ -5,6 +5,7 @@ using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
+using Sequencer.Utilities;
 using Sequencer.View;
 using Sequencer.ViewModel;
 

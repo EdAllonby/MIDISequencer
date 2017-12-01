@@ -3,8 +3,8 @@ using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
-using Sequencer.Domain;
 using Sequencer.Input;
+using Sequencer.Utilities;
 using Sequencer.View;
 
 namespace Sequencer.Command.NotesCommand

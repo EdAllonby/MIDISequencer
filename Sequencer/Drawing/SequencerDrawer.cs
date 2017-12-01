@@ -6,6 +6,7 @@ using System.Windows.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.Utilities;
 using Sequencer.View;
 
 namespace Sequencer.Drawing

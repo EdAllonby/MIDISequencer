@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.Utilities;
 
 namespace Sequencer.ViewModel
 {

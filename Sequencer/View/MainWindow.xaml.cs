@@ -2,8 +2,8 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
-using Sequencer.Domain;
 using Sequencer.Input;
+using Sequencer.Utilities;
 
 namespace Sequencer.View
 {
