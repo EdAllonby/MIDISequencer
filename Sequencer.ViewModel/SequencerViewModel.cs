@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 using Sequencer.Utilities;
+using Sequencer.ViewModel.Command;
 
 namespace Sequencer.ViewModel
 {
@@ -14,6 +16,7 @@ namespace Sequencer.ViewModel
         [NotNull] private NoteAction noteAction = NoteAction.Create;
         [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
         [CanBeNull] private object selectedObject;
+        private bool sequencerPlaying;
 
         [NotNull]
         public NoteAction NoteAction
@@ -25,7 +28,20 @@ namespace Sequencer.ViewModel
             {
                 noteAction = value;
                 OnPropertyChanged(nameof(NoteAction));
+                OnPropertyChanged(nameof(Information));
+
                 Log.Info($"Note action set to {NoteAction}");
+            }
+        }
+
+        [NotNull]
+        public string Information
+        {
+            [NotNull]
+            get
+            {
+                string playState = SequencerPlaying ? "Playing" : "Stopped";
+                return $"Note Action {NoteAction}, Currently {playState}";
             }
         }
 
@@ -50,6 +66,21 @@ namespace Sequencer.ViewModel
             }
         }
 
+        public bool SequencerPlaying
+        {
+            [NotNull] get { return sequencerPlaying; }
+            [NotNull]
+            set
+            {
+                sequencerPlaying = value;
+                OnPropertyChanged(nameof(SequencerPlaying));
+                OnPropertyChanged(nameof(Information));
+
+                Log.Info($"Sequencer play state set to {SequencerPlaying}");
+            }
+        }
+
+
         [CanBeNull]
         public object SelectedObject
         {
@@ -59,6 +90,30 @@ namespace Sequencer.ViewModel
                 selectedObject = value;
                 OnPropertyChanged(nameof(SelectedObject));
             }
+        }
+
+        public ICommand PlaySequencer => new RelayCommand(ExecutePlayCommand, CanExecutePlayCommand);
+
+        public ICommand StopSequencer => new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
+
+        private bool CanExecuteStopCommand(object obj)
+        {
+            return sequencerPlaying;
+        }
+
+        private void ExecuteStopCommand(object obj)
+        {
+            SequencerPlaying = false;
+        }
+
+        private bool CanExecutePlayCommand(object obj)
+        {
+            return !sequencerPlaying;
+        }
+
+        private void ExecutePlayCommand(object obj)
+        {
+            SequencerPlaying = true;
         }
     }
 }

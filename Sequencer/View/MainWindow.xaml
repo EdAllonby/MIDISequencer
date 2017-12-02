@@ -18,15 +18,31 @@
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
-            <view:SequencerControl x:Name="Sequencer" Grid.Row="0" MouseMove="SequencerMouseMoved"
-                                   MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
-                                   NoteAction="{Binding NoteAction}" 
-                                   SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <view:SequencerControl x:Name="Sequencer" Grid.Row="0" MouseMove="SequencerMouseMoved"
+                                       MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
+                                       NoteAction="{Binding NoteAction}" 
+                                       SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                       SequencerPlaying="{Binding SequencerPlaying, Mode=TwoWay}" />
 
-            <radialContextMenu:NoteActionRadialContextMenuWrapper x:Name="RadialContextMenu"
-                                                                  SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
-                                                                  MenuRadius="40" />
+                <radialContextMenu:NoteActionRadialContextMenuWrapper x:Name="RadialContextMenu"
+                                                                      SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
+                                                                      MenuRadius="40" />
+            </Grid>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Height="20" Width="20" Margin="5" Command="{Binding PlaySequencer}">&#x25B6;</Button>
+                <Button Height="20" Width="20" Margin="5" Command="{Binding StopSequencer}">&#x25A0;</Button>
+            </StackPanel>
+
+
         </Grid>
+        
+
         <Grid Grid.Row="0" Grid.Column="1" MinWidth="20">
             <xctk:PropertyGrid SelectedObject="{Binding SelectedObject}" ShowSearchBox="False" />
         </Grid>
@@ -49,7 +65,7 @@
             </StatusBar.ItemsPanel>
             <Separator Grid.Column="0" />
             <StatusBarItem Grid.Column="1">
-                <TextBlock Text="{Binding NoteAction, StringFormat=Note Action {0}}" />
+                <TextBlock Text="{Binding Information}" />
             </StatusBarItem>
         </StatusBar>
 

@@ -29,6 +29,11 @@ namespace Sequencer.View
             DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
+        [NotNull]
+        public static readonly DependencyProperty SequencerPlayingProperty =
+            DependencyProperty.Register(nameof(SequencerPlaying), typeof(bool), typeof(SequencerControl),
+                new FrameworkPropertyMetadata(null));
+        
         [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor = new KeyboardStateProcessor();
         [NotNull] private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
         [NotNull] private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
@@ -81,6 +86,12 @@ namespace Sequencer.View
         {
             get => (IEnumerable<Tone>) GetValue(SelectedNotesProperty) ?? throw new InvalidOperationException();
             set => SetValue(SelectedNotesProperty, value);
+        }
+
+        public bool SequencerPlaying
+        {
+            get => (bool) (GetValue(SequencerPlayingProperty) ?? false);
+            set => SetValue(SequencerPlayingProperty, value);
         }
 
         public void HandleLeftMouseDown([NotNull] IMousePoint mouseDownPoint)
