@@ -1,0 +1,9 @@
+﻿<Application x:Class="Sequencer.View.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModel="clr-namespace:Sequencer.ViewModel;assembly=Sequencer.ViewModel"
+             StartupUri="Control/MainWindow.xaml">
+    <Application.Resources>
+        <viewModel:SequencerViewModel x:Key="SequencerViewModel" />
+    </Application.Resources>
+</Application>
