@@ -2,6 +2,8 @@
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Drawing;
+using Sequencer.Midi;
+using Sequencer.Shared;
 
 namespace Sequencer.View
 {

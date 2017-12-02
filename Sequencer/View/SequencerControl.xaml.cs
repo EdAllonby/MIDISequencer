@@ -10,6 +10,7 @@ using Sequencer.Command.NotesCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
+using Sequencer.Shared;
 using Sequencer.ViewModel;
 
 namespace Sequencer.View

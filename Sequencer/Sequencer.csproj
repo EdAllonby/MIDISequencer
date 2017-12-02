@@ -46,7 +46,6 @@
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -196,6 +195,14 @@
     <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
       <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
       <Name>Sequencer.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj">
+      <Project>{8ADB7C17-3648-4992-AAD4-C0E6D8B1D23B}</Project>
+      <Name>Sequencer.Midi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Shared\Sequencer.Shared.csproj">
+      <Project>{538D9626-9A18-4F76-BBD5-93495D794060}</Project>
+      <Name>Sequencer.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
       <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>

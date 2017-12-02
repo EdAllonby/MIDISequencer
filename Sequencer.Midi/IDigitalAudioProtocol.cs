@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
+using Sequencer.Domain;
 
-namespace Sequencer.Domain
+namespace Sequencer.Midi
 {
     /// <summary>
     /// A digital audio protocol defines a set of rules for representing musical values as digital data.

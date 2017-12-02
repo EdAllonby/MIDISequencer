@@ -78,9 +78,9 @@
       <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
       <Name>Sequencer.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
-      <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
-      <Name>Sequencer.Utilities</Name>
+    <ProjectReference Include="..\Sequencer.Shared\Sequencer.Shared.csproj">
+      <Project>{538D9626-9A18-4F76-BBD5-93495D794060}</Project>
+      <Name>Sequencer.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj">
       <Project>{68A8D4A6-B8EE-4684-8F1B-21B686014069}</Project>

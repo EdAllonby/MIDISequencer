@@ -1,7 +1,9 @@
 ﻿using System.Windows.Media;
 using JetBrains.Annotations;
+using Sequencer.Domain;
+using Sequencer.Midi;
 
-namespace Sequencer.Domain
+namespace Sequencer.Shared
 {
     /// <summary>
     /// Holds the sequencer's currently assigned settings.

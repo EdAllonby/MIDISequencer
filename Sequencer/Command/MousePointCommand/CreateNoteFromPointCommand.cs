@@ -2,6 +2,7 @@
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
+using Sequencer.Shared;
 using Sequencer.View;
 
 namespace Sequencer.Command.MousePointCommand

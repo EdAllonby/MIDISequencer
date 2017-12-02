@@ -2,9 +2,9 @@
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Command.NotesCommand;
-using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
+using Sequencer.Shared;
 using Sequencer.Utilities;
 using Sequencer.View;
 using Sequencer.ViewModel;

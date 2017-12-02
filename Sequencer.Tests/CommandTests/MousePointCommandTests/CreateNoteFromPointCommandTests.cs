@@ -4,6 +4,7 @@ using Sequencer.Command.MousePointCommand;
 using Sequencer.Domain;
 using Sequencer.Drawing;
 using Sequencer.Input;
+using Sequencer.Shared;
 using Sequencer.View;
 
 namespace Sequencer.Tests.CommandTests.MousePointCommandTests

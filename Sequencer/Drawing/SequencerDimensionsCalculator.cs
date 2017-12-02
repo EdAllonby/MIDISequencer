@@ -3,6 +3,8 @@ using System.Windows.Controls;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Input;
+using Sequencer.Midi;
+using Sequencer.Shared;
 using Sequencer.View;
 
 namespace Sequencer.Drawing

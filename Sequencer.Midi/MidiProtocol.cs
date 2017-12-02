@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
+using Sequencer.Domain;
 
-namespace Sequencer.Domain
+namespace Sequencer.Midi
 {
     /// <summary>
     /// MIDI is a technical standard which allows a wide variety of electronic musical instruments,
