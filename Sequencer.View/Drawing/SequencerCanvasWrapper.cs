@@ -23,6 +23,8 @@ namespace Sequencer.View.Drawing
             canvas.Children.Remove(child);
         }
 
+        public double Width => canvas.ActualWidth;
+
         public double Height => canvas.ActualHeight;
     }
 }

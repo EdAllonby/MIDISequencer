@@ -8,7 +8,8 @@ namespace Sequencer.View.Drawing
         void AddChild([NotNull] UIElement child);
         void RemoveChild([NotNull] UIElement child);
 
-        double Height { get; }
+        double Width { get; }
 
+        double Height { get; }
     }
 }

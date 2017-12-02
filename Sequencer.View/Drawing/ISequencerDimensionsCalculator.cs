@@ -30,5 +30,9 @@ namespace Sequencer.View.Drawing
 
         [CanBeNull]
         IVisualNote NoteAtStartingPoint([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
+
+        double GetPointFromPosition([NotNull] IPosition position);
+
+        double GetPointFromPitch([NotNull] Pitch pitch);
     }
 }

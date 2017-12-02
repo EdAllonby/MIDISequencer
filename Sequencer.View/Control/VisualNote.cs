@@ -14,14 +14,14 @@ namespace Sequencer.View.Control
         [NotNull] private readonly SequencerSettings sequencerSettings;
         private NoteState noteState = NoteState.Selected;
 
-        public VisualNote([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
+        public VisualNote([NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
             [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone)
         {
             protocol = sequencerSettings.Protocol;
             this.sequencerSettings = sequencerSettings;
             Tone = tone;
 
-            noteDrawer = new NoteDrawer(pitchAndPositionCalculator, sequencer, sequencerSettings, sequencerDimensionsCalculator);
+            noteDrawer = new NoteDrawer(sequencer, sequencerSettings, sequencerDimensionsCalculator);
         }
 
         public Pitch Pitch

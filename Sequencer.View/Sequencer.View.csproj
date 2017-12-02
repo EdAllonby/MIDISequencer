@@ -101,6 +101,7 @@
     <Compile Include="Control\SequencerNotes.cs" />
     <Compile Include="Control\VisualNote.cs" />
     <Compile Include="Control\VisualNoteFactory.cs" />
+    <Compile Include="Drawing\PositionIndicatorDrawer.cs" />
     <Compile Include="Input\IMousePoint.cs" />
     <Compile Include="Input\MousePoint.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />

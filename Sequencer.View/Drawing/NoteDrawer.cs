@@ -16,21 +16,17 @@ namespace Sequencer.View.Drawing
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(NoteDrawer));
 
         [NotNull] private readonly Rectangle noteRectangle;
-        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly ISequencerCanvasWrapper sequencer;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        [NotNull] private readonly TimeSignature timeSignature;
         [NotNull] private readonly Rectangle velocityRectangle;
 
-        public NoteDrawer([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings,
+        public NoteDrawer([NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
-            this.pitchAndPositionCalculator = pitchAndPositionCalculator;
             this.sequencer = sequencer;
             this.sequencerSettings = sequencerSettings;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
-            timeSignature = sequencerSettings.TimeSignature;
 
             noteRectangle = new Rectangle
             {
@@ -53,20 +49,19 @@ namespace Sequencer.View.Drawing
 
         public void DrawNote([NotNull] Pitch pitch, [NotNull] Velocity velocity, [NotNull] IPosition startPosition, [NotNull] IPosition endPosition, NoteState noteState)
         {
-            Log.InfoFormat("Drawing note length with start position {0} to end position {1}", startPosition, endPosition);
+            Log.InfoFormat($"Drawing note length with start position {startPosition} to end position {endPosition}");
 
-            double beatWidth = sequencerDimensionsCalculator.BeatWidth;
             double noteHeight = sequencerDimensionsCalculator.NoteHeight;
 
-            double noteWidth = ActualWidthBetweenPositions(startPosition, endPosition, beatWidth);
-            double noteStartHeight = GetPointFromPitch(pitch, sequencer.Height, noteHeight);
+            double noteWidth = ActualWidthBetweenPositions(startPosition, endPosition);
+            double noteStartHeight = sequencerDimensionsCalculator.GetPointFromPitch(pitch);
 
             noteRectangle.Height = noteHeight;
             noteRectangle.Width = noteWidth;
 
             SetNoteColour(noteState);
 
-            double noteStartLocation = GetPointFromPosition(startPosition, sequencerDimensionsCalculator.BeatWidth);
+            double noteStartLocation = sequencerDimensionsCalculator.GetPointFromPosition(startPosition);
 
             SetRectanglePosition(noteRectangle, noteStartLocation, noteStartHeight);
 
@@ -104,26 +99,14 @@ namespace Sequencer.View.Drawing
             sequencer.RemoveChild(noteRectangle);
             sequencer.RemoveChild(velocityRectangle);
         }
-
-        private double GetPointFromPitch([NotNull] Pitch pitch, double sequencerHeight, double noteHeight)
+        
+        private double ActualWidthBetweenPositions([NotNull] IPosition startPosition, [NotNull] IPosition endPosition)
         {
-            int halfStepDifference = pitchAndPositionCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
-            double relativePitchPosition = (noteHeight*halfStepDifference) + noteHeight;
-            return sequencerHeight - relativePitchPosition;
-        }
-
-        private double ActualWidthBetweenPositions([NotNull] IPosition startPosition, [NotNull] IPosition endPosition, double beatWidth)
-        {
-            double noteStartingPoint = GetPointFromPosition(startPosition, beatWidth);
-            double noteEndingPoint = GetPointFromPosition(endPosition, beatWidth);
+            double noteStartingPoint = sequencerDimensionsCalculator.GetPointFromPosition(startPosition);
+            double noteEndingPoint = sequencerDimensionsCalculator.GetPointFromPosition(endPosition);
             double newNoteWidth = noteEndingPoint - noteStartingPoint;
 
             return newNoteWidth >= 0 ? newNoteWidth : 0;
-        }
-
-        private double GetPointFromPosition([NotNull] IPosition position, double beatWidth)
-        {
-            return (position.SummedBeat(timeSignature)*beatWidth) - beatWidth;
         }
 
         private static void SetRectanglePosition([NotNull] UIElement rectangle, double leftPosition, double topPosition)

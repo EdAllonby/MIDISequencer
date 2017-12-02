@@ -19,12 +19,12 @@ namespace Sequencer.View.Drawing
         [NotNull] [ItemNotNull] private readonly List<UIElement> elementCache = new List<UIElement>();
         [NotNull] private readonly IDigitalAudioProtocol protocol;
 
-        [NotNull] private readonly Canvas sequencerCanvas;
+        [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
 
-        public SequencerDrawer([NotNull] Canvas sequencerCanvas, [NotNull] ISequencerNotes sequencerNotes,
+        public SequencerDrawer([NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
         {
             protocol = sequencerSettings.Protocol;
@@ -89,7 +89,7 @@ namespace Sequencer.View.Drawing
                 X1 = currentBeatPosition,
                 X2 = currentBeatPosition,
                 Y1 = 0,
-                Y2 = sequencerCanvas.ActualHeight,
+                Y2 = sequencerCanvas.Height,
                 StrokeThickness = thickness,
                 Stroke = new SolidColorBrush(sequencerSettings.LineColour)
             };
@@ -103,7 +103,7 @@ namespace Sequencer.View.Drawing
 
             var noteBackground = new Rectangle
             {
-                Width = sequencerCanvas.ActualWidth,
+                Width = sequencerCanvas.Width,
                 Height = noteSize,
                 Fill = new SolidColorBrush(backgroundColour)
             };
@@ -119,7 +119,7 @@ namespace Sequencer.View.Drawing
             var sequencerLine = new Line
             {
                 X1 = 0,
-                X2 = sequencerCanvas.ActualWidth,
+                X2 = sequencerCanvas.Width,
                 Y1 = currentNotePosition,
                 Y2 = currentNotePosition,
                 StrokeThickness = thickness,
@@ -133,7 +133,7 @@ namespace Sequencer.View.Drawing
         {
             foreach (UIElement uiElement in elementCache)
             {
-                sequencerCanvas.Children.Add(uiElement);
+                sequencerCanvas.AddChild(uiElement);
             }
         }
 
@@ -141,7 +141,7 @@ namespace Sequencer.View.Drawing
         {
             foreach (UIElement uiElement in elementCache)
             {
-                sequencerCanvas.Children.Remove(uiElement);
+                sequencerCanvas.RemoveChild(uiElement);
             }
 
             elementCache.Clear();

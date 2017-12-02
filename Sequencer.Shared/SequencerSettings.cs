@@ -25,5 +25,6 @@ namespace Sequencer.Shared
         public Color LineColour = Colors.Black;
         public Color SelectedNoteColour = Colors.DarkRed;
         public Color UnselectedNoteColour = Colors.Crimson;
+        public Color IndicatorColour = Colors.BurlyWood;
     }
 }

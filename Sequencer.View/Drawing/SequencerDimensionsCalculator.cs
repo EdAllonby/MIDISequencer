@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Controls;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Midi;
@@ -12,25 +11,27 @@ namespace Sequencer.View.Drawing
     public sealed class SequencerDimensionsCalculator : ISequencerDimensionsCalculator
     {
         [NotNull] private readonly IDigitalAudioProtocol protocol;
-        [NotNull] private readonly Canvas sequencerCanvas;
+        [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
 
-        public SequencerDimensionsCalculator([NotNull] Canvas sequencerCanvas, [NotNull] SequencerSettings sequencerSettings)
+        public SequencerDimensionsCalculator([NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] SequencerSettings sequencerSettings, [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
         {
             protocol = sequencerSettings.Protocol;
             this.sequencerCanvas = sequencerCanvas;
             this.sequencerSettings = sequencerSettings;
+            this.pitchAndPositionCalculator = pitchAndPositionCalculator;
         }
 
         /// <summary>
         /// The note heights the sequencer should display.
         /// </summary>
-        public double NoteHeight => sequencerCanvas.ActualHeight/SequencerSettings.TotalNotes;
+        public double NoteHeight => sequencerCanvas.Height/SequencerSettings.TotalNotes;
 
         /// <summary>
         /// The measure widths the sequencer should display.
         /// </summary>
-        public double MeasureWidth => sequencerCanvas.ActualWidth/SequencerSettings.TotalMeasures;
+        public double MeasureWidth => sequencerCanvas.Width/SequencerSettings.TotalMeasures;
 
         /// <summary>
         /// The brr widths the sequencer should display.
@@ -53,6 +54,18 @@ namespace Sequencer.View.Drawing
             return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
         }
 
+        public double GetPointFromPosition(IPosition position)
+        {
+            return (position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth) - BeatWidth;
+        }
+
+        public double GetPointFromPitch(Pitch pitch)
+        {
+            int halfStepDifference = pitchAndPositionCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
+            double relativePitchPosition = (NoteHeight * halfStepDifference) + NoteHeight;
+            return sequencerCanvas.Height - relativePitchPosition;
+        }
+
         /// <summary>
         /// Finds the pitch a mouse is on from a position in the sequencer.
         /// </summary>
@@ -60,7 +73,7 @@ namespace Sequencer.View.Drawing
         /// <returns>The pitch the mouse is over.</returns>
         public Pitch FindPitchFromPoint(IMousePoint mousePosition)
         {
-            int relativeMidiNumber = (int) ((sequencerCanvas.ActualHeight/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
+            int relativeMidiNumber = (int) ((sequencerCanvas.Height/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
             int absoluteMidiNumber = protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch) + relativeMidiNumber;
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }

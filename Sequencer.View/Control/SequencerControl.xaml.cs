@@ -42,6 +42,7 @@ namespace Sequencer.View.Control
         [NotNull] private readonly UpdateNoteStateCommand selectNoteCommand;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly SequencerDrawer sequencerDrawer;
+        [NotNull] private readonly PositionIndicatorDrawer positionIndicatorDrawer;
         [NotNull] private readonly SequencerSettings sequencerSettings = new SequencerSettings();
         [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
 
@@ -63,15 +64,17 @@ namespace Sequencer.View.Control
             }
 
             ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
-            sequencerDimensionsCalculator = new SequencerDimensionsCalculator(SequencerCanvas, sequencerSettings);
             pitchAndPositionCalculator = new PitchAndPositionCalculator(sequencerSettings.TimeSignature);
+            sequencerDimensionsCalculator = new SequencerDimensionsCalculator(sequencerCanvasWrapper, sequencerSettings, pitchAndPositionCalculator);
 
-            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(pitchAndPositionCalculator, sequencerSettings, sequencerDimensionsCalculator, sequencerCanvasWrapper);
+            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, sequencerDimensionsCalculator, sequencerCanvasWrapper);
 
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings.TimeSignature, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
-            sequencerDrawer = new SequencerDrawer(SequencerCanvas, notes, sequencerDimensionsCalculator, sequencerSettings);
+            sequencerDrawer = new SequencerDrawer(sequencerCanvasWrapper, notes, sequencerDimensionsCalculator, sequencerSettings);
+            positionIndicatorDrawer = new PositionIndicatorDrawer(sequencerSettings, sequencerCanvasWrapper, sequencerDimensionsCalculator);
+            positionIndicatorDrawer.DrawPositionIndicator(new Position(3, 2, 3));
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);
         }
 
@@ -218,6 +221,7 @@ namespace Sequencer.View.Control
         private void SequencerSizeChanged(object sender, RoutedEventArgs e)
         {
             sequencerDrawer.RedrawEditor();
+            positionIndicatorDrawer.RedrawEditor();
         }
     }
 }
