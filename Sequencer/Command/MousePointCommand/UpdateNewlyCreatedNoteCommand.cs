@@ -13,15 +13,15 @@ namespace Sequencer.Command.MousePointCommand
     {
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly IMouseOperator mouseOperator;
-        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly TimeSignature timeSignature;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
 
         public UpdateNewlyCreatedNoteCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] TimeSignature timeSignature, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencerNotes = sequencerNotes;
             this.mouseOperator = mouseOperator;
-            this.sequencerSettings = sequencerSettings;
+            this.timeSignature = timeSignature;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
         }
 
@@ -30,7 +30,7 @@ namespace Sequencer.Command.MousePointCommand
         protected override void DoExecute(IMousePoint mousePosition)
         {
             IPosition currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
-            IPosition nextPosition = currentEndPosition.NextPosition(sequencerSettings.TimeSignature);
+            IPosition nextPosition = currentEndPosition.NextPosition(timeSignature);
 
             foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
             {
