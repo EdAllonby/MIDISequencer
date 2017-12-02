@@ -68,14 +68,14 @@ namespace Sequencer.Drawing
         {
             double pointsPerNote = sequencerDimensionsCalculator.NoteHeight;
 
-            for (int note = SequencerSettings.TotalNotes; note >= 0; note--)
+            for (int note = SequencerSettings.TotalNotes - 1; note >= 0; note--)
             {
                 double currentNotePosition = pointsPerNote*note;
 
                 int currentMidiNote = (SequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch)) - note;
                 Pitch pitch = protocol.CreatePitchFromProtocolNumber(currentMidiNote - 1);
 
-                DrawNoteBackground(currentNotePosition, pointsPerNote, pitch);
+                DrawNoteLaneBackground(currentNotePosition, pointsPerNote, pitch);
                 DrawHorizontalSequencerLine(currentNotePosition, 0.5);
             }
         }
@@ -95,7 +95,7 @@ namespace Sequencer.Drawing
             elementCache.Add(sequencerLine);
         }
 
-        private void DrawNoteBackground(double currentNotePosition, double noteSize, [NotNull] Pitch pitch)
+        private void DrawNoteLaneBackground(double currentNotePosition, double noteSize, [NotNull] Pitch pitch)
         {
             Color backgroundColour = pitch.Note.IsAccidental ? sequencerSettings.AccidentalKeyColour : sequencerSettings.KeyColour;
 
