@@ -40,8 +40,8 @@ namespace Sequencer.View.RadialContextMenu
 
         public EnumerableType<TMenuItem> SelectedMenuItem
         {
-            get { return (EnumerableType<TMenuItem>) GetValue(SelectedMenuItemProperty); }
-            set { SetValue(SelectedMenuItemProperty, value); }
+            get => (EnumerableType<TMenuItem>) GetValue(SelectedMenuItemProperty);
+            set => SetValue(SelectedMenuItemProperty, value);
         }
 
         public double MenuRadius
@@ -56,7 +56,7 @@ namespace Sequencer.View.RadialContextMenu
 
                 return (double) value;
             }
-            set { SetValue(MenuRadiusProperty, value); }
+            set => SetValue(MenuRadiusProperty, value);
         }
 
         private static double AngleSize => (double) 360 / EnumerableType<TMenuItem>.Count;

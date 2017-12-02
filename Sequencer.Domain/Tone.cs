@@ -33,7 +33,7 @@ namespace Sequencer.Domain
         [NotNull]
         public IPosition EndPosition
         {
-            get { return endPosition; }
+            get => endPosition;
             set
             {
                 if (value.IsGreaterThan(StartPosition))

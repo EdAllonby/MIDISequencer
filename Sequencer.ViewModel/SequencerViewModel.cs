@@ -53,7 +53,7 @@ namespace Sequencer.ViewModel
         [CanBeNull]
         public object SelectedObject
         {
-            get { return selectedObject; }
+            get => selectedObject;
             set
             {
                 selectedObject = value;

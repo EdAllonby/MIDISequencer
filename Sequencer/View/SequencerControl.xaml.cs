@@ -71,16 +71,16 @@ namespace Sequencer.View
 
         public NoteAction NoteAction
         {
-            get { return (NoteAction) GetValue(NoteActionProperty); }
-            set { SetValue(NoteActionProperty, value); }
+            get => (NoteAction) GetValue(NoteActionProperty);
+            set => SetValue(NoteActionProperty, value);
         }
 
         [NotNull]
         [ItemNotNull]
         public IEnumerable<Tone> SelectedNotes
         {
-            get { return (IEnumerable<Tone>) GetValue(SelectedNotesProperty) ?? throw new InvalidOperationException(); }
-            set { SetValue(SelectedNotesProperty, value); }
+            get => (IEnumerable<Tone>) GetValue(SelectedNotesProperty) ?? throw new InvalidOperationException();
+            set => SetValue(SelectedNotesProperty, value);
         }
 
         public void HandleLeftMouseDown([NotNull] IMousePoint mouseDownPoint)

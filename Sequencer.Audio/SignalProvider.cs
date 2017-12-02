@@ -28,13 +28,13 @@ namespace Sequencer.Audio
 
         public bool NoteState
         {
-            get { return envelope.State != EnvelopeGenerator.EnvelopeState.Idle; }
-            set { envelope.Gate(value); }
+            get => envelope.State != EnvelopeGenerator.EnvelopeState.Idle;
+            set => envelope.Gate(value);
         }
 
         public float Amplitude
         {
-            get { return amplitude; }
+            get => amplitude;
             set
             {
                 if (value >= 0 && value <= 1)
@@ -46,7 +46,7 @@ namespace Sequencer.Audio
 
         public float Frequency
         {
-            get { return frequency; }
+            get => frequency;
             set
             {
                 if (value > 0 && value < 20000)

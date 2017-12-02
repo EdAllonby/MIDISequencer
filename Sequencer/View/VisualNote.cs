@@ -24,7 +24,7 @@ namespace Sequencer.View
 
         public Pitch Pitch
         {
-            get { return Tone.Pitch; }
+            get => Tone.Pitch;
             private set
             {
                 Tone.Pitch = value;
@@ -36,7 +36,7 @@ namespace Sequencer.View
 
         public Velocity Velocity
         {
-            get { return Tone.Velocity; }
+            get => Tone.Velocity;
             set
             {
                 Tone.Velocity = value;
@@ -49,7 +49,7 @@ namespace Sequencer.View
         /// </summary>
         public IPosition StartPosition
         {
-            get { return Tone.StartPosition; }
+            get => Tone.StartPosition;
             set
             {
                 if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature).IsLessThan(Tone.EndPosition))
@@ -65,7 +65,7 @@ namespace Sequencer.View
         /// </summary>
         public IPosition EndPosition
         {
-            get { return Tone.EndPosition; }
+            get => Tone.EndPosition;
             set
             {
                 if (!EndPosition.Equals(value) && (value.IsGreaterThan(StartPosition)))
@@ -81,7 +81,7 @@ namespace Sequencer.View
         /// </summary>
         public NoteState NoteState
         {
-            get { return noteState; }
+            get => noteState;
             set
             {
                 noteState = value;
