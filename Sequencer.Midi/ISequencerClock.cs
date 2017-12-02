@@ -2,10 +2,11 @@
 
 namespace Sequencer.Midi
 {
-    internal interface ISequencerClock
+    public interface ISequencerClock
     {
         int Tempo { get; }
-        void SetTicks(int ticks);
+        int Ticks { get; set; }
+
         void Start();
         void Continue();
         void Stop();

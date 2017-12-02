@@ -13,10 +13,12 @@ namespace Sequencer.Midi
 
         public int Tempo => clock.Tempo;
 
-        public void SetTicks(int ticks)
+        public int Ticks
         {
-            clock.SetTicks(ticks);
+            get => clock.Ticks;
+            set => clock.SetTicks(value);
         }
+
 
         public void Start()
         {

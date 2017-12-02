@@ -11,19 +11,17 @@ namespace Sequencer.View.Drawing
 {
     public class PositionIndicatorDrawer
     {
+        private const double IndicatorWidth = 2;
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(PositionIndicatorDrawer));
         [NotNull] private readonly Rectangle indicator;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        [NotNull] private IPosition currentPosition;
-        private const double IndicatorWidth = 2;
 
-        public PositionIndicatorDrawer([NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+        public PositionIndicatorDrawer([NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerCanvasWrapper sequencerCanvas,
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencerCanvas = sequencerCanvas;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
-
-            currentPosition = new Position(0, 0, 0);
 
             indicator = new Rectangle
             {
@@ -36,8 +34,11 @@ namespace Sequencer.View.Drawing
 
             Panel.SetZIndex(indicator, int.MaxValue);
 
-            DrawPositionIndicator(currentPosition);
+            DrawPositionIndicator(CurrentPosition);
         }
+
+        [NotNull]
+        public IPosition CurrentPosition { get; private set; } = new Position(1,1,1);
 
         public void DrawPositionIndicator([NotNull] IPosition position)
         {
@@ -45,7 +46,7 @@ namespace Sequencer.View.Drawing
 
             indicator.Height = sequencerCanvas.Height;
 
-            currentPosition = position;
+            CurrentPosition = position;
             double noteStartLocation = sequencerDimensionsCalculator.GetPointFromPosition(position);
 
             SetRectanglePosition(noteStartLocation);
@@ -53,7 +54,7 @@ namespace Sequencer.View.Drawing
 
         public void RedrawEditor()
         {
-            DrawPositionIndicator(currentPosition);
+            DrawPositionIndicator(CurrentPosition);
         }
 
         private void SetRectanglePosition(double position)

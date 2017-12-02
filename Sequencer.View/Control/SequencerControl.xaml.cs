@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Midi;
 using Sequencer.Shared;
 using Sequencer.View.Command;
 using Sequencer.View.Command.MousePointCommand;
@@ -49,11 +50,12 @@ namespace Sequencer.View.Control
         [NotNull] private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
         [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
         [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
-        
+        [NotNull] private readonly ISequencerClock sequencerClock = new SequencerClock();
+
         public SequencerControl()
         {
             InitializeComponent();
-
+            
             SizeChanged += SequencerSizeChanged;
             notes = new SequencerNotes(sequencerSettings);
             notes.SelectedNotesChanged += SelectedNotesChanged;
@@ -74,8 +76,26 @@ namespace Sequencer.View.Control
             selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(sequencerCanvasWrapper, notes, sequencerDimensionsCalculator, sequencerSettings);
             positionIndicatorDrawer = new PositionIndicatorDrawer(sequencerSettings, sequencerCanvasWrapper, sequencerDimensionsCalculator);
-            positionIndicatorDrawer.DrawPositionIndicator(new Position(3, 2, 3));
+
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);
+
+
+            sequencerClock.Tick += SequencerClock_Tick;
+            sequencerClock.Start();
+        }
+
+        private void SequencerClock_Tick(object sender, EventArgs e)
+        {
+            if (sequencerClock.Ticks % 6 == 0)
+            {
+                IPosition current = positionIndicatorDrawer.CurrentPosition;
+                IPosition nextPosition = current.NextPosition(sequencerSettings.TimeSignature);
+
+                if (Application.Current != null && Application.Current.Dispatcher != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() => { positionIndicatorDrawer.DrawPositionIndicator(nextPosition); });
+                }
+            }
         }
 
         public NoteAction NoteAction
