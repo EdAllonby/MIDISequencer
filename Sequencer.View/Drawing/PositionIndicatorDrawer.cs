@@ -38,7 +38,7 @@ namespace Sequencer.View.Drawing
         }
 
         [NotNull]
-        public IPosition CurrentPosition { get; private set; } = new Position(1,1,1);
+        private IPosition CurrentPosition { get; set; } = new Position(1, 1, 1);
 
         public void DrawPositionIndicator([NotNull] IPosition position)
         {

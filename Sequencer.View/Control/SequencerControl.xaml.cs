@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using Microsoft.Practices.ServiceLocation;
+using log4net;
 using Sequencer.Domain;
-using Sequencer.Midi;
 using Sequencer.Shared;
+using Sequencer.Utilities;
 using Sequencer.View.Command;
 using Sequencer.View.Command.MousePointCommand;
 using Sequencer.View.Command.NotesCommand;
@@ -31,6 +33,18 @@ namespace Sequencer.View.Control
         public static readonly DependencyProperty SelectedNotesProperty =
             DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
+        
+        [NotNull]
+        public static readonly DependencyProperty CurrentPositionProperty =
+            DependencyProperty.Register(nameof(CurrentPosition), typeof(IPosition), typeof(SequencerControl),
+                new FrameworkPropertyMetadata(OnCurrentPositionChanged));
+
+        private static void OnCurrentPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var component = (SequencerControl) d;
+            PositionIndicatorDrawer indicatorDrawer = component.positionIndicatorDrawer;
+            indicatorDrawer.DrawPositionIndicator((IPosition) e.NewValue);
+        }
 
         [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor = new KeyboardStateProcessor();
         [NotNull] private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
@@ -46,15 +60,11 @@ namespace Sequencer.View.Control
         [NotNull] private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
         [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
         [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
-        [NotNull] private readonly ISequencerClock sequencerClock;
 
         public SequencerControl()
         {
             InitializeComponent();
-
-            // Find a better way of doing this...
-            sequencerClock = ServiceLocator.Current.GetInstance<ISequencerClock>();
-
+            
             SizeChanged += SequencerSizeChanged;
             notes = new SequencerNotes(sequencerSettings);
             notes.SelectedNotesChanged += SelectedNotesChanged;
@@ -77,23 +87,6 @@ namespace Sequencer.View.Control
             positionIndicatorDrawer = new PositionIndicatorDrawer(sequencerSettings, sequencerCanvasWrapper, sequencerDimensionsCalculator);
 
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);
-
-
-            sequencerClock.Tick += SequencerClock_Tick;
-        }
-
-        private void SequencerClock_Tick(object sender, EventArgs e)
-        {
-            if (sequencerClock.Ticks % 6 == 0)
-            {
-                IPosition current = positionIndicatorDrawer.CurrentPosition;
-                IPosition nextPosition = current.NextPosition(sequencerSettings.TimeSignature);
-
-                if (Application.Current != null && Application.Current.Dispatcher != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() => { positionIndicatorDrawer.DrawPositionIndicator(nextPosition); });
-                }
-            }
         }
 
         public NoteAction NoteAction
@@ -108,6 +101,13 @@ namespace Sequencer.View.Control
         {
             get => (IEnumerable<Tone>) GetValue(SelectedNotesProperty) ?? throw new InvalidOperationException();
             set => SetValue(SelectedNotesProperty, value);
+        }
+
+        [NotNull]
+        public IPosition CurrentPosition
+        {
+            get => (IPosition) GetValue(CurrentPositionProperty) ?? throw new InvalidOperationException();
+            set => SetValue(CurrentPositionProperty, value);
         }
 
         public void HandleLeftMouseDown([NotNull] IMousePoint mouseDownPoint)

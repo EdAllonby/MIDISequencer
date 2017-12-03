@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using JetBrains.Annotations;
@@ -20,10 +23,30 @@ namespace Sequencer.ViewModel
         [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
         [CanBeNull] private object selectedObject;
         private bool sequencerPlaying;
+        private IPosition currentPosition;
+
 
         public SequencerViewModel([NotNull] ISequencerClock clock)
         {
             this.clock = clock;
+            CurrentPosition = new Position(1, 1, 1);
+
+            clock.Tick += OnTick;
+
+        }
+
+        private void OnTick(object sender, EventArgs e)
+        {
+            if (clock.Ticks % 6 == 0)
+            {
+                IPosition nextPosition = CurrentPosition.NextPosition(new TimeSignature(4, 4));
+
+                // Abstract this. For some reason (yet to be discovered), raising property changes on the UI thread is much, much quicker than letting WPF handle it.
+                // I don't really like having this View dependency in the view model, but we'll have to live with it for the moment.
+                Application.Current.Dispatcher.Invoke(() => {
+                    CurrentPosition = nextPosition;
+                });
+            }
         }
 
         [NotNull]
@@ -88,6 +111,19 @@ namespace Sequencer.ViewModel
             }
         }
 
+        [NotNull]
+        public IPosition CurrentPosition
+        {
+            [NotNull] get { return currentPosition; }
+            [NotNull]
+            set
+            {
+                currentPosition = value;
+                RaisePropertyChanged(nameof(CurrentPosition));
+
+                Log.Info($"Sequencer current position set to {CurrentPosition}");
+            }
+        }
 
         [CanBeNull]
         public object SelectedObject
@@ -125,5 +161,7 @@ namespace Sequencer.ViewModel
             SequencerPlaying = true;
             clock.Start();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

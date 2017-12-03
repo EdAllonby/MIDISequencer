@@ -24,9 +24,10 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <control:SequencerControl x:Name="Sequencer" Grid.Row="0" MouseMove="SequencerMouseMoved"
-                                       MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
-                                       NoteAction="{Binding NoteAction}" 
-                                       SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}" />
+                                          MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
+                                          NoteAction="{Binding NoteAction}" 
+                                          SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                          CurrentPosition="{Binding CurrentPosition, Mode=OneWay}" />
 
                 <radialContextMenu:NoteActionRadialContextMenuWrapper x:Name="RadialContextMenu"
                                                                       SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
