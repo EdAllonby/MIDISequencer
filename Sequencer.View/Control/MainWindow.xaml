@@ -36,6 +36,7 @@
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Height="20" Width="20" Margin="5" Command="{Binding PlaySequencer}">&#x25B6;</Button>
+                <Button Height="20" Width="20" Margin="5" Command="{Binding PauseSequencer}">P</Button>
                 <Button Height="20" Width="20" Margin="5" Command="{Binding StopSequencer}">&#x25A0;</Button>
             </StackPanel>
 

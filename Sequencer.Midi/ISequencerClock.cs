@@ -12,10 +12,10 @@ namespace Sequencer.Midi
         void Start();
         void Continue();
         void Stop();
+        void Pause();
+
 
         event EventHandler Started;
         event EventHandler Tick;
-        event EventHandler Stopped;
-        event EventHandler Continued;
     }
 }
