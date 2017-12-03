@@ -35,6 +35,8 @@ namespace Sequencer.Midi
             clock.Stop();
         }
 
+        public int TicksPerQuarterNote => clock.Ppqn;
+
         public event EventHandler Started
         {
             add => clock.Started += value;

@@ -19,6 +19,7 @@ namespace Sequencer.ViewModel
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly IWpfDispatcher dispatcher;
         [NotNull] private readonly IMusicalSettings musicalSettings;
+        [NotNull] private readonly ITickCalculator tickCalculator;
         private IPosition currentPosition;
 
         [NotNull] private NoteAction noteAction = NoteAction.Create;
@@ -27,10 +28,11 @@ namespace Sequencer.ViewModel
         private bool sequencerPlaying;
 
 
-        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] IMusicalSettings musicalSettings, [NotNull] IWpfDispatcher dispatcher)
+        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] IMusicalSettings musicalSettings, [NotNull] ITickCalculator tickCalculator, [NotNull] IWpfDispatcher dispatcher)
         {
             this.clock = clock;
             this.musicalSettings = musicalSettings;
+            this.tickCalculator = tickCalculator;
             this.dispatcher = dispatcher;
             CurrentPosition = new Position(1, 1, 1);
 
@@ -132,6 +134,7 @@ namespace Sequencer.ViewModel
         {
             if (clock.Ticks % 6 == 0)
             {
+                tickCalculator.CalculatePositionFromTick(clock.Ticks, clock.TicksPerQuarterNote);
                 dispatcher.DispatchToWpf(() => CurrentPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature));
             }
         }

@@ -8,6 +8,7 @@ using Autofac.Extras.CommonServiceLocator;
 using JetBrains.Annotations;
 using log4net.Config;
 using Microsoft.Practices.ServiceLocation;
+using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
 using Sequencer.View.Console;
@@ -39,13 +40,25 @@ namespace Sequencer.View
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
+            try
+            {
 
-            builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings>().SingleInstance();
+                builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
 
-            builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
-            builder.RegisterType<SequencerViewModel>().SingleInstance();
+                builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings>().SingleInstance();
 
+                builder.RegisterType<TickCalculator>().As<ITickCalculator>().SingleInstance();
+
+                builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
+                builder.RegisterType<SequencerViewModel>().SingleInstance();
+
+
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e);
+                throw;
+            }
             IContainer container = builder.Build();
             ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
         }

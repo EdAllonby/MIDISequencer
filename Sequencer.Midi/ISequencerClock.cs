@@ -7,6 +7,8 @@ namespace Sequencer.Midi
         int Tempo { get; }
         int Ticks { get; set; }
 
+        int TicksPerQuarterNote { get; }
+
         void Start();
         void Continue();
         void Stop();
