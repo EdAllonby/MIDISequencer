@@ -160,6 +160,7 @@
     <Compile Include="Drawing\SequencerDrawer.cs" />
     <Compile Include="Command\SequencerKeyPressCommandHandler.cs" />
     <Compile Include="Console\UnsafeNativeMethods.cs" />
+    <Compile Include="WpfDispatcher.cs" />
     <Page Include="Control\DragSelectionBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

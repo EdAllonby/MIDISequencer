@@ -58,6 +58,8 @@ namespace Sequencer.View
         {
             var builder = new ContainerBuilder();
 
+            builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
+
             builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings > ().SingleInstance();
 
             builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();

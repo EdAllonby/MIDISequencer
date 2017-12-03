@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using JetBrains.Annotations;
@@ -19,6 +18,7 @@ namespace Sequencer.ViewModel
     {
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly IMusicalSettings musicalSettings;
+        [NotNull] private readonly IWpfDispatcher dispatcher;
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
 
         [NotNull] private NoteAction noteAction = NoteAction.Create;
@@ -28,10 +28,11 @@ namespace Sequencer.ViewModel
         private IPosition currentPosition;
 
 
-        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] IMusicalSettings musicalSettings)
+        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] IMusicalSettings musicalSettings, [NotNull] IWpfDispatcher dispatcher)
         {
             this.clock = clock;
             this.musicalSettings = musicalSettings;
+            this.dispatcher = dispatcher;
             CurrentPosition = new Position(1, 1, 1);
 
             clock.Tick += OnTick;
@@ -42,13 +43,7 @@ namespace Sequencer.ViewModel
         {
             if (clock.Ticks % 6 == 0)
             {
-                IPosition nextPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature);
-
-                // Abstract this. For some reason (yet to be discovered), raising property changes on the UI thread is much, much quicker than letting WPF handle it.
-                // I don't really like having this View dependency in the view model, but we'll have to live with it for the moment.
-                Application.Current.Dispatcher.Invoke(() => {
-                    CurrentPosition = nextPosition;
-                });
+                dispatcher.DispatchToWpf(() => CurrentPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature));
             }
         }
 
@@ -164,7 +159,5 @@ namespace Sequencer.ViewModel
             SequencerPlaying = true;
             clock.Start();
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
