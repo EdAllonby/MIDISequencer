@@ -26,8 +26,7 @@
                 <control:SequencerControl x:Name="Sequencer" Grid.Row="0" MouseMove="SequencerMouseMoved"
                                        MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
                                        NoteAction="{Binding NoteAction}" 
-                                       SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
-                                       SequencerPlaying="{Binding SequencerPlaying, Mode=TwoWay}" />
+                                       SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}" />
 
                 <radialContextMenu:NoteActionRadialContextMenuWrapper x:Name="RadialContextMenu"
                                                                       SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"

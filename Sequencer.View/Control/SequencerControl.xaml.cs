@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
+using Microsoft.Practices.ServiceLocation;
 using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
@@ -31,11 +32,6 @@ namespace Sequencer.View.Control
             DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
-        [NotNull]
-        public static readonly DependencyProperty SequencerPlayingProperty =
-            DependencyProperty.Register(nameof(SequencerPlaying), typeof(bool), typeof(SequencerControl),
-                new FrameworkPropertyMetadata(null));
-        
         [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor = new KeyboardStateProcessor();
         [NotNull] private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
         [NotNull] private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
@@ -50,12 +46,15 @@ namespace Sequencer.View.Control
         [NotNull] private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
         [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
         [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
-        [NotNull] private readonly ISequencerClock sequencerClock = new SequencerClock();
+        [NotNull] private readonly ISequencerClock sequencerClock;
 
         public SequencerControl()
         {
             InitializeComponent();
-            
+
+            // Find a better way of doing this...
+            sequencerClock = ServiceLocator.Current.GetInstance<ISequencerClock>();
+
             SizeChanged += SequencerSizeChanged;
             notes = new SequencerNotes(sequencerSettings);
             notes.SelectedNotesChanged += SelectedNotesChanged;
@@ -81,7 +80,6 @@ namespace Sequencer.View.Control
 
 
             sequencerClock.Tick += SequencerClock_Tick;
-            sequencerClock.Start();
         }
 
         private void SequencerClock_Tick(object sender, EventArgs e)
@@ -110,12 +108,6 @@ namespace Sequencer.View.Control
         {
             get => (IEnumerable<Tone>) GetValue(SelectedNotesProperty) ?? throw new InvalidOperationException();
             set => SetValue(SelectedNotesProperty, value);
-        }
-
-        public bool SequencerPlaying
-        {
-            get => (bool) (GetValue(SequencerPlayingProperty) ?? false);
-            set => SetValue(SequencerPlayingProperty, value);
         }
 
         public void HandleLeftMouseDown([NotNull] IMousePoint mouseDownPoint)

@@ -3,9 +3,15 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using Autofac;
+using Autofac.Extras.CommonServiceLocator;
 using JetBrains.Annotations;
 using log4net.Config;
+using Microsoft.Practices.ServiceLocation;
+using Sequencer.Midi;
 using Sequencer.View.Console;
+using Sequencer.ViewModel;
+
 // ReSharper disable once RedundantUsingDirective
 
 namespace Sequencer.View
@@ -30,6 +36,7 @@ namespace Sequencer.View
 #endif
             Thread.CurrentThread.Name = "Main Thread";
 
+            RegisterServices();
             base.OnStartup(e);
         }
 
@@ -44,6 +51,17 @@ namespace Sequencer.View
 
                 XmlConfigurator.Configure(uri);
             }
+        }
+
+        private static void RegisterServices()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
+            builder.RegisterType<SequencerViewModel>().SingleInstance();
+
+            var container = builder.Build();
+            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
         }
     }
 }

@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.Midi;
 using Sequencer.Utilities;
 using Sequencer.ViewModel.Command;
 
@@ -12,12 +13,18 @@ namespace Sequencer.ViewModel
 {
     public sealed class SequencerViewModel : ViewModelBase
     {
+        [NotNull] private readonly ISequencerClock clock;
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
 
         [NotNull] private NoteAction noteAction = NoteAction.Create;
         [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
         [CanBeNull] private object selectedObject;
         private bool sequencerPlaying;
+
+        public SequencerViewModel([NotNull] ISequencerClock clock)
+        {
+            this.clock = clock;
+        }
 
         [NotNull]
         public NoteAction NoteAction
@@ -105,6 +112,7 @@ namespace Sequencer.ViewModel
         private void ExecuteStopCommand(object obj)
         {
             SequencerPlaying = false;
+            clock.Stop();
         }
 
         private bool CanExecutePlayCommand(object obj)
@@ -115,6 +123,7 @@ namespace Sequencer.ViewModel
         private void ExecutePlayCommand(object obj)
         {
             SequencerPlaying = true;
+            clock.Start();
         }
     }
 }
