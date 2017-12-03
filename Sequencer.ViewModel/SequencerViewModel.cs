@@ -134,8 +134,8 @@ namespace Sequencer.ViewModel
         {
             if (clock.Ticks % 6 == 0)
             {
-                tickCalculator.CalculatePositionFromTick(clock.Ticks, clock.TicksPerQuarterNote);
-                dispatcher.DispatchToWpf(() => CurrentPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature));
+                IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(clock.Ticks, clock.TicksPerQuarterNote);
+                dispatcher.DispatchToWpf(() => CurrentPosition = positionAtTick);
             }
         }
 
