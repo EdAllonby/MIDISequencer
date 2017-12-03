@@ -47,7 +47,7 @@ namespace Sequencer.View.Drawing
 
         private void DrawVerticalSequencerLines()
         {
-            for (var measure = 0; measure < SequencerSettings.TotalMeasures; measure++)
+            for (var measure = 0; measure < sequencerSettings.TotalMeasures; measure++)
             {
                 double currentMeasurePosition = sequencerDimensionsCalculator.MeasureWidth*measure;
                 DrawVerticalSequencerLine(currentMeasurePosition, 2);
@@ -70,11 +70,11 @@ namespace Sequencer.View.Drawing
         {
             double pointsPerNote = sequencerDimensionsCalculator.NoteHeight;
 
-            for (int note = SequencerSettings.TotalNotes - 1; note >= 0; note--)
+            for (int note = sequencerSettings.TotalNotes - 1; note >= 0; note--)
             {
                 double currentNotePosition = pointsPerNote*note;
 
-                int currentMidiNote = (SequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch)) - note;
+                int currentMidiNote = (sequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch)) - note;
                 Pitch pitch = protocol.CreatePitchFromProtocolNumber(currentMidiNote - 1);
 
                 DrawNoteLaneBackground(currentNotePosition, pointsPerNote, pitch);

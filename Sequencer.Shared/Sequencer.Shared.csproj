@@ -38,6 +38,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IColourSettings.cs" />
+    <Compile Include="IMusicalSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SequencerSettings.cs" />
   </ItemGroup>

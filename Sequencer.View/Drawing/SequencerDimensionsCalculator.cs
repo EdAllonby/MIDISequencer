@@ -26,12 +26,12 @@ namespace Sequencer.View.Drawing
         /// <summary>
         /// The note heights the sequencer should display.
         /// </summary>
-        public double NoteHeight => sequencerCanvas.Height/SequencerSettings.TotalNotes;
+        public double NoteHeight => sequencerCanvas.Height/sequencerSettings.TotalNotes;
 
         /// <summary>
         /// The measure widths the sequencer should display.
         /// </summary>
-        public double MeasureWidth => sequencerCanvas.Width/SequencerSettings.TotalMeasures;
+        public double MeasureWidth => sequencerCanvas.Width/sequencerSettings.TotalMeasures;
 
         /// <summary>
         /// The brr widths the sequencer should display.

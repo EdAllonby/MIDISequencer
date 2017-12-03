@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 using Sequencer.Midi;
+using Sequencer.Shared;
 using Sequencer.Utilities;
 using Sequencer.ViewModel.Command;
 
@@ -17,6 +18,7 @@ namespace Sequencer.ViewModel
     public sealed class SequencerViewModel : ViewModelBase
     {
         [NotNull] private readonly ISequencerClock clock;
+        [NotNull] private readonly IMusicalSettings musicalSettings;
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
 
         [NotNull] private NoteAction noteAction = NoteAction.Create;
@@ -26,9 +28,10 @@ namespace Sequencer.ViewModel
         private IPosition currentPosition;
 
 
-        public SequencerViewModel([NotNull] ISequencerClock clock)
+        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] IMusicalSettings musicalSettings)
         {
             this.clock = clock;
+            this.musicalSettings = musicalSettings;
             CurrentPosition = new Position(1, 1, 1);
 
             clock.Tick += OnTick;
@@ -39,7 +42,7 @@ namespace Sequencer.ViewModel
         {
             if (clock.Ticks % 6 == 0)
             {
-                IPosition nextPosition = CurrentPosition.NextPosition(new TimeSignature(4, 4));
+                IPosition nextPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature);
 
                 // Abstract this. For some reason (yet to be discovered), raising property changes on the UI thread is much, much quicker than letting WPF handle it.
                 // I don't really like having this View dependency in the view model, but we'll have to live with it for the moment.

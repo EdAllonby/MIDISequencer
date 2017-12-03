@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using Sequencer.Midi;
+using Sequencer.Shared;
 
 namespace Sequencer.ViewModel.Tests
 {
@@ -11,7 +12,7 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void ExecutingPlayCommand_SetsPlayState_ToTrue()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object) { SequencerPlaying = false };
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = false };
 
             ICommand playCommand = viewModel.PlaySequencer;
 
@@ -23,7 +24,7 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void ExecutingStopCommand_SetsPlayState_ToFalse()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object) { SequencerPlaying = true };
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = true };
 
             ICommand stopCommand = viewModel.StopSequencer;
 
@@ -35,7 +36,7 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void SequencerInStopState_CannotExecuteStop()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object) { SequencerPlaying = false };
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = false };
 
 
             ICommand stopCommand = viewModel.StopSequencer;
@@ -46,7 +47,7 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void SequencerInStartState_CannotExecuteStart()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object) { SequencerPlaying = true };
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = true };
 
 
             ICommand playCommand = viewModel.PlaySequencer;
@@ -57,7 +58,7 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void SequencerInStopState_CanExecuteStart()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object) { SequencerPlaying = false };
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = false };
 
 
             ICommand playCommand = viewModel.PlaySequencer;
@@ -68,7 +69,7 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void SequencerInStartState_CanExecuteStop()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object) { SequencerPlaying = true };
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = true };
 
 
             ICommand stopCommand = viewModel.StopSequencer;
@@ -81,7 +82,7 @@ namespace Sequencer.ViewModel.Tests
         {
             var mockClock = new Mock<ISequencerClock>();
 
-            var viewModel = new SequencerViewModel(mockClock.Object) { SequencerPlaying = false };
+            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = false };
             var playCommand = viewModel.PlaySequencer;
             playCommand.Execute(null);
 
@@ -93,7 +94,7 @@ namespace Sequencer.ViewModel.Tests
         {
             var mockClock = new Mock<ISequencerClock>();
 
-            var viewModel = new SequencerViewModel(mockClock.Object) { SequencerPlaying = true };
+            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<IMusicalSettings>().Object) { SequencerPlaying = true };
             var stopCommand = viewModel.StopSequencer;
             stopCommand.Execute(null);
 

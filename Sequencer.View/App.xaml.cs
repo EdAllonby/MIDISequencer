@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using log4net.Config;
 using Microsoft.Practices.ServiceLocation;
 using Sequencer.Midi;
+using Sequencer.Shared;
 using Sequencer.View.Console;
 using Sequencer.ViewModel;
 
@@ -56,6 +57,8 @@ namespace Sequencer.View
         private static void RegisterServices()
         {
             var builder = new ContainerBuilder();
+
+            builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings > ().SingleInstance();
 
             builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
             builder.RegisterType<SequencerViewModel>().SingleInstance();
