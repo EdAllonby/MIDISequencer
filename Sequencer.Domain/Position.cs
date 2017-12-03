@@ -36,23 +36,16 @@ namespace Sequencer.Domain
             {
                 return 1;
             }
-            if ((Measure == other.Measure) && (Bar > other.Bar))
+            if (Measure == other.Measure && Bar > other.Bar)
             {
                 return 1;
             }
-            if ((Measure == other.Measure) && (Bar == other.Bar) && (Beat > other.Beat))
+            if (Measure == other.Measure && Bar == other.Bar && Beat > other.Beat)
             {
                 return 1;
             }
 
             return -1;
-        }
-
-        public bool Equals(IPosition other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return (Measure == other.Measure) && (Bar == other.Bar) && (Beat == other.Beat);
         }
 
         /// <summary>
@@ -62,7 +55,7 @@ namespace Sequencer.Domain
         /// <returns></returns>
         public int SummedBeat(TimeSignature timeSignature)
         {
-            return ((Measure - 1)*timeSignature.BeatsPerMeasure) + ((Bar - 1)*timeSignature.BeatsPerBar) + Beat;
+            return (Measure - 1) * timeSignature.BeatsPerMeasure + (Bar - 1) * timeSignature.BeatsPerBar + Beat;
         }
 
         /// <summary>
@@ -74,7 +67,7 @@ namespace Sequencer.Domain
         {
             return PositionRelativeByBeats(1, timeSignature);
         }
-        
+
         /// <summary>
         /// Get the previous <see cref="IPosition" />.
         /// </summary>
@@ -91,6 +84,33 @@ namespace Sequencer.Domain
             return PositionFromBeat(totalBeats + beatDelta, timeSignature);
         }
 
+        public bool IsGreaterThan(IPosition other)
+        {
+            return CompareTo(other) > 0;
+        }
+
+        public bool IsGreaterThanOrEqual(IPosition other)
+        {
+            return Equals(this, other) || CompareTo(other) > 0;
+        }
+
+        public bool IsLessThan(IPosition other)
+        {
+            return CompareTo(other) < 0;
+        }
+
+        public bool IsLessThanOrEqual(IPosition other)
+        {
+            return Equals(this, other) || CompareTo(other) < 0;
+        }
+
+        public bool Equals(IPosition other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Measure == other.Measure && Bar == other.Bar && Beat == other.Beat;
+        }
+
         /// <summary>
         /// Get the position from origin of a sum of beats.
         /// </summary>
@@ -100,10 +120,10 @@ namespace Sequencer.Domain
         [NotNull]
         public static IPosition PositionFromBeat(int totalBeats, [NotNull] TimeSignature timeSignature)
         {
-            int measures = 1 + ((totalBeats - 1)/timeSignature.BeatsPerMeasure);
-            int remainingBeatsForBars = totalBeats - (timeSignature.BeatsPerMeasure*(measures - 1));
-            int bars = 1 + ((remainingBeatsForBars - 1)/timeSignature.BeatsPerBar);
-            int remainingBeats = remainingBeatsForBars - (timeSignature.BeatsPerBar*(bars - 1));
+            int measures = 1 + (totalBeats - 1) / timeSignature.BeatsPerMeasure;
+            int remainingBeatsForBars = totalBeats - timeSignature.BeatsPerMeasure * (measures - 1);
+            int bars = 1 + (remainingBeatsForBars - 1) / timeSignature.BeatsPerBar;
+            int remainingBeats = remainingBeatsForBars - timeSignature.BeatsPerBar * (bars - 1);
 
             return new Position(measures, bars, remainingBeats);
         }
@@ -120,8 +140,8 @@ namespace Sequencer.Domain
             unchecked
             {
                 int hashCode = Measure;
-                hashCode = (hashCode*397) ^ Bar;
-                hashCode = (hashCode*397) ^ Beat;
+                hashCode = (hashCode * 397) ^ Bar;
+                hashCode = (hashCode * 397) ^ Beat;
                 return hashCode;
             }
         }
@@ -138,32 +158,12 @@ namespace Sequencer.Domain
 
         public static bool operator <=([NotNull] Position first, [NotNull] Position second)
         {
-            return Equals(first, second) || (first.CompareTo(second) < 0);
+            return Equals(first, second) || first.CompareTo(second) < 0;
         }
 
         public static bool operator >=([NotNull] Position first, [NotNull] Position second)
         {
-            return Equals(first, second) || (first.CompareTo(second) > 0);
-        }
-
-        public bool IsGreaterThan(IPosition other)
-        {
-            return CompareTo(other) > 0;
-        }
-
-        public bool IsGreaterThanOrEqual(IPosition other)
-        {
-            return Equals(this, other) || (CompareTo(other) > 0);
-        }
-
-        public bool IsLessThan(IPosition other)
-        {
-            return CompareTo(other) < 0;
-        }
-
-        public bool IsLessThanOrEqual(IPosition other)
-        {
-            return Equals(this, other) || (CompareTo(other) < 0);
+            return Equals(first, second) || first.CompareTo(second) > 0;
         }
 
         public override string ToString()

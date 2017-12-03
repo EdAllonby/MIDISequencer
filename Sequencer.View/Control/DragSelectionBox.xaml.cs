@@ -15,12 +15,12 @@ namespace Sequencer.View.Control
     /// </summary>
     public partial class DragSelectionBox
     {
-        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(DragSelectionBox));
-
         /// <summary>
         /// The threshold distance the mouse-cursor must move before drag-selection begins.
         /// </summary>
         private const double DragThreshold = 5;
+
+        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(DragSelectionBox));
 
         /// <summary>
         /// Set to 'true' when the left mouse-button is down.

@@ -41,7 +41,7 @@ namespace Sequencer.Domain
                 return true;
             }
 
-            return Note.Equals(other.Note) && (Octave == other.Octave);
+            return Note.Equals(other.Note) && Octave == other.Octave;
         }
 
         public override bool Equals(object obj)
@@ -55,7 +55,7 @@ namespace Sequencer.Domain
         {
             unchecked
             {
-                return (Note.GetHashCode()*397) ^ Octave;
+                return (Note.GetHashCode() * 397) ^ Octave;
             }
         }
 

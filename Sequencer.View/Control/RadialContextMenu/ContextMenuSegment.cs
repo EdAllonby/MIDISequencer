@@ -46,7 +46,7 @@ namespace Sequencer.View.Control.RadialContextMenu
             //  start angle line
             Point arcStartPosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius, startAngle);
 
-            var lineToArc = new LineSegment {Point = arcStartPosition};
+            var lineToArc = new LineSegment { Point = arcStartPosition };
 
             pathData.Segments?.Add(lineToArc);
 
@@ -67,7 +67,7 @@ namespace Sequencer.View.Control.RadialContextMenu
 
             var pathGeometry = new PathGeometry
             {
-                Figures = {pathData}
+                Figures = { pathData }
             };
 
             segmentShape.Data = pathGeometry;
@@ -78,8 +78,8 @@ namespace Sequencer.View.Control.RadialContextMenu
             {
                 Source = MenuItem.Visual.ToBitmapImage(),
                 Stretch = Stretch.Fill,
-                Height = segmentIconSize*0.7,
-                Width = segmentIconSize*0.7
+                Height = segmentIconSize * 0.7,
+                Width = segmentIconSize * 0.7
             };
 
             // We don't want the scaled bitmap to look pixelated,
@@ -89,9 +89,9 @@ namespace Sequencer.View.Control.RadialContextMenu
 
             Children.Add(segmentIcon);
 
-            double midAngle = endAngle - (angle/2);
+            double midAngle = endAngle - angle / 2;
 
-            Point imagePosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius*0.5, midAngle);
+            Point imagePosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius * 0.5, midAngle);
 
             segmentIcon.SetCentreOnCanvas(imagePosition);
 
@@ -101,7 +101,8 @@ namespace Sequencer.View.Control.RadialContextMenu
         /// <summary>
         /// The <see cref="TMenuItem" /> this segment represents.
         /// </summary>
-        [NotNull] public TMenuItem MenuItem { get; }
+        [NotNull]
+        public TMenuItem MenuItem { get; }
 
         /// <summary>
         /// Whether this segment is selected.
@@ -132,7 +133,7 @@ namespace Sequencer.View.Control.RadialContextMenu
         /// </summary>
         public void Unselect()
         {
-            segmentShape.Fill = new SolidColorBrush(unselectedColor) {Opacity = 0.7};
+            segmentShape.Fill = new SolidColorBrush(unselectedColor) { Opacity = 0.7 };
             IsSelected = false;
         }
     }

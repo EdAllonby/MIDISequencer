@@ -18,7 +18,7 @@ namespace Sequencer.View.Command.NotesCommand
         {
             foreach (IVisualNote visualNote in notes)
             {
-                var currentVelocity = visualNote.Velocity;
+                Velocity currentVelocity = visualNote.Velocity;
 
                 Velocity newVelocity = currentVelocity - velocityIncrement;
                 var incrementCommand = new ChangeVelocityCommand(newVelocity);

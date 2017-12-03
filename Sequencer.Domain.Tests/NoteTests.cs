@@ -28,7 +28,7 @@ namespace Sequencer.Domain.Tests
         {
             Note element = Note.A;
 
-            var nextPitch = Note.GetNextElement(element);
+            Note nextPitch = Note.GetNextElement(element);
 
             Note expectedNote = Note.ASharp;
 

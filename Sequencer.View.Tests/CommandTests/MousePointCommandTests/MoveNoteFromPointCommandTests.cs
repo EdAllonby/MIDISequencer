@@ -4,15 +4,48 @@ using Moq;
 using NUnit.Framework;
 using Sequencer.Domain;
 using Sequencer.View.Command.MousePointCommand;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 {
     [TestFixture]
     public sealed class MoveNoteFromPointCommandTests
     {
+        [Test]
+        public void MoveNotePitch_WithSmallMovement_MovesNotePitchByThatAmount()
+        {
+            var mockKeyboardStateProcessor = new Mock<IKeyboardStateProcessor>();
+            var mockSequencerNotes = new Mock<ISequencerNotes>();
+            var mockSequencerCalculator = new Mock<ISequencerDimensionsCalculator>();
+            var mockInitialMousePoint = new Mock<IMousePoint>();
+            var calculator = new Mock<IPitchAndPositionCalculator>();
+            var mockMousePoint = new Mock<IMousePoint>();
+            var mockNoteToMove = new Mock<IVisualNote>();
+            var mockMouseOperator = new Mock<IMouseOperator>();
+            var startPosition = new Mock<IPosition>();
+            var endPosition = new Mock<IPosition>();
+            var mockNextPosition = new Mock<IPosition>();
+
+            var relativePitchesToMove = 2;
+
+            mockKeyboardStateProcessor.Setup(x => x.IsKeyDown(Key.LeftShift)).Returns(false);
+            calculator.Setup(x => x.FindStepsFromPitches(It.IsAny<Pitch>(), It.IsAny<Pitch>())).Returns(relativePitchesToMove);
+            endPosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
+            mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
+
+            mockSequencerNotes.Setup(x => x.SelectedNotes).Returns(new List<IVisualNote> { mockNoteToMove.Object });
+
+            mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockInitialMousePoint.Object)).Returns(startPosition.Object);
+            mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockMousePoint.Object)).Returns(endPosition.Object);
+
+            var command = new MoveNoteFromPointCommand(mockKeyboardStateProcessor.Object, calculator.Object, mockInitialMousePoint.Object, mockMouseOperator.Object, mockSequencerNotes.Object, mockSequencerCalculator.Object);
+            command.Execute(mockMousePoint.Object);
+
+            mockNoteToMove.Verify(x => x.MovePitchRelativeTo(relativePitchesToMove), Times.Once);
+        }
+
         [Test]
         public void MoveNotePosition_WithNoMovement_DoesNothing()
         {
@@ -73,39 +106,6 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             command.Execute(mockMousePoint.Object);
 
             mockNoteToMove.Verify(x => x.MovePositionRelativeTo(relativeBeatsToMove), Times.Once);
-        }
-
-        [Test]
-        public void MoveNotePitch_WithSmallMovement_MovesNotePitchByThatAmount()
-        {
-            var mockKeyboardStateProcessor = new Mock<IKeyboardStateProcessor>();
-            var mockSequencerNotes = new Mock<ISequencerNotes>();
-            var mockSequencerCalculator = new Mock<ISequencerDimensionsCalculator>();
-            var mockInitialMousePoint = new Mock<IMousePoint>();
-            var calculator = new Mock<IPitchAndPositionCalculator>();
-            var mockMousePoint = new Mock<IMousePoint>();
-            var mockNoteToMove = new Mock<IVisualNote>();
-            var mockMouseOperator = new Mock<IMouseOperator>();
-            var startPosition = new Mock<IPosition>();
-            var endPosition = new Mock<IPosition>();
-            var mockNextPosition = new Mock<IPosition>();
-
-            var relativePitchesToMove = 2;
-
-            mockKeyboardStateProcessor.Setup(x => x.IsKeyDown(Key.LeftShift)).Returns(false);
-            calculator.Setup(x => x.FindStepsFromPitches(It.IsAny<Pitch>(), It.IsAny<Pitch>())).Returns(relativePitchesToMove);
-            endPosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
-            mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
-
-            mockSequencerNotes.Setup(x => x.SelectedNotes).Returns(new List<IVisualNote> { mockNoteToMove.Object });
-
-            mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockInitialMousePoint.Object)).Returns(startPosition.Object);
-            mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockMousePoint.Object)).Returns(endPosition.Object);
-
-            var command = new MoveNoteFromPointCommand(mockKeyboardStateProcessor.Object, calculator.Object, mockInitialMousePoint.Object, mockMouseOperator.Object, mockSequencerNotes.Object, mockSequencerCalculator.Object);
-            command.Execute(mockMousePoint.Object);
-
-            mockNoteToMove.Verify(x => x.MovePitchRelativeTo(relativePitchesToMove), Times.Once);
         }
     }
 }

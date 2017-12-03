@@ -5,11 +5,10 @@ namespace Sequencer.View.Drawing
 {
     public interface ISequencerCanvasWrapper
     {
-        void AddChild([NotNull] UIElement child);
-        void RemoveChild([NotNull] UIElement child);
-
         double Width { get; }
 
         double Height { get; }
+        void AddChild([NotNull] UIElement child);
+        void RemoveChild([NotNull] UIElement child);
     }
 }

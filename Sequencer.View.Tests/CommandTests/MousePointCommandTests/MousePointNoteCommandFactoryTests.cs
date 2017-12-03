@@ -12,8 +12,6 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
     [TestFixture]
     public sealed class MousePointNoteCommandFactoryTests
     {
-        private MousePointNoteCommandFactory factory;
-
         [SetUp]
         public void BeforeEachTest()
         {
@@ -26,6 +24,8 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             factory = new MousePointNoteCommandFactory(mockVisualNoteFactory.Object, mockMouseOperator.Object, keyboardStateStub.Object, mockSequencerNotes.Object, new SequencerSettings(), mockSequencerCalculator.Object);
         }
 
+        private MousePointNoteCommandFactory factory;
+
         [Test]
         public void CreateReturnsCreateCommand()
         {
@@ -35,19 +35,19 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
         }
 
         [Test]
-        public void SelectReturnsCreateCommand()
-        {
-            IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.Select);
-
-            Assert.IsInstanceOf<UpdateNoteStateFromPointCommand>(mouseCommand);
-        }
-
-        [Test]
         public void DeleteReturnsCreateCommand()
         {
             IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.Delete);
 
             Assert.IsInstanceOf<DeleteNoteFromPointCommand>(mouseCommand);
+        }
+
+        [Test]
+        public void SelectReturnsCreateCommand()
+        {
+            IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.Select);
+
+            Assert.IsInstanceOf<UpdateNoteStateFromPointCommand>(mouseCommand);
         }
     }
 }

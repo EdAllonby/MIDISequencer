@@ -23,6 +23,5 @@ namespace Sequencer.Shared
 
         [NotNull]
         TimeSignature TimeSignature { get; }
-
     }
 }

@@ -7,9 +7,9 @@ namespace Sequencer.View.Control
 {
     public class VisualNoteFactory : IVisualNoteFactory
     {
-        [NotNull] private readonly SequencerSettings sequencerSettings;
-        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
 
         public VisualNoteFactory([NotNull] SequencerSettings sequencerSettings,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper)

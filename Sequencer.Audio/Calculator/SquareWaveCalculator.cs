@@ -16,7 +16,7 @@ namespace Sequencer.Audio.Calculator
         protected override float AmplitudeForHarmonic(int harmonic)
         {
             // multiplying by 4 / pi renormalises the amplitude
-            return (float)((1.0 / harmonic) * (4.0 / Math.PI));
+            return (float) (1.0 / harmonic * (4.0 / Math.PI));
         }
     }
 }

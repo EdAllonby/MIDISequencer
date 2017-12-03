@@ -17,7 +17,7 @@ namespace Sequencer.Audio.Calculator
         {
             // multiplying by sin(harmonic * pi / 2) inverts every other odd harmonic
             // multiplying by 8 / pi^2 renormalises the amplitude
-            return (float)((1.0 / (harmonic * harmonic)) * Math.Sin(harmonic * Math.PI / 2) * (8.0 / (Math.PI * Math.PI)));
+            return (float) (1.0 / (harmonic * harmonic) * Math.Sin(harmonic * Math.PI / 2) * (8.0 / (Math.PI * Math.PI)));
         }
     }
 }

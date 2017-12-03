@@ -49,17 +49,17 @@ namespace Sequencer.View.Drawing
         {
             for (var measure = 0; measure < sequencerSettings.TotalMeasures; measure++)
             {
-                double currentMeasurePosition = sequencerDimensionsCalculator.MeasureWidth*measure;
+                double currentMeasurePosition = sequencerDimensionsCalculator.MeasureWidth * measure;
                 DrawVerticalSequencerLine(currentMeasurePosition, 2);
 
                 for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
-                    double currentBarPosition = currentMeasurePosition + (sequencerDimensionsCalculator.BarWidth*bar);
+                    double currentBarPosition = currentMeasurePosition + sequencerDimensionsCalculator.BarWidth * bar;
                     DrawVerticalSequencerLine(currentBarPosition, 1);
 
                     for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
-                        double currentBeatPosition = currentBarPosition + (sequencerDimensionsCalculator.BeatWidth*beat);
+                        double currentBeatPosition = currentBarPosition + sequencerDimensionsCalculator.BeatWidth * beat;
                         DrawVerticalSequencerLine(currentBeatPosition, 0.5);
                     }
                 }
@@ -72,9 +72,9 @@ namespace Sequencer.View.Drawing
 
             for (int note = sequencerSettings.TotalNotes - 1; note >= 0; note--)
             {
-                double currentNotePosition = pointsPerNote*note;
+                double currentNotePosition = pointsPerNote * note;
 
-                int currentMidiNote = (sequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch)) - note;
+                int currentMidiNote = sequencerSettings.TotalNotes + protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch) - note;
                 Pitch pitch = protocol.CreatePitchFromProtocolNumber(currentMidiNote - 1);
 
                 DrawNoteLaneBackground(currentNotePosition, pointsPerNote, pitch);

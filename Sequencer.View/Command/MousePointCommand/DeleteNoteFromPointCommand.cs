@@ -1,17 +1,17 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Command.MousePointCommand
 {
     public sealed class DeleteNoteFromPointCommand : MousePointNoteCommand
     {
-        [NotNull] private readonly ISequencerNotes sequencerNotes;
-        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly IDeleteNotesCommand deleteNotesCommand;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
 
         public DeleteNoteFromPointCommand([NotNull] ISequencerNotes sequencerNotes,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] IDeleteNotesCommand deleteNotesCommand)

@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Command.MousePointCommand
 {
@@ -11,10 +11,10 @@ namespace Sequencer.View.Command.MousePointCommand
     /// </summary>
     public sealed class UpdateNewlyCreatedNoteCommand : MousePointNoteCommand
     {
-        [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly IMouseOperator mouseOperator;
-        [NotNull] private readonly TimeSignature timeSignature;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly TimeSignature timeSignature;
 
         public UpdateNewlyCreatedNoteCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
             [NotNull] TimeSignature timeSignature, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)

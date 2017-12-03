@@ -8,6 +8,5 @@ namespace Sequencer.Domain
         bool IsGreaterThan([NotNull] T other);
 
         bool IsGreaterThanOrEqual([NotNull] T other);
-
     }
 }

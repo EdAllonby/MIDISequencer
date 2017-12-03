@@ -30,8 +30,8 @@ namespace Sequencer.View.Control
 
         public static void SetCentreOnCanvas([NotNull] this FrameworkElement frameworkElement, Point startingPoint)
         {
-            Canvas.SetLeft(frameworkElement, startingPoint.X - (frameworkElement.Width/2));
-            Canvas.SetTop(frameworkElement, startingPoint.Y - (frameworkElement.Height/2));
+            Canvas.SetLeft(frameworkElement, startingPoint.X - frameworkElement.Width / 2);
+            Canvas.SetTop(frameworkElement, startingPoint.Y - frameworkElement.Height / 2);
         }
 
         /// <summary>

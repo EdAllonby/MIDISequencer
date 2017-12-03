@@ -5,9 +5,9 @@ namespace Sequencer.Domain
 {
     public class FrequencyCalculator
     {
-        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         private const double TwelthRootOfTwo = 1.05946309;
         [NotNull] private readonly Pitch originPitch;
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         private readonly double standardFrequency;
 
         public FrequencyCalculator([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] Pitch originPitch, double standardFrequency)

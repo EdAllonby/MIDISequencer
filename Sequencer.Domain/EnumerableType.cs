@@ -19,7 +19,7 @@ namespace Sequencer.Domain
         static EnumerableType()
         {
             // We need to run this to make sure our static fields get instantiated before use.
-            var info = typeof(TElement).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            FieldInfo[] info = typeof(TElement).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
             info[1]?.GetValue(null);
         }
 
@@ -43,7 +43,8 @@ namespace Sequencer.Domain
         [NotNull]
         public string DisplayName { get; }
 
-        [NotNull] public static IEnumerable<TElement> All => ElementsById.Values;
+        [NotNull]
+        public static IEnumerable<TElement> All => ElementsById.Values;
 
         [NotNull]
         public static TElement FromValue(int value)
@@ -59,7 +60,12 @@ namespace Sequencer.Domain
         [NotNull]
         public static TElement GetNextElement([NotNull] TElement element)
         {
-            return ElementsById[(element.Value + 1)%ElementsById.Count] ?? throw new InvalidOperationException();
+            return ElementsById[(element.Value + 1) % ElementsById.Count] ?? throw new InvalidOperationException();
+        }
+
+        public override string ToString()
+        {
+            return DisplayName;
         }
 
         [NotNull]
@@ -74,11 +80,6 @@ namespace Sequencer.Domain
 
             string message = $"'{value}' is not a valid {description} in {typeof(TElement)}";
             throw new ApplicationException(message);
-        }
-
-        public override string ToString()
-        {
-            return DisplayName;
         }
     }
 }

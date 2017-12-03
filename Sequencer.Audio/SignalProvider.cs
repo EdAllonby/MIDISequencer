@@ -62,13 +62,12 @@ namespace Sequencer.Audio
             {
                 int sampleRate = WaveFormat.SampleRate;
 
-                for (int n = 0; n < sampleCount; n++)
+                for (var n = 0; n < sampleCount; n++)
                 {
                     float envelopeAmplitude = envelope.Process();
 
                     if (envelopeAmplitude > 0)
                     {
-
                         buffer[n + offset] = Amplitude * envelopeAmplitude * waveformCalculator.CalculateForSample(sample, Frequency, sampleRate);
                     }
                     else

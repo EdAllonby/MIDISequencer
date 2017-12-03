@@ -4,18 +4,18 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Utilities;
-using Sequencer.View.Input;
 using Sequencer.View.Control;
+using Sequencer.View.Input;
 
 namespace Sequencer.View.Command.NotesCommand
 {
     public sealed class UpdateNoteStateCommand : INotesCommand
     {
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(UpdateNoteStateCommand));
+        [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
         private readonly NoteState newState;
 
         [NotNull] private readonly ISequencerNotes sequencerNotes;
-        [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
 
         public UpdateNoteStateCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IKeyboardStateProcessor keyboardStateProcessor, NoteState newState)
         {
@@ -30,7 +30,7 @@ namespace Sequencer.View.Command.NotesCommand
 
             foreach (IVisualNote visualNote in notesList)
             {
-                if ((visualNote != null) && (visualNote.NoteState != newState))
+                if (visualNote != null && visualNote.NoteState != newState)
                 {
                     visualNote.NoteState = newState;
 

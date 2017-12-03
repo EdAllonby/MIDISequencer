@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Shared;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Command.MousePointCommand
 {
@@ -12,11 +12,11 @@ namespace Sequencer.View.Command.MousePointCommand
     /// </summary>
     public class CreateNoteFromPointCommand : MousePointNoteCommand
     {
-        [NotNull] private readonly IVisualNoteFactory visualNoteFactory;
-        [NotNull] private readonly ISequencerNotes sequencerNotes;
-        [NotNull] private readonly SequencerSettings sequencerSettings;
         [NotNull] private readonly IMouseOperator mouseOperator;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly IVisualNoteFactory visualNoteFactory;
 
         public CreateNoteFromPointCommand([NotNull] IVisualNoteFactory visualNoteFactory, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] IMouseOperator mouseOperator,
@@ -31,6 +31,12 @@ namespace Sequencer.View.Command.MousePointCommand
 
         protected override bool CanExecute => mouseOperator.CanModifyNote;
 
+        [NotNull]
+        private IPosition GetDefaultEndPosition([NotNull] IPosition notePosition)
+        {
+            return notePosition.NextPosition(sequencerSettings.TimeSignature);
+        }
+
         protected override void DoExecute(IMousePoint mousePoint)
         {
             sequencerNotes.MakeAllUnselected();
@@ -43,11 +49,5 @@ namespace Sequencer.View.Command.MousePointCommand
 
             sequencerNotes.AddNote(newNote);
         }
-
-        [NotNull]
-        private IPosition GetDefaultEndPosition([NotNull] IPosition notePosition)
-        {
-            return notePosition.NextPosition(sequencerSettings.TimeSignature);
-        }
     }
-} 
+}

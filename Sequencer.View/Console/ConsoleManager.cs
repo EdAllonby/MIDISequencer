@@ -64,7 +64,7 @@ namespace Sequencer.View.Console
 
             MethodInfo consoleInitializeStdOutError = type.GetMethod("InitializeStdOutError",
                 BindingFlags.Static | BindingFlags.NonPublic);
-            
+
             if (consoleOut != null)
             {
                 consoleOut.SetValue(null, null);

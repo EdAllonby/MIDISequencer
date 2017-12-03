@@ -22,25 +22,6 @@ namespace Sequencer.View
     /// </summary>
     public partial class App
     {
-        /// <summary>
-        /// When the application has started, give it an appropriate logging mechanism, and show the log in view.
-        /// </summary>
-        /// <param name="e">Startup event args.</param>
-        protected override void OnStartup(StartupEventArgs e)
-        {
-#if DEBUG
-            // Console must be started before configuring log4net.
-            ConsoleManager.Show();
-            SetupLogging("log4netDebug.config");
-#else
-            SetupLogging("log4netRelease.config");
-#endif
-            Thread.CurrentThread.Name = "Main Thread";
-
-            RegisterServices();
-            base.OnStartup(e);
-        }
-
         private static void SetupLogging([NotNull] string logConfigName)
         {
             string assemblyPath = Assembly.GetAssembly(typeof(App))?.Location;
@@ -60,13 +41,32 @@ namespace Sequencer.View
 
             builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
 
-            builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings > ().SingleInstance();
+            builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings>().SingleInstance();
 
             builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
             builder.RegisterType<SequencerViewModel>().SingleInstance();
 
-            var container = builder.Build();
+            IContainer container = builder.Build();
             ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
+        }
+
+        /// <summary>
+        /// When the application has started, give it an appropriate logging mechanism, and show the log in view.
+        /// </summary>
+        /// <param name="e">Startup event args.</param>
+        protected override void OnStartup(StartupEventArgs e)
+        {
+#if DEBUG
+            // Console must be started before configuring log4net.
+            ConsoleManager.Show();
+            SetupLogging("log4netDebug.config");
+#else
+            SetupLogging("log4netRelease.config");
+#endif
+            Thread.CurrentThread.Name = "Main Thread";
+
+            RegisterServices();
+            base.OnStartup(e);
         }
     }
 }

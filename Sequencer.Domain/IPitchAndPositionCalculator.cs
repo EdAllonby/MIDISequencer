@@ -9,6 +9,5 @@ namespace Sequencer.Domain
 
         [Pure]
         int FindBeatsBetweenPositions([NotNull] IPosition initialPosition, [NotNull] IPosition newPosition);
-
     }
 }

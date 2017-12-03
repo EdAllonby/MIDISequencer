@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Shared;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Command.MousePointCommand
 {
@@ -13,11 +13,11 @@ namespace Sequencer.View.Command.MousePointCommand
     public sealed class UpdateNoteStartPositionFromInitialPointCommand : MousePointNoteCommand
     {
         [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        [NotNull] private IPosition initialStartPosition;
         private int beatsDelta;
+        [NotNull] private IPosition initialStartPosition;
 
         public UpdateNoteStartPositionFromInitialPointCommand([NotNull] IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator,
             [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
@@ -31,11 +31,6 @@ namespace Sequencer.View.Command.MousePointCommand
         }
 
         protected override bool CanExecute => mouseOperator.CanModifyNote;
-
-        protected override void DoExecute(IMousePoint mousePoint)
-        {
-            MoveNotePositions(mousePoint);
-        }
 
         private void MoveNotePositions([NotNull] IMousePoint mousePoint)
         {
@@ -55,6 +50,11 @@ namespace Sequencer.View.Command.MousePointCommand
                     selectedNote.StartPosition = selectedNote.StartPosition.PositionRelativeByBeats(beatsDelta, sequencerSettings.TimeSignature);
                 }
             }
+        }
+
+        protected override void DoExecute(IMousePoint mousePoint)
+        {
+            MoveNotePositions(mousePoint);
         }
     }
 }

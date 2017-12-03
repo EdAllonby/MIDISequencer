@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using log4net;
 using Sequencer.Domain;
 using Sequencer.Shared;
-using Sequencer.Utilities;
 using Sequencer.View.Command;
 using Sequencer.View.Command.MousePointCommand;
 using Sequencer.View.Command.NotesCommand;
@@ -24,47 +20,37 @@ namespace Sequencer.View.Control
         /// <summary>
         /// The NoteAction Dependency Property.
         /// </summary>
-        [NotNull]
-        public static readonly DependencyProperty NoteActionProperty =
+        [NotNull] public static readonly DependencyProperty NoteActionProperty =
             DependencyProperty.Register(nameof(NoteAction), typeof(NoteAction), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
 
-        [NotNull]
-        public static readonly DependencyProperty SelectedNotesProperty =
+        [NotNull] public static readonly DependencyProperty SelectedNotesProperty =
             DependencyProperty.Register(nameof(SelectedNotes), typeof(IEnumerable<Tone>), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(null));
-        
-        [NotNull]
-        public static readonly DependencyProperty CurrentPositionProperty =
+
+        [NotNull] public static readonly DependencyProperty CurrentPositionProperty =
             DependencyProperty.Register(nameof(CurrentPosition), typeof(IPosition), typeof(SequencerControl),
                 new FrameworkPropertyMetadata(OnCurrentPositionChanged));
 
-        private static void OnCurrentPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var component = (SequencerControl) d;
-            PositionIndicatorDrawer indicatorDrawer = component.positionIndicatorDrawer;
-            indicatorDrawer.DrawPositionIndicator((IPosition) e.NewValue);
-        }
-
         [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor = new KeyboardStateProcessor();
         [NotNull] private readonly SequencerKeyPressCommandHandler keyPressCommandHandler;
+        [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
         [NotNull] private readonly MousePointNoteCommandFactory mousePointNoteCommandFactory;
         [NotNull] private readonly ISequencerNotes notes;
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
+        [NotNull] private readonly PositionIndicatorDrawer positionIndicatorDrawer;
         [NotNull] private readonly UpdateNoteStateCommand selectNoteCommand;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly SequencerDrawer sequencerDrawer;
-        [NotNull] private readonly PositionIndicatorDrawer positionIndicatorDrawer;
         [NotNull] private readonly SequencerSettings sequencerSettings = new SequencerSettings();
-        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
 
         [NotNull] private readonly UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
-        [NotNull] private readonly IMouseOperator mouseOperator = new MouseOperator(new MouseStateProcessor());
         [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
 
         public SequencerControl()
         {
             InitializeComponent();
-            
+
             SizeChanged += SequencerSizeChanged;
             notes = new SequencerNotes(sequencerSettings);
             notes.SelectedNotesChanged += SelectedNotesChanged;
@@ -126,7 +112,7 @@ namespace Sequencer.View.Control
             {
                 DragSelectionBox.SetNewOriginMousePosition(mouseDownPoint);
             }
-            
+
             IMousePointNoteCommand noteCommand = mousePointNoteCommandFactory.FindCommand(NoteAction);
 
             moveNoteFromPointCommand = GetMovementCommand(mouseDownPoint);
@@ -150,6 +136,13 @@ namespace Sequencer.View.Control
             {
                 HandleMouseSelectMovement(newMousePoint);
             }
+        }
+
+        private static void OnCurrentPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var component = (SequencerControl) d;
+            PositionIndicatorDrawer indicatorDrawer = component.positionIndicatorDrawer;
+            indicatorDrawer.DrawPositionIndicator((IPosition) e.NewValue);
         }
 
         private void SelectedNotesChanged(object sender, [NotNull] [ItemNotNull] IEnumerable<IVisualNote> e)

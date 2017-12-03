@@ -4,7 +4,7 @@ using Sequencer.ViewModel;
 
 namespace Sequencer.View
 {
-    class WpfDispatcher : IWpfDispatcher
+    internal class WpfDispatcher : IWpfDispatcher
     {
         public void DispatchToWpf(Action callback)
         {

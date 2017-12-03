@@ -17,17 +17,17 @@ namespace Sequencer.View.Input
             KeyPress = keyPress;
         }
 
-        public ModifierKeys Modifiers { get; }
-
-        public Key KeyPress { get; }
-
         public bool Equals(KeyboardInput other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            var isit =  Modifiers == other.Modifiers && KeyPress == other.KeyPress;
+            bool isit = Modifiers == other.Modifiers && KeyPress == other.KeyPress;
             return isit;
         }
+
+        public ModifierKeys Modifiers { get; }
+
+        public Key KeyPress { get; }
 
         public override bool Equals(object obj)
         {

@@ -3,9 +3,9 @@ using NUnit.Framework;
 using Sequencer.Domain;
 using Sequencer.Shared;
 using Sequencer.View.Command.MousePointCommand;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 {
@@ -34,8 +34,8 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             var command = new CreateNoteFromPointCommand(mockVisualNoteFactory.Object, mockSequencerNotes.Object, new SequencerSettings(), mockMouseOperator.Object, mockSequencerCalculator.Object);
             command.Execute(mockMousePoint.Object);
 
-            mockSequencerNotes.Verify(x=>x.MakeAllUnselected(), Times.Once);
-            mockSequencerNotes.Verify(x=>x.AddNote(mockCreatedNote.Object), Times.Once);
+            mockSequencerNotes.Verify(x => x.MakeAllUnselected(), Times.Once);
+            mockSequencerNotes.Verify(x => x.AddNote(mockCreatedNote.Object), Times.Once);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -16,16 +15,16 @@ namespace Sequencer.ViewModel
 {
     public sealed class SequencerViewModel : ViewModelBase
     {
-        [NotNull] private readonly ISequencerClock clock;
-        [NotNull] private readonly IMusicalSettings musicalSettings;
-        [NotNull] private readonly IWpfDispatcher dispatcher;
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
+        [NotNull] private readonly ISequencerClock clock;
+        [NotNull] private readonly IWpfDispatcher dispatcher;
+        [NotNull] private readonly IMusicalSettings musicalSettings;
+        private IPosition currentPosition;
 
         [NotNull] private NoteAction noteAction = NoteAction.Create;
         [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
         [CanBeNull] private object selectedObject;
         private bool sequencerPlaying;
-        private IPosition currentPosition;
 
 
         public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] IMusicalSettings musicalSettings, [NotNull] IWpfDispatcher dispatcher)
@@ -36,15 +35,6 @@ namespace Sequencer.ViewModel
             CurrentPosition = new Position(1, 1, 1);
 
             clock.Tick += OnTick;
-
-        }
-
-        private void OnTick(object sender, EventArgs e)
-        {
-            if (clock.Ticks % 6 == 0)
-            {
-                dispatcher.DispatchToWpf(() => CurrentPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature));
-            }
         }
 
         [NotNull]
@@ -137,6 +127,14 @@ namespace Sequencer.ViewModel
         public ICommand PlaySequencer => new RelayCommand(ExecutePlayCommand, CanExecutePlayCommand);
 
         public ICommand StopSequencer => new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
+
+        private void OnTick(object sender, EventArgs e)
+        {
+            if (clock.Ticks % 6 == 0)
+            {
+                dispatcher.DispatchToWpf(() => CurrentPosition = CurrentPosition.NextPosition(musicalSettings.TimeSignature));
+            }
+        }
 
         private bool CanExecuteStopCommand(object obj)
         {

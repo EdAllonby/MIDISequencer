@@ -23,17 +23,17 @@ namespace Sequencer.Audio.Calculator
             return harmonicSignals.Sum();
         }
 
-        protected abstract bool IsHarmonicIncluded(int harmonic);
-
-        protected abstract float AmplitudeForHarmonic(int harmonic);
-
         private float CalculateSignalForHarmonic(int sample, float frequency, int sampleRate, int currentHarmonic)
         {
-            float harmonicFrequency = frequency*currentHarmonic;
+            float harmonicFrequency = frequency * currentHarmonic;
             float harmonicSignal = sineWaveCalculator.CalculateForSample(sample, harmonicFrequency, sampleRate);
             float harmonicAmplitude = AmplitudeForHarmonic(currentHarmonic);
 
-            return harmonicAmplitude*harmonicSignal;
+            return harmonicAmplitude * harmonicSignal;
         }
+
+        protected abstract bool IsHarmonicIncluded(int harmonic);
+
+        protected abstract float AmplitudeForHarmonic(int harmonic);
     }
 }

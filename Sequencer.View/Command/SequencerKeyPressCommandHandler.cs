@@ -2,8 +2,8 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Input;
 using Sequencer.View.Control;
+using Sequencer.View.Input;
 
 namespace Sequencer.View.Command
 {

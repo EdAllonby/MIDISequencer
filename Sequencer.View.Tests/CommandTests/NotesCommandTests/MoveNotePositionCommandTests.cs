@@ -22,10 +22,9 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
 
             command.Execute(new List<IVisualNote> { deleteNote1.Object, deleteNote2.Object, deleteNote3.Object });
 
-            deleteNote1.Verify(x=>x.MovePositionRelativeTo(beatsToMove));
+            deleteNote1.Verify(x => x.MovePositionRelativeTo(beatsToMove));
             deleteNote2.Verify(x => x.MovePositionRelativeTo(beatsToMove));
             deleteNote3.Verify(x => x.MovePositionRelativeTo(beatsToMove));
-
         }
     }
 }

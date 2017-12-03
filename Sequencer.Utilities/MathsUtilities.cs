@@ -35,8 +35,8 @@ namespace Sequencer.Utilities
             {
                 double degreesInRadians = ToRadians(degrees);
 
-                double x = origin.X + (radius*Math.Cos(degreesInRadians));
-                double y = origin.Y + (radius*Math.Sin(degreesInRadians));
+                double x = origin.X + radius * Math.Cos(degreesInRadians);
+                double y = origin.Y + radius * Math.Sin(degreesInRadians);
 
                 return new Point(x, y);
             }
@@ -51,7 +51,7 @@ namespace Sequencer.Utilities
         [Pure]
         private static double ToRadians(double degrees)
         {
-            return (degrees*Math.PI)/180.0;
+            return degrees * Math.PI / 180.0;
         }
     }
 }

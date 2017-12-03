@@ -70,7 +70,7 @@ namespace Sequencer.View.Control
             get => Tone.EndPosition;
             set
             {
-                if (!EndPosition.Equals(value) && (value.IsGreaterThan(StartPosition)))
+                if (!EndPosition.Equals(value) && value.IsGreaterThan(StartPosition))
                 {
                     Tone.EndPosition = value;
                     Draw();
@@ -117,11 +117,6 @@ namespace Sequencer.View.Control
             noteDrawer.RemoveNote();
         }
 
-        public override string ToString()
-        {
-            return $"Pitch: {Pitch}, Start IPosition: {StartPosition}, End IPosition: {EndPosition}";
-        }
-
         /// <summary>
         /// Moves the start and end positions of this visual note.
         /// </summary>
@@ -140,6 +135,11 @@ namespace Sequencer.View.Control
         {
             int midiNoteNumber = protocol.ProtocolNoteNumber(Tone.Pitch);
             Pitch = protocol.CreatePitchFromProtocolNumber(midiNoteNumber + halfStepsToMove);
+        }
+
+        public override string ToString()
+        {
+            return $"Pitch: {Pitch}, Start IPosition: {StartPosition}, End IPosition: {EndPosition}";
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.View.Input;
 using Sequencer.View.Control;
+using Sequencer.View.Input;
 
 namespace Sequencer.View.Drawing
 {

@@ -12,19 +12,20 @@ namespace Sequencer.Domain.Tests
 
         private static readonly object[] PitchFrequencyCases =
         {
-            new object[] {new Pitch(Note.C, 0), 16.35},
-            new object[] {new Pitch(Note.D, 2), 73.42},
-            new object[] {new Pitch(Note.B, 8), 7902.13},
-            new object[] {new Pitch(Note.A, 4), 440},
-            new object[] {new Pitch(Note.A, 3), 220},
-            new object[] {new Pitch(Note.B, 3), 246.94},
-            new object[] {new Pitch(Note.C, 4), 261.63},
-            new object[] {new Pitch(Note.F, 6), 1396.91},
-            new object[] {new Pitch(Note.DSharp, 8), 4978.03}
+            new object[] { new Pitch(Note.C, 0), 16.35 },
+            new object[] { new Pitch(Note.D, 2), 73.42 },
+            new object[] { new Pitch(Note.B, 8), 7902.13 },
+            new object[] { new Pitch(Note.A, 4), 440 },
+            new object[] { new Pitch(Note.A, 3), 220 },
+            new object[] { new Pitch(Note.B, 3), 246.94 },
+            new object[] { new Pitch(Note.C, 4), 261.63 },
+            new object[] { new Pitch(Note.F, 6), 1396.91 },
+            new object[] { new Pitch(Note.DSharp, 8), 4978.03 }
         };
 
 
-        [Test, TestCaseSource(nameof(PitchFrequencyCases))]
+        [Test]
+        [TestCaseSource(nameof(PitchFrequencyCases))]
         public void FrequencyFromPitchTest(Pitch pitch, double expectedFrequency)
         {
             double actualFrequency = calculator.PitchFrequency(pitch);

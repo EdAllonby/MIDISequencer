@@ -8,6 +8,8 @@ namespace Sequencer.View.Command.MousePointCommand
     /// </summary>
     public abstract class MousePointNoteCommand : IMousePointNoteCommand
     {
+        protected abstract bool CanExecute { get; }
+
         public void Execute(IMousePoint mousePoint)
         {
             if (CanExecute)
@@ -15,8 +17,6 @@ namespace Sequencer.View.Command.MousePointCommand
                 DoExecute(mousePoint);
             }
         }
-
-        protected abstract bool CanExecute { get; }
 
         protected abstract void DoExecute([NotNull] IMousePoint mousePoint);
     }

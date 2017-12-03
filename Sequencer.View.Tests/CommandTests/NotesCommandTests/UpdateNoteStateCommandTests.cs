@@ -3,8 +3,8 @@ using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Input;
 using Sequencer.View.Control;
+using Sequencer.View.Input;
 
 namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
 {
@@ -61,6 +61,5 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
             note1.VerifySet(x => x.NoteState = expectedNoteState, Times.Once);
             note2.VerifySet(x => x.NoteState = NoteState.Unselected, Times.Once);
         }
-
     }
 }

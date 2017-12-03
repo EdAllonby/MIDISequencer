@@ -3,17 +3,17 @@ using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
-using Sequencer.View.Input;
 using Sequencer.View.Control;
+using Sequencer.View.Input;
 
 namespace Sequencer.View.Drawing
 {
     public sealed class SequencerDimensionsCalculator : ISequencerDimensionsCalculator
     {
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly IDigitalAudioProtocol protocol;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
 
         public SequencerDimensionsCalculator([NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] SequencerSettings sequencerSettings, [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
         {
@@ -26,22 +26,22 @@ namespace Sequencer.View.Drawing
         /// <summary>
         /// The note heights the sequencer should display.
         /// </summary>
-        public double NoteHeight => sequencerCanvas.Height/sequencerSettings.TotalNotes;
+        public double NoteHeight => sequencerCanvas.Height / sequencerSettings.TotalNotes;
 
         /// <summary>
         /// The measure widths the sequencer should display.
         /// </summary>
-        public double MeasureWidth => sequencerCanvas.Width/sequencerSettings.TotalMeasures;
+        public double MeasureWidth => sequencerCanvas.Width / sequencerSettings.TotalMeasures;
 
         /// <summary>
         /// The brr widths the sequencer should display.
         /// </summary>
-        public double BarWidth => MeasureWidth/sequencerSettings.TimeSignature.BarsPerMeasure;
+        public double BarWidth => MeasureWidth / sequencerSettings.TimeSignature.BarsPerMeasure;
 
         /// <summary>
         /// The beat widths the sequencer should display.
         /// </summary>
-        public double BeatWidth => BarWidth/sequencerSettings.TimeSignature.BeatsPerBar;
+        public double BeatWidth => BarWidth / sequencerSettings.TimeSignature.BeatsPerBar;
 
         public bool IsPointInsideNote(ISequencerNotes sequencerNotes, IMousePoint mousePoint)
         {
@@ -50,19 +50,19 @@ namespace Sequencer.View.Drawing
 
         public IPosition FindPositionFromPoint(IMousePoint mousePosition)
         {
-            var beat = (int) Math.Ceiling(mousePosition.X/BeatWidth);
+            var beat = (int) Math.Ceiling(mousePosition.X / BeatWidth);
             return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
         }
 
         public double GetPointFromPosition(IPosition position)
         {
-            return (position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth) - BeatWidth;
+            return position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth - BeatWidth;
         }
 
         public double GetPointFromPitch(Pitch pitch)
         {
             int halfStepDifference = pitchAndPositionCalculator.FindStepsFromPitches(sequencerSettings.LowestPitch, pitch);
-            double relativePitchPosition = (NoteHeight * halfStepDifference) + NoteHeight;
+            double relativePitchPosition = NoteHeight * halfStepDifference + NoteHeight;
             return sequencerCanvas.Height - relativePitchPosition;
         }
 
@@ -73,7 +73,7 @@ namespace Sequencer.View.Drawing
         /// <returns>The pitch the mouse is over.</returns>
         public Pitch FindPitchFromPoint(IMousePoint mousePosition)
         {
-            int relativeMidiNumber = (int) ((sequencerCanvas.Height/NoteHeight) - Math.Ceiling(mousePosition.Y/NoteHeight));
+            var relativeMidiNumber = (int) (sequencerCanvas.Height / NoteHeight - Math.Ceiling(mousePosition.Y / NoteHeight));
             int absoluteMidiNumber = protocol.ProtocolNoteNumber(sequencerSettings.LowestPitch) + relativeMidiNumber;
             return protocol.CreatePitchFromProtocolNumber(absoluteMidiNumber);
         }

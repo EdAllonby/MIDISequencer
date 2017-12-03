@@ -9,44 +9,46 @@ namespace Sequencer.Domain.Tests
 
         private static readonly object[] PositionSumCases =
         {
-            new object[] {new Position(1, 1, 1), 1},
-            new object[] {new Position(1, 1, 2), 2},
-            new object[] {new Position(1, 2, 1), 5},
-            new object[] {new Position(1, 2, 3), 7},
-            new object[] {new Position(1, 4, 4), 16},
-            new object[] {new Position(2, 1, 1), 17},
-            new object[] {new Position(4, 4, 4), 64}
+            new object[] { new Position(1, 1, 1), 1 },
+            new object[] { new Position(1, 1, 2), 2 },
+            new object[] { new Position(1, 2, 1), 5 },
+            new object[] { new Position(1, 2, 3), 7 },
+            new object[] { new Position(1, 4, 4), 16 },
+            new object[] { new Position(2, 1, 1), 17 },
+            new object[] { new Position(4, 4, 4), 64 }
         };
 
         private static readonly object[] BeatPositionCases =
         {
-            new object[] {17, new Position(2, 1, 1)},
-            new object[] {16, new Position(1, 4, 4)},
-            new object[] {49, new Position(4, 1, 1)},
-            new object[] {21, new Position(2, 2, 1)},
-            new object[] {22, new Position(2, 2, 2)},
-            new object[] {1, new Position(1, 1, 1)},
-            new object[] {4, new Position(1, 1, 4)},
-            new object[] {5, new Position(1, 2, 1)},
-            new object[] {25, new Position(2, 3, 1)}
+            new object[] { 17, new Position(2, 1, 1) },
+            new object[] { 16, new Position(1, 4, 4) },
+            new object[] { 49, new Position(4, 1, 1) },
+            new object[] { 21, new Position(2, 2, 1) },
+            new object[] { 22, new Position(2, 2, 2) },
+            new object[] { 1, new Position(1, 1, 1) },
+            new object[] { 4, new Position(1, 1, 4) },
+            new object[] { 5, new Position(1, 2, 1) },
+            new object[] { 25, new Position(2, 3, 1) }
         };
 
         private static readonly object[] NextPositionCases =
         {
-            new object[] {new Position(1, 1, 1), new Position(1, 1, 2)},
-            new object[] {new Position(3, 1, 1), new Position(3, 1, 2)},
-            new object[] {new Position(4, 4, 4), new Position(5, 1, 1)},
-            new object[] {new Position(2, 3, 4), new Position(2, 4, 1)}
+            new object[] { new Position(1, 1, 1), new Position(1, 1, 2) },
+            new object[] { new Position(3, 1, 1), new Position(3, 1, 2) },
+            new object[] { new Position(4, 4, 4), new Position(5, 1, 1) },
+            new object[] { new Position(2, 3, 4), new Position(2, 4, 1) }
         };
 
-        [Test, TestCaseSource(nameof(BeatPositionCases))]
+        [Test]
+        [TestCaseSource(nameof(BeatPositionCases))]
         public void BeatShouldReturnCorrectPosition(int beat, IPosition expectedPosition)
         {
             IPosition actualPosition = Position.PositionFromBeat(beat, standardTimeSignature);
             Assert.AreEqual(expectedPosition, actualPosition);
         }
 
-        [Test, TestCaseSource(nameof(NextPositionCases))]
+        [Test]
+        [TestCaseSource(nameof(NextPositionCases))]
         public void NextPositionShouldBeCorrect(IPosition initialPosition, IPosition expectedNextPosition)
         {
             IPosition actualNextPosition = initialPosition.NextPosition(standardTimeSignature);
@@ -117,7 +119,8 @@ namespace Sequencer.Domain.Tests
             Assert.IsTrue(firstPosition >= secondPosition);
         }
 
-        [Test, TestCaseSource(nameof(PositionSumCases))]
+        [Test]
+        [TestCaseSource(nameof(PositionSumCases))]
         public void PositionShouldReturnCorrectSummedBeat(IPosition position, int expectedSum)
         {
             int actual = position.SummedBeat(standardTimeSignature);

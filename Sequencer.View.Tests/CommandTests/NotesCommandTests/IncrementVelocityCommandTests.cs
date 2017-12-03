@@ -11,10 +11,10 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
     public class IncrementVelocityCommandTests
     {
         [Test]
-        public void IncrementVelocityTest()
+        public void IncrementVelocity_NearMaximum_SetsAs127()
         {
-            var velocity = new Velocity(100);
-            var expectedVelocity = new Velocity(110);
+            var velocity = new Velocity(124);
+            var expectedVelocity = new Velocity(127);
 
             var command = new IncrementVelocityCommand(10);
 
@@ -27,10 +27,10 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
         }
 
         [Test]
-        public void IncrementVelocity_NearMaximum_SetsAs127()
+        public void IncrementVelocityTest()
         {
-            var velocity = new Velocity(124);
-            var expectedVelocity = new Velocity(127);
+            var velocity = new Velocity(100);
+            var expectedVelocity = new Velocity(110);
 
             var command = new IncrementVelocityCommand(10);
 

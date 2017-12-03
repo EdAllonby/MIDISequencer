@@ -65,11 +65,11 @@ namespace Sequencer.View.Drawing
 
             SetRectanglePosition(noteRectangle, noteStartLocation, noteStartHeight);
 
-            double velocityHeight = noteHeight*0.3;
-            double velocityStartHeight = (noteStartHeight + (noteHeight/2)) - (velocityHeight/2);
+            double velocityHeight = noteHeight * 0.3;
+            double velocityStartHeight = noteStartHeight + noteHeight / 2 - velocityHeight / 2;
 
             velocityRectangle.Height = velocityHeight;
-            velocityRectangle.Width = noteWidth*velocity.Volume;
+            velocityRectangle.Width = noteWidth * velocity.Volume;
 
             SetRectanglePosition(velocityRectangle, noteStartLocation, velocityStartHeight);
         }
@@ -99,7 +99,7 @@ namespace Sequencer.View.Drawing
             sequencer.RemoveChild(noteRectangle);
             sequencer.RemoveChild(velocityRectangle);
         }
-        
+
         private double ActualWidthBetweenPositions([NotNull] IPosition startPosition, [NotNull] IPosition endPosition)
         {
             double noteStartingPoint = sequencerDimensionsCalculator.GetPointFromPosition(startPosition);

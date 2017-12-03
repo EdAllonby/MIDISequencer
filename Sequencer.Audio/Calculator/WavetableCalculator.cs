@@ -12,13 +12,13 @@ namespace Sequencer.Audio.Calculator
 
         public WavetableCalculator([NotNull] IWaveformCalculator calculator)
         {
-            int wavetableSize = 1024;
+            var wavetableSize = 1024;
 
-            List<float> wavetableSamples = new List<float>();
+            var wavetableSamples = new List<float>();
 
-            for (int position = 0; position < wavetableSize; position++)
+            for (var position = 0; position < wavetableSize; position++)
             {
-                float sample = calculator.CalculateForSample(position, wavetableSize, wavetableSize*wavetableSize);
+                float sample = calculator.CalculateForSample(position, wavetableSize, wavetableSize * wavetableSize);
                 wavetableSamples.Add(sample);
             }
 
@@ -29,9 +29,9 @@ namespace Sequencer.Audio.Calculator
         {
             float interpolatedSample = InterpolateCurrentPosition();
 
-            float step = wavetable.Size*frequency/sampleRate;
+            float step = wavetable.Size * frequency / sampleRate;
 
-            currentWavetablePosition = (currentWavetablePosition + step)%(wavetable.Size - 1);
+            currentWavetablePosition = (currentWavetablePosition + step) % (wavetable.Size - 1);
 
             return interpolatedSample;
         }
@@ -48,7 +48,7 @@ namespace Sequencer.Audio.Calculator
         {
             float positionFraction = GetFraction(currentWavetablePosition);
 
-            return (nextSample - previousSample)*positionFraction + previousSample;
+            return (nextSample - previousSample) * positionFraction + previousSample;
         }
 
         private static float GetFraction(float value)

@@ -7,8 +7,6 @@ namespace Sequencer.View.Control
 {
     public interface ISequencerNotes
     {
-        event EventHandler<IEnumerable<IVisualNote>> SelectedNotesChanged;
-
         /// <summary>
         /// The currently selected sequencer notes.
         /// </summary>
@@ -21,6 +19,8 @@ namespace Sequencer.View.Control
         /// </summary>
         [NotNull]
         IEnumerable<IVisualNote> AllNotes { get; }
+
+        event EventHandler<IEnumerable<IVisualNote>> SelectedNotesChanged;
 
         /// <summary>
         /// Draw all the sequencewr notes on the screen.

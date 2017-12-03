@@ -11,10 +11,10 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
     public class DecrementVelocityCommandTests
     {
         [Test]
-        public void DecrementVelocityTest()
+        public void DecrementVelocity_NearMinimum_SetsAsOne()
         {
-            var velocity = new Velocity(100);
-            var expectedVelocity = new Velocity(90);
+            var velocity = new Velocity(5);
+            var expectedVelocity = new Velocity(0);
 
             var command = new DecrementVelocityCommand(10);
 
@@ -27,10 +27,10 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
         }
 
         [Test]
-        public void DecrementVelocity_NearMinimum_SetsAsOne()
+        public void DecrementVelocityTest()
         {
-            var velocity = new Velocity(5);
-            var expectedVelocity = new Velocity(0);
+            var velocity = new Velocity(100);
+            var expectedVelocity = new Velocity(90);
 
             var command = new DecrementVelocityCommand(10);
 

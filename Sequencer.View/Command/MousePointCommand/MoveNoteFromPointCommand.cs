@@ -2,26 +2,26 @@
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.View.Command.NotesCommand;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Command.MousePointCommand
 {
     public sealed class MoveNoteFromPointCommand : MousePointNoteCommand
     {
+        [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
         [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         private int beatsDelta;
         [NotNull] private IMousePoint initialMousePitch;
-        [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
-        [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private IMousePoint initialMousePoint;
         private int lastHalfStepDifference;
 
         public MoveNoteFromPointCommand([NotNull] IKeyboardStateProcessor keyboardStateProcessor,
-            [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IMousePoint initialMousePoint, 
+            [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IMousePoint initialMousePoint,
             [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {

@@ -4,9 +4,9 @@ using log4net;
 using Sequencer.Shared;
 using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 using Sequencer.ViewModel;
 
 namespace Sequencer.View.Command.MousePointCommand

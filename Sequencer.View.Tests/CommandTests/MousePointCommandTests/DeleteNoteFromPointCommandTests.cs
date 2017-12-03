@@ -4,9 +4,9 @@ using Moq;
 using NUnit.Framework;
 using Sequencer.View.Command.MousePointCommand;
 using Sequencer.View.Command.NotesCommand;
+using Sequencer.View.Control;
 using Sequencer.View.Drawing;
 using Sequencer.View.Input;
-using Sequencer.View.Control;
 
 namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 {

@@ -25,7 +25,7 @@
             <Grid Grid.Row="0">
                 <control:SequencerControl x:Name="Sequencer" Grid.Row="0" MouseMove="SequencerMouseMoved"
                                           MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
-                                          NoteAction="{Binding NoteAction}" 
+                                          NoteAction="{Binding NoteAction}"
                                           SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
                                           CurrentPosition="{Binding CurrentPosition, Mode=OneWay}" />
 
@@ -41,16 +41,16 @@
 
 
         </Grid>
-        
+
 
         <Grid Grid.Row="0" Grid.Column="1" MinWidth="20">
             <xctk:PropertyGrid SelectedObject="{Binding SelectedObject}" ShowSearchBox="False" />
         </Grid>
 
         <GridSplitter Width="5" HorizontalAlignment="Left" Margin="0,0,0,0"
-		      ResizeDirection="Columns"
-		      ShowsPreview="True"
-		      Grid.Row="0" Grid.Column="1"/>
+                      ResizeDirection="Columns"
+                      ShowsPreview="True"
+                      Grid.Row="0" Grid.Column="1" />
 
         <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <StatusBar.ItemsPanel>
