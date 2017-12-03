@@ -12,6 +12,7 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using System.Diagnostics;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 
@@ -41,11 +42,19 @@ namespace Sequencer.ViewModel
             ////    SimpleIoc.Default.Register<IDataService, DataService>();
             ////}
 
-            
+
+            Debug.Assert(SimpleIoc.Default != null, "SimpleIoc.Default != null");
             SimpleIoc.Default.Register<SequencerViewModel>();
         }
 
-        public SequencerViewModel Sequencer => ServiceLocator.Current.GetInstance<SequencerViewModel>();
+        public SequencerViewModel Sequencer
+        {
+            get
+            {
+                Debug.Assert(ServiceLocator.Current != null, "ServiceLocator.Current != null");
+                return ServiceLocator.Current.GetInstance<SequencerViewModel>();
+            }
+        }
 
         public static void Cleanup()
         {
