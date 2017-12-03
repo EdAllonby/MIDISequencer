@@ -4,7 +4,7 @@
         xmlns:control="clr-namespace:Sequencer.View.Control"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:radialContextMenu="clr-namespace:Sequencer.View.Control.RadialContextMenu"
-        DataContext="{StaticResource SequencerViewModel}"
+        DataContext="{Binding Source={StaticResource Locator}, Path=Sequencer}"
         Title="Sequencer" Height="500" Width="1200" KeyDown="SequencerKeyPressed">
     <Grid>
         <Grid.RowDefinitions>

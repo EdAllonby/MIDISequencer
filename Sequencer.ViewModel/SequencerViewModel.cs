@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using GalaSoft.MvvmLight;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
@@ -9,7 +10,7 @@ using Sequencer.ViewModel.Command;
 
 namespace Sequencer.ViewModel
 {
-    public sealed class SequencerViewModel : ViewModel
+    public sealed class SequencerViewModel : ViewModelBase
     {
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
 
@@ -27,8 +28,8 @@ namespace Sequencer.ViewModel
             set
             {
                 noteAction = value;
-                OnPropertyChanged(nameof(NoteAction));
-                OnPropertyChanged(nameof(Information));
+                RaisePropertyChanged(nameof(NoteAction));
+                RaisePropertyChanged(nameof(Information));
 
                 Log.Info($"Note action set to {NoteAction}");
             }
@@ -57,7 +58,7 @@ namespace Sequencer.ViewModel
                 if (selectedNotes.Count() == 1)
                 {
                     SelectedObject = SelectedNotes.FirstOrDefault();
-                    OnPropertyChanged(nameof(SelectedNotes));
+                    RaisePropertyChanged(nameof(SelectedNotes));
                 }
                 else
                 {
@@ -73,8 +74,8 @@ namespace Sequencer.ViewModel
             set
             {
                 sequencerPlaying = value;
-                OnPropertyChanged(nameof(SequencerPlaying));
-                OnPropertyChanged(nameof(Information));
+                RaisePropertyChanged(nameof(SequencerPlaying));
+                RaisePropertyChanged(nameof(Information));
 
                 Log.Info($"Sequencer play state set to {SequencerPlaying}");
             }
@@ -88,7 +89,7 @@ namespace Sequencer.ViewModel
             set
             {
                 selectedObject = value;
-                OnPropertyChanged(nameof(SelectedObject));
+                RaisePropertyChanged(nameof(SelectedObject));
             }
         }
 
