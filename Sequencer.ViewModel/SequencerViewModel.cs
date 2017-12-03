@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
 using Sequencer.Utilities;
-using Sequencer.ViewModel.Command;
 
 namespace Sequencer.ViewModel
 {
@@ -136,23 +136,23 @@ namespace Sequencer.ViewModel
             }
         }
 
-        private bool CanExecuteStopCommand(object obj)
+        private bool CanExecuteStopCommand()
         {
             return sequencerPlaying;
         }
 
-        private void ExecuteStopCommand(object obj)
+        private void ExecuteStopCommand()
         {
             SequencerPlaying = false;
             clock.Stop();
         }
 
-        private bool CanExecutePlayCommand(object obj)
+        private bool CanExecutePlayCommand()
         {
             return !sequencerPlaying;
         }
 
-        private void ExecutePlayCommand(object obj)
+        private void ExecutePlayCommand()
         {
             SequencerPlaying = true;
             clock.Start();
