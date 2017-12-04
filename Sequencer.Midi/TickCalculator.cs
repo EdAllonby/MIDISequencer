@@ -20,7 +20,8 @@ namespace Sequencer.Midi
         {
             int currentBeat = (tick + quarterNoteResolution) / quarterNoteResolution;
 
-            return Position.PositionFromBeat(currentBeat, timeSignature);
+            var wrappedTick = tick % quarterNoteResolution;
+            return Position.PositionFromBeat(currentBeat, wrappedTick, timeSignature);
         }
     }
 }

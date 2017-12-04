@@ -49,7 +49,7 @@ namespace Sequencer.View.Drawing
             CurrentPosition = position;
             double noteStartLocation = sequencerDimensionsCalculator.GetPointFromPosition(position);
 
-            SetRectanglePosition(noteStartLocation);
+            SetIndicatorPosition(noteStartLocation);
         }
 
         public void RedrawEditor()
@@ -57,7 +57,7 @@ namespace Sequencer.View.Drawing
             DrawPositionIndicator(CurrentPosition);
         }
 
-        private void SetRectanglePosition(double position)
+        private void SetIndicatorPosition(double position)
         {
             Canvas.SetLeft(indicator, position - IndicatorWidth / 2);
             Canvas.SetTop(indicator, 0);

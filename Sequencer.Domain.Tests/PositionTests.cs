@@ -43,7 +43,7 @@ namespace Sequencer.Domain.Tests
         [TestCaseSource(nameof(BeatPositionCases))]
         public void BeatShouldReturnCorrectPosition(int beat, IPosition expectedPosition)
         {
-            IPosition actualPosition = Position.PositionFromBeat(beat, standardTimeSignature);
+            IPosition actualPosition = Position.PositionFromBeat(beat, 0, standardTimeSignature);
             Assert.AreEqual(expectedPosition, actualPosition);
         }
 

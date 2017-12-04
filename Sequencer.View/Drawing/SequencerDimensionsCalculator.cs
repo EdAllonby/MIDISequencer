@@ -46,6 +46,8 @@ namespace Sequencer.View.Drawing
 
         public double SixteenthNoteWidth => BeatWidth / 4;
 
+        public double TickWidth => BeatWidth / sequencerSettings.TicksPerQuarterNote;
+
         public bool IsPointInsideNote(ISequencerNotes sequencerNotes, IMousePoint mousePoint)
         {
             return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
@@ -54,12 +56,13 @@ namespace Sequencer.View.Drawing
         public IPosition FindPositionFromPoint(IMousePoint mousePosition)
         {
             var beat = (int) Math.Ceiling(mousePosition.X / BeatWidth);
-            return Position.PositionFromBeat(beat, sequencerSettings.TimeSignature);
+            return Position.PositionFromBeat(beat, 0, sequencerSettings.TimeSignature);
         }
 
         public double GetPointFromPosition(IPosition position)
         {
-            return position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth - BeatWidth;
+            var beatPosition = position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth - BeatWidth;
+            return TickWidth * position.Ticks + beatPosition;
         }
 
         public double GetPointFromPitch(Pitch pitch)

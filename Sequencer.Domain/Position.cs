@@ -88,7 +88,7 @@ namespace Sequencer.Domain
         public IPosition PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature)
         {
             int totalBeats = SummedBeat(timeSignature);
-            return PositionFromBeat(totalBeats + beatDelta, timeSignature);
+            return PositionFromBeat(totalBeats + beatDelta, 0, timeSignature);
         }
 
         public bool IsGreaterThan(IPosition other)
@@ -125,14 +125,14 @@ namespace Sequencer.Domain
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use in calculation.</param>
         /// <returns>The position from origin of the summed beats.</returns>
         [NotNull]
-        public static IPosition PositionFromBeat(int totalBeats, [NotNull] TimeSignature timeSignature)
+        public static IPosition PositionFromBeat(int totalBeats, int tick, [NotNull] TimeSignature timeSignature)
         {
             int measures = 1 + (totalBeats - 1) / timeSignature.BeatsPerMeasure;
             int remainingBeatsForBars = totalBeats - timeSignature.BeatsPerMeasure * (measures - 1);
             int bars = 1 + (remainingBeatsForBars - 1) / timeSignature.BeatsPerBar;
             int remainingBeats = remainingBeatsForBars - timeSignature.BeatsPerBar * (bars - 1);
 
-            return new Position(measures, bars, remainingBeats);
+            return new Position(measures, bars, remainingBeats, tick);
         }
 
         public override bool Equals(object obj)

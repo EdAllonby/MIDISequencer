@@ -131,7 +131,7 @@ namespace Sequencer.ViewModel
 
         private void OnTick(object sender, EventArgs e)
         {
-            if (clock.Ticks % clock.TicksPerQuarterNote == 0)
+            if (clock.Ticks % (clock.TicksPerQuarterNote / 4) == 0)
             {
                 IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(clock.Ticks);
                 dispatcher.DispatchToWpf(() => CurrentPosition = positionAtTick);
