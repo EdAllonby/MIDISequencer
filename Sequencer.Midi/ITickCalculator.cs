@@ -6,6 +6,6 @@ namespace Sequencer.Midi
     public interface ITickCalculator
     {
         [NotNull]
-        IPosition CalculatePositionFromTick(int tick, int quaterNoteResolution);
+        IPosition CalculatePositionFromTick(int tick);
     }
 }

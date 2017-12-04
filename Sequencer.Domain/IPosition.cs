@@ -10,6 +10,8 @@ namespace Sequencer.Domain
 
         int Beat { get; }
 
+        int Ticks { get; }
+
         [NotNull]
         IPosition PreviousPosition([NotNull] TimeSignature timeSignature);
 

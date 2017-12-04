@@ -19,8 +19,8 @@ namespace Sequencer.Midi
         {
             TicksPerQuarterNote = musicalSettings.TicksPerQuarterNote;
 
-            int sequencerSize = musicalSettings.TotalMeasures * musicalSettings.TimeSignature.BeatsPerMeasure;
-            totalTicks = sequencerSize * TicksPerQuarterNote;
+            int totalBeats = musicalSettings.TotalMeasures * musicalSettings.TimeSignature.BeatsPerMeasure;
+            totalTicks = totalBeats * TicksPerQuarterNote;
 
             clock.Tick += OnTick;
         }

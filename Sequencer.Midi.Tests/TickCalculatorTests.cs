@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using Sequencer.Domain;
+using Sequencer.Shared;
 
 namespace Sequencer.Midi.Tests
 {
@@ -9,17 +11,23 @@ namespace Sequencer.Midi.Tests
         private static readonly object[] TickPositionCases =
         {
             new object[] { 0, new Position(1, 1, 1) },
-            new object[] { 6, new Position(1, 1, 2) },
-            new object[] { 24, new Position(1, 2, 1) },
-            new object[] { 120, new Position(2, 2, 1) }
+            new object[] { 96, new Position(1, 1, 2) },
+            new object[] { 192, new Position(1, 1, 3) },
+            new object[] { 960, new Position(1, 3, 3) }
         };
 
         [Test]
         [TestCaseSource(nameof(TickPositionCases))]
         public void AssertMidiNumberFromPitch(int tick, Position expectedPosition)
         {
-            var tickCalulcator = new TickCalculator();
-            IPosition position = tickCalulcator.CalculatePositionFromTick(tick, 24);
+            var musicalSettingsStub = new Mock<IMusicalSettings>();
+            musicalSettingsStub.Setup(x => x.TimeSignature).Returns(TimeSignature.FourFour);
+            musicalSettingsStub.Setup(x => x.TicksPerQuarterNote).Returns(96);
+
+            var tickCalulcator = new TickCalculator(musicalSettingsStub.Object);
+
+            IPosition position = tickCalulcator.CalculatePositionFromTick(tick);
+
             Assert.AreEqual(expectedPosition, position);
         }
     }

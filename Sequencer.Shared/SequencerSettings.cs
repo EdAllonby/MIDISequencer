@@ -20,7 +20,7 @@ namespace Sequencer.Shared
 
         // Musical definitions
         public int TotalNotes => 32;
-        public int TotalMeasures => 4;
+        public int TotalMeasures => 1;
         public Velocity DefaultVelocity => new Velocity(64);
         public Pitch LowestPitch => new Pitch(Note.A, 2);
         public TimeSignature TimeSignature => TimeSignature.FourFour;

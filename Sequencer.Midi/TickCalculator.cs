@@ -1,24 +1,24 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Shared;
 
 namespace Sequencer.Midi
 {
     public class TickCalculator : ITickCalculator
     {
         [NotNull] private readonly TimeSignature timeSignature;
+        private readonly int quarterNoteResolution;
 
-        public TickCalculator()
+        public TickCalculator([NotNull] IMusicalSettings musicalSettings)
         {
             // TODO: Inject
-            timeSignature = new TimeSignature(4, 4);
+            timeSignature = musicalSettings.TimeSignature;
+            quarterNoteResolution = musicalSettings.TicksPerQuarterNote;
         }
 
-        public IPosition CalculatePositionFromTick(int tick, int quaterNoteResolution)
+        public IPosition CalculatePositionFromTick(int tick)
         {
-            var beatsPerBar = timeSignature.BeatsPerBar;
-
-            int ticksPerBeat = quaterNoteResolution / beatsPerBar;
-            int currentBeat = (tick + ticksPerBeat) / ticksPerBeat;
+            int currentBeat = (tick + quarterNoteResolution) / quarterNoteResolution;
 
             return Position.PositionFromBeat(currentBeat, timeSignature);
         }

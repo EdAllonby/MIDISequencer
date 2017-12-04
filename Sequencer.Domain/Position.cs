@@ -7,17 +7,22 @@ namespace Sequencer.Domain
     /// </summary>
     public sealed class Position : IPosition
     {
+        // TODO: Inject
+        private readonly int ticksPerQuarterNote = 96;
+
         /// <summary>
         /// A position based on current measure, bar and beat.
         /// </summary>
         /// <param name="measure">The measure the position is in.</param>
         /// <param name="bar">The bar the position is in.</param>
         /// <param name="beat">The beat the position is in.</param>
-        public Position(int measure, int bar, int beat)
+        /// <param name="ticks">The sub ticks the position is in</param>
+        public Position(int measure, int bar, int beat, int ticks = 0)
         {
             Measure = measure;
             Bar = bar;
             Beat = beat;
+            Ticks = ticks;
         }
 
         public int Measure { get; }
@@ -25,6 +30,8 @@ namespace Sequencer.Domain
         public int Bar { get; }
 
         public int Beat { get; }
+
+        public int Ticks { get; }
 
         public int CompareTo([NotNull] IPosition other)
         {
@@ -168,7 +175,7 @@ namespace Sequencer.Domain
 
         public override string ToString()
         {
-            return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}";
+            return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}, Sub-Beat {Ticks}";
         }
     }
 }
