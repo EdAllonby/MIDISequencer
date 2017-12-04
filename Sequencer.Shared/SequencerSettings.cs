@@ -1,6 +1,5 @@
 ﻿using System.Windows.Media;
 using Sequencer.Domain;
-using Sequencer.Midi;
 
 namespace Sequencer.Shared
 {
@@ -21,11 +20,10 @@ namespace Sequencer.Shared
 
         // Musical definitions
         public int TotalNotes => 32;
-
         public int TotalMeasures => 4;
         public Velocity DefaultVelocity => new Velocity(64);
         public Pitch LowestPitch => new Pitch(Note.A, 2);
-        public IDigitalAudioProtocol Protocol => new MidiProtocol(new PitchAndPositionCalculator(TimeSignature.FourFour));
         public TimeSignature TimeSignature => TimeSignature.FourFour;
+        public int TicksPerQuarterNote => 96;
     }
 }

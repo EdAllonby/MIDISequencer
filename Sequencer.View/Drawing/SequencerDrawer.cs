@@ -24,10 +24,10 @@ namespace Sequencer.View.Drawing
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
 
-        public SequencerDrawer([NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] ISequencerNotes sequencerNotes,
+        public SequencerDrawer([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
         {
-            protocol = sequencerSettings.Protocol;
+            this.protocol = protocol;
             this.sequencerCanvas = sequencerCanvas;
             this.sequencerNotes = sequencerNotes;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;

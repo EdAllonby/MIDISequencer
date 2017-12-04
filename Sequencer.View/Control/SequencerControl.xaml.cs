@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Midi;
 using Sequencer.Shared;
 using Sequencer.View.Command;
 using Sequencer.View.Command.MousePointCommand;
@@ -62,14 +63,15 @@ namespace Sequencer.View.Control
 
             ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
             pitchAndPositionCalculator = new PitchAndPositionCalculator(sequencerSettings.TimeSignature);
-            sequencerDimensionsCalculator = new SequencerDimensionsCalculator(sequencerCanvasWrapper, sequencerSettings, pitchAndPositionCalculator);
+            IDigitalAudioProtocol protocol = new MidiProtocol(pitchAndPositionCalculator);
 
-            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, sequencerDimensionsCalculator, sequencerCanvasWrapper);
+            sequencerDimensionsCalculator = new SequencerDimensionsCalculator(protocol, sequencerCanvasWrapper, sequencerSettings, pitchAndPositionCalculator);
+            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, protocol, sequencerDimensionsCalculator, sequencerCanvasWrapper);
 
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings.TimeSignature, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
-            sequencerDrawer = new SequencerDrawer(sequencerCanvasWrapper, notes, sequencerDimensionsCalculator, sequencerSettings);
+            sequencerDrawer = new SequencerDrawer(protocol, sequencerCanvasWrapper, notes, sequencerDimensionsCalculator, sequencerSettings);
             positionIndicatorDrawer = new PositionIndicatorDrawer(sequencerSettings, sequencerCanvasWrapper, sequencerDimensionsCalculator);
 
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);

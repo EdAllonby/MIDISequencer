@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.Midi;
 
 namespace Sequencer.Shared
 {
@@ -19,9 +18,8 @@ namespace Sequencer.Shared
         Pitch LowestPitch { get; }
 
         [NotNull]
-        IDigitalAudioProtocol Protocol { get; }
-
-        [NotNull]
         TimeSignature TimeSignature { get; }
+
+        int TicksPerQuarterNote { get; }
     }
 }

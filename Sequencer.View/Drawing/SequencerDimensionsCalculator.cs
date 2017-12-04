@@ -15,9 +15,10 @@ namespace Sequencer.View.Drawing
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
 
-        public SequencerDimensionsCalculator([NotNull] ISequencerCanvasWrapper sequencerCanvas, [NotNull] SequencerSettings sequencerSettings, [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
+        public SequencerDimensionsCalculator([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerCanvasWrapper sequencerCanvas, 
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
         {
-            protocol = sequencerSettings.Protocol;
+            this.protocol = protocol;
             this.sequencerCanvas = sequencerCanvas;
             this.sequencerSettings = sequencerSettings;
             this.pitchAndPositionCalculator = pitchAndPositionCalculator;

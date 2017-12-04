@@ -14,10 +14,10 @@ namespace Sequencer.View.Control
         [NotNull] private readonly SequencerSettings sequencerSettings;
         private NoteState noteState = NoteState.Selected;
 
-        public VisualNote([NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
+        public VisualNote([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
             [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone)
         {
-            protocol = sequencerSettings.Protocol;
+            this.protocol = protocol;
             this.sequencerSettings = sequencerSettings;
             Tone = tone;
 

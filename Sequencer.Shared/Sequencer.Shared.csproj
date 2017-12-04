@@ -48,10 +48,6 @@
       <Project>{2F107EEB-5405-4D9A-A21E-866FBD9E697B}</Project>
       <Name>Sequencer.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj">
-      <Project>{8ADB7C17-3648-4992-AAD4-C0E6D8B1D23B}</Project>
-      <Name>Sequencer.Midi</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

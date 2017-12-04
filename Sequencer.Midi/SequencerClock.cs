@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Sanford.Multimedia.Midi;
+using Sequencer.Shared;
 
 namespace Sequencer.Midi
 {
@@ -14,14 +15,13 @@ namespace Sequencer.Midi
 
         public int Tempo => clock.Tempo;
 
-        public SequencerClock()
+        public SequencerClock([NotNull] IMusicalSettings musicalSettings)
         {
-            int bpm = 500000;
+            TicksPerQuarterNote = musicalSettings.TicksPerQuarterNote;
 
-            clock = new MidiInternalClock();
-            // TODO: Inject setting
-            const int sequencerSize = 32 / 2;
+            int sequencerSize = musicalSettings.TotalMeasures * musicalSettings.TimeSignature.BeatsPerMeasure;
             totalTicks = sequencerSize * TicksPerQuarterNote;
+
             clock.Tick += OnTick;
         }
 
@@ -66,7 +66,11 @@ namespace Sequencer.Midi
             Tick?.Invoke(this, EventArgs.Empty);
         }
 
-        public int TicksPerQuarterNote => clock.Ppqn;
+        public int TicksPerQuarterNote
+        {
+            get => clock.Ppqn;
+            private set => clock.Ppqn = value;
+        }
 
         public event EventHandler Started
         {

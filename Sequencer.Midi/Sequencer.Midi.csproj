@@ -56,6 +56,10 @@
       <Project>{2F107EEB-5405-4D9A-A21E-866FBD9E697B}</Project>
       <Name>Sequencer.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Shared\Sequencer.Shared.csproj">
+      <Project>{538D9626-9A18-4F76-BBD5-93495D794060}</Project>
+      <Name>Sequencer.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
