@@ -50,17 +50,23 @@ namespace Sequencer.View.Drawing
             for (var measure = 0; measure < sequencerSettings.TotalMeasures; measure++)
             {
                 double currentMeasurePosition = sequencerDimensionsCalculator.MeasureWidth * measure;
-                DrawVerticalSequencerLine(currentMeasurePosition, 2);
+                DrawVerticalSequencerLine(currentMeasurePosition, 4);
 
                 for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
                 {
                     double currentBarPosition = currentMeasurePosition + sequencerDimensionsCalculator.BarWidth * bar;
-                    DrawVerticalSequencerLine(currentBarPosition, 1);
+                    DrawVerticalSequencerLine(currentBarPosition, 2);
 
-                    for (var beat = 1; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
+                    for (var beat = 0; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
                     {
                         double currentBeatPosition = currentBarPosition + sequencerDimensionsCalculator.BeatWidth * beat;
-                        DrawVerticalSequencerLine(currentBeatPosition, 0.5);
+                        DrawVerticalSequencerLine(currentBeatPosition, 1);
+
+                        for (var sixteenthNote = 0; sixteenthNote < 4; sixteenthNote++)
+                        {
+                            double currentEighthNotePosition = currentBeatPosition + sequencerDimensionsCalculator.SixteenthNoteWidth * sixteenthNote;
+                            DrawVerticalSequencerLine(currentEighthNotePosition, 0.5);
+                        }
                     }
                 }
             }

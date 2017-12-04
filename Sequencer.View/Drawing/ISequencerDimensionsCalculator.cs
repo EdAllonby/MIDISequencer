@@ -12,7 +12,10 @@ namespace Sequencer.View.Drawing
         double NoteHeight { get; }
 
         double MeasureWidth { get; }
+
         double BarWidth { get; }
+
+        double SixteenthNoteWidth { get; }
 
         [CanBeNull]
         IVisualNote FindNoteFromPoint([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMousePoint point);

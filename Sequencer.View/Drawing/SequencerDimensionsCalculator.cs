@@ -44,6 +44,8 @@ namespace Sequencer.View.Drawing
         /// </summary>
         public double BeatWidth => BarWidth / sequencerSettings.TimeSignature.BeatsPerBar;
 
+        public double SixteenthNoteWidth => BeatWidth / 4;
+
         public bool IsPointInsideNote(ISequencerNotes sequencerNotes, IMousePoint mousePoint)
         {
             return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
