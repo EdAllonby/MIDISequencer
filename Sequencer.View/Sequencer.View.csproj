@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -116,6 +117,7 @@
     <Compile Include="Control\RadialContextMenu\NoteActionRadialContextMenuWrapper.cs" />
     <Compile Include="Control\RadialContextMenu\RadialContextMenu.cs" />
     <Compile Include="Control\RadialContextMenu\RadialCursorLine.cs" />
+    <Compile Include="Control\SelectedNotesEventArgs.cs" />
     <Compile Include="Control\SequencerControl.xaml.cs">
       <DependentUpon>SequencerControl.xaml</DependentUpon>
     </Compile>

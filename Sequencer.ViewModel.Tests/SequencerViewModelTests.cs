@@ -2,7 +2,6 @@
 using Moq;
 using NUnit.Framework;
 using Sequencer.Midi;
-using Sequencer.Shared;
 
 namespace Sequencer.ViewModel.Tests
 {

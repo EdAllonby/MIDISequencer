@@ -20,7 +20,7 @@ namespace Sequencer.View.Control
         [NotNull]
         IEnumerable<IVisualNote> AllNotes { get; }
 
-        event EventHandler<IEnumerable<IVisualNote>> SelectedNotesChanged;
+        event EventHandler<SelectedNotesEventArgs> SelectedNotesChanged;
 
         /// <summary>
         /// Draw all the sequencewr notes on the screen.

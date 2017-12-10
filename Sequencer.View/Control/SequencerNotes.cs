@@ -24,7 +24,7 @@ namespace Sequencer.View.Control
             this.sequencerSettings = sequencerSettings;
         }
 
-        public event EventHandler<IEnumerable<IVisualNote>> SelectedNotesChanged;
+        public event EventHandler<SelectedNotesEventArgs> SelectedNotesChanged;
 
         /// <summary>
         /// The currently selected sequencer notes.
@@ -111,7 +111,7 @@ namespace Sequencer.View.Control
 
         public void NoteStateChanged()
         {
-            SelectedNotesChanged?.Invoke(this, SelectedNotes);
+            SelectedNotesChanged?.Invoke(this, new SelectedNotesEventArgs(SelectedNotes));
         }
 
         [NotNull]

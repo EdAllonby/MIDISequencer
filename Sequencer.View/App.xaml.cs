@@ -8,7 +8,6 @@ using Autofac.Extras.CommonServiceLocator;
 using JetBrains.Annotations;
 using log4net.Config;
 using Microsoft.Practices.ServiceLocation;
-using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
 using Sequencer.View.Console;
@@ -42,17 +41,13 @@ namespace Sequencer.View
 
             try
             {
-
+                // ReSharper disable PossibleNullReferenceException
                 builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
-
                 builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings>().SingleInstance();
-
                 builder.RegisterType<TickCalculator>().As<ITickCalculator>().SingleInstance();
-
                 builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
-                builder.RegisterType<SequencerViewModel>().SingleInstance();
-
-
+                builder.RegisterType<SequencerViewModel>().SingleInstance();         
+                // ReSharper restore PossibleNullReferenceException
             }
             catch (Exception e)
             {

@@ -7,9 +7,6 @@ namespace Sequencer.Domain
     /// </summary>
     public sealed class Position : IPosition
     {
-        // TODO: Inject
-        private readonly int ticksPerQuarterNote = 96;
-
         /// <summary>
         /// A position based on current measure, bar and beat.
         /// </summary>
@@ -113,7 +110,7 @@ namespace Sequencer.Domain
 
         public bool Equals(IPosition other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Measure == other.Measure && Bar == other.Bar && Beat == other.Beat;
         }
@@ -122,6 +119,7 @@ namespace Sequencer.Domain
         /// Get the position from origin of a sum of beats.
         /// </summary>
         /// <param name="totalBeats">The summed beats to the particular position.</param>
+        /// <param name="tick">The tick of the current position.</param>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use in calculation.</param>
         /// <returns>The position from origin of the summed beats.</returns>
         [NotNull]
@@ -137,9 +135,9 @@ namespace Sequencer.Domain
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is IPosition && Equals((IPosition) obj);
+            return obj is IPosition position && Equals(position);
         }
 
         public override int GetHashCode()

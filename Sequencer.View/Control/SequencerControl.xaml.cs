@@ -142,14 +142,19 @@ namespace Sequencer.View.Control
 
         private static void OnCurrentPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var component = (SequencerControl) d;
-            PositionIndicatorDrawer indicatorDrawer = component.positionIndicatorDrawer;
-            indicatorDrawer.DrawPositionIndicator((IPosition) e.NewValue);
+            if (d is SequencerControl component)
+            {
+                PositionIndicatorDrawer indicatorDrawer = component.positionIndicatorDrawer;
+                if (e.NewValue is IPosition newPosition)
+                {
+                    indicatorDrawer.DrawPositionIndicator(newPosition);
+                }
+            }
         }
 
-        private void SelectedNotesChanged(object sender, [NotNull] [ItemNotNull] IEnumerable<IVisualNote> e)
+        private void SelectedNotesChanged(object sender, [NotNull] SelectedNotesEventArgs e)
         {
-            SelectedNotes = e.Select(x => x.Tone);
+            SelectedNotes = e.SelectedVisualNotes.Select(x => x.Tone);
         }
 
         [CanBeNull]

@@ -5,10 +5,8 @@ namespace Sequencer.Shared
 {
     public interface IMusicalSettings
     {
-        [NotNull]
         int TotalNotes { get; }
 
-        [NotNull]
         int TotalMeasures { get; }
 
         [NotNull]

@@ -8,7 +8,7 @@ namespace Sequencer.Midi
     /// <summary>
     /// Currently just a wrapper for the <see cref="MidiInternalClock" />.
     /// </summary>
-    public class SequencerClock : ISequencerClock
+    public class SequencerClock : ISequencerClock, IDisposable
     {
         private readonly int totalTicks;
         [NotNull] private readonly MidiInternalClock clock = new MidiInternalClock();
@@ -41,7 +41,7 @@ namespace Sequencer.Midi
             get => clock.Ticks;
             set => clock.SetTicks(value);
         }
-        
+
         public void Start()
         {
             clock.Continue();
@@ -79,5 +79,19 @@ namespace Sequencer.Midi
         }
 
         public event EventHandler Tick;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                clock.Dispose();
+            }
+        }
     }
 }
