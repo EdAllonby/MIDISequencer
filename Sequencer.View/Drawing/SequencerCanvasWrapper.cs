@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using JetBrains.Annotations;
+using Sequencer.Visual;
 
 namespace Sequencer.View.Drawing
 {

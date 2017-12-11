@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace Sequencer.View.Control
+namespace Sequencer.Visual
 {
     public sealed class SelectedNotesEventArgs : EventArgs
     {

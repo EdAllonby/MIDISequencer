@@ -6,6 +6,7 @@ using System.Windows.Shapes;
 using JetBrains.Annotations;
 using Sequencer.Utilities;
 using Sequencer.ViewModel;
+using Sequencer.Visual;
 
 namespace Sequencer.View.Control.RadialContextMenu
 {

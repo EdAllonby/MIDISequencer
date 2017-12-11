@@ -6,6 +6,7 @@ using log4net;
 using Sequencer.Domain;
 using Sequencer.Shared;
 using Sequencer.Utilities;
+using Sequencer.Visual;
 
 namespace Sequencer.View.Drawing
 {

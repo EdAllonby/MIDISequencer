@@ -3,9 +3,8 @@ using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
-using Sequencer.View.Drawing;
 
-namespace Sequencer.View.Control
+namespace Sequencer.Visual
 {
     public sealed class VisualNote : IVisualNote
     {

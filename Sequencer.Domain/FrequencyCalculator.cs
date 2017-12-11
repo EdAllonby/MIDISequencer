@@ -3,18 +3,18 @@ using JetBrains.Annotations;
 
 namespace Sequencer.Domain
 {
-    public class FrequencyCalculator
+    public class FrequencyCalculator : IFrequencyCalculator
     {
         private const double TwelthRootOfTwo = 1.05946309;
         [NotNull] private readonly Pitch originPitch;
         [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         private readonly double standardFrequency;
 
-        public FrequencyCalculator([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] Pitch originPitch, double standardFrequency)
+        public FrequencyCalculator([NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
         {
             this.pitchAndPositionCalculator = pitchAndPositionCalculator;
-            this.originPitch = originPitch;
-            this.standardFrequency = standardFrequency;
+            originPitch = new Pitch(Note.A, 4);
+            standardFrequency = 440;
         }
 
         /// <summary>

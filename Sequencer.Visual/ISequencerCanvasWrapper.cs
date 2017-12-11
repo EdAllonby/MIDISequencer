@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using JetBrains.Annotations;
 
-namespace Sequencer.View.Drawing
+namespace Sequencer.Visual
 {
     public interface ISequencerCanvasWrapper
     {

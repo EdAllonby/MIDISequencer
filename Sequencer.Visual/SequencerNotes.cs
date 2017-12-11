@@ -7,7 +7,7 @@ using Sequencer.Domain;
 using Sequencer.Shared;
 using Sequencer.Utilities;
 
-namespace Sequencer.View.Control
+namespace Sequencer.Visual
 {
     /// <summary>
     /// The notes contained in the sequencer.
@@ -17,11 +17,11 @@ namespace Sequencer.View.Control
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(ISequencerNotes));
 
         [NotNull] [ItemNotNull] private readonly List<IVisualNote> notes = new List<IVisualNote>();
-        [NotNull] private readonly SequencerSettings sequencerSettings;
+        [NotNull] private readonly IMusicalSettings musicalSettings;
 
-        public SequencerNotes([NotNull] SequencerSettings sequencerSettings)
+        public SequencerNotes([NotNull] IMusicalSettings musicalSettings)
         {
-            this.sequencerSettings = sequencerSettings;
+            this.musicalSettings = musicalSettings;
         }
 
         public event EventHandler<SelectedNotesEventArgs> SelectedNotesChanged;
@@ -103,7 +103,16 @@ namespace Sequencer.View.Control
             return notes.FirstOrDefault(DoesPitchAndPositionMatchCurrentNoteEndingPosition(position, pitch));
         }
 
+        public IEnumerable<IVisualNote> FindNotesFromStartingPosition(IPosition position)
+        {
+            return notes.Where(DoesPositionMatchNoteStartingPosition(position));
+        }
 
+        public IEnumerable<IVisualNote> FindNotesFromEndingPosition(IPosition position)
+        {
+            return notes.Where(DoesPositionMatchNoteEndingPosition(position));
+        }
+        
         public IEnumerable<IVisualNote> FindAllOtherNotes(IEnumerable<IVisualNote> notesToIgnore)
         {
             return notes.Except(notesToIgnore);
@@ -115,21 +124,33 @@ namespace Sequencer.View.Control
         }
 
         [NotNull]
-        private static Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNote([NotNull] IPosition mousePosition, [NotNull] Pitch mousePitch)
+        private static Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNote([NotNull] IPosition position, [NotNull] Pitch pitch)
         {
-            return visualNote => visualNote != null && visualNote.StartPosition.IsLessThanOrEqual(mousePosition) && visualNote.EndPosition.IsGreaterThan(mousePosition) && visualNote.Pitch.Equals(mousePitch);
+            return visualNote => visualNote != null && visualNote.StartPosition.IsLessThanOrEqual(position) && visualNote.EndPosition.IsGreaterThan(position) && visualNote.Pitch.Equals(pitch);
         }
 
         [NotNull]
-        private static Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteStartingPosition([NotNull] IPosition mousePosition, [NotNull] Pitch mousePitch)
+        private static Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteStartingPosition([NotNull] IPosition position, [NotNull] Pitch pitch)
         {
-            return visualNote => visualNote != null && visualNote.StartPosition.Equals(mousePosition) && visualNote.Pitch.Equals(mousePitch);
+            return visualNote => visualNote != null && visualNote.StartPosition.Equals(position) && visualNote.Pitch.Equals(pitch);
         }
 
         [NotNull]
-        private Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteEndingPosition([NotNull] IPosition mousePosition, [NotNull] Pitch mousePitch)
+        private static Func<IVisualNote, bool> DoesPositionMatchNoteStartingPosition([NotNull] IPosition position)
         {
-            return visualNote => visualNote != null && visualNote.EndPosition.PreviousPosition(sequencerSettings.TimeSignature).Equals(mousePosition) && visualNote.Pitch.Equals(mousePitch);
+            return visualNote => visualNote != null && visualNote.StartPosition.Equals(position);
+        }
+
+        [NotNull]
+        private Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteEndingPosition([NotNull] IPosition position, [NotNull] Pitch pitch)
+        {
+            return visualNote => visualNote != null && visualNote.EndPosition.PreviousPosition(musicalSettings.TimeSignature).Equals(position) && visualNote.Pitch.Equals(pitch);
+        }
+        
+        [NotNull]
+        private Func<IVisualNote, bool> DoesPositionMatchNoteEndingPosition([NotNull] IPosition position)
+        {
+            return visualNote => visualNote != null && visualNote.EndPosition.Equals(position);
         }
     }
 }

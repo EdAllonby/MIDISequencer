@@ -3,8 +3,8 @@ using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
-using Sequencer.View.Control;
-using Sequencer.View.Input;
+using Sequencer.Visual;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Drawing
 {

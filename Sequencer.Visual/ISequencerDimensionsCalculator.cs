@@ -1,9 +1,8 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.View.Control;
-using Sequencer.View.Input;
+using Sequencer.Visual.Input;
 
-namespace Sequencer.View.Drawing
+namespace Sequencer.Visual
 {
     public interface ISequencerDimensionsCalculator
     {

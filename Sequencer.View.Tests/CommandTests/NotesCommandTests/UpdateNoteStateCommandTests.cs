@@ -4,7 +4,8 @@ using Moq;
 using NUnit.Framework;
 using Sequencer.View.Command.NotesCommand;
 using Sequencer.View.Control;
-using Sequencer.View.Input;
+using Sequencer.Visual;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
 {

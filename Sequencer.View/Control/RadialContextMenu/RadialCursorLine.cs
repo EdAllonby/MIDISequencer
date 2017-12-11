@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using JetBrains.Annotations;
-using Sequencer.View.Input;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Control.RadialContextMenu
 {

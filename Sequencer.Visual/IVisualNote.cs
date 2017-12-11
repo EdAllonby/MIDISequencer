@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
 
-namespace Sequencer.View.Control
+namespace Sequencer.Visual
 {
     public interface IVisualNote : IPositionAware
     {

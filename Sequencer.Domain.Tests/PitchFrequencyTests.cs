@@ -5,7 +5,7 @@ namespace Sequencer.Domain.Tests
     [TestFixture]
     internal class PitchFrequencyTests
     {
-        private readonly FrequencyCalculator calculator = new FrequencyCalculator(new PitchAndPositionCalculator(TimeSignature.FourFour), new Pitch(Note.A, 4), 440);
+        private readonly FrequencyCalculator calculator = new FrequencyCalculator(new PitchAndPositionCalculator());
 
         // Realistically, we're not going to hear a difference between a frequency of 330Hz and 330.01Hz.
         private const double Tolerance = 0.01;

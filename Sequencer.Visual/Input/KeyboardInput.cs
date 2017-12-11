@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Sequencer.View.Input
+namespace Sequencer.Visual.Input
 {
     public sealed class KeyboardInput : IEquatable<KeyboardInput>, IKeyboardInput
     {

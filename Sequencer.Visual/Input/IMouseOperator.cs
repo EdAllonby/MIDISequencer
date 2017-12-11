@@ -1,4 +1,4 @@
-﻿namespace Sequencer.View.Input
+﻿namespace Sequencer.Visual.Input
 {
     public interface IMouseOperator
     {

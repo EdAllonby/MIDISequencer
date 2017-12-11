@@ -91,6 +91,10 @@
       <Project>{F891ABD0-A37F-42A2-9B98-C1723D58CED3}</Project>
       <Name>Sequencer.View</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Visual\Sequencer.Visual.csproj">
+      <Project>{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}</Project>
+      <Name>Sequencer.Visual</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

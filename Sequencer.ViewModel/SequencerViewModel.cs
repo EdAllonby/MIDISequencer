@@ -129,15 +129,15 @@ namespace Sequencer.ViewModel
 
         public ICommand StopSequencer => new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
 
-        private void OnTick(object sender, EventArgs e)
+        private void OnTick(object sender, TickEventArgs e)
         {
-            if (clock.Ticks % (clock.TicksPerQuarterNote / 4) == 0)
+            if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
             {
                 IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(clock.Ticks);
                 dispatcher.DispatchToWpf(() => CurrentPosition = positionAtTick);
             }
         }
-
+        
         private bool CanExecuteStopCommand()
         {
             return SequencerPlayState != PlayState.Stop;

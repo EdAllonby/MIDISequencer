@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
 using JetBrains.Annotations;
 
-namespace Sequencer.View.Control
+namespace Sequencer.Visual
 {
     /// <summary>
     /// An element which is aware of its position.

@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-using Sequencer.View.Input;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Command.MousePointCommand
 {

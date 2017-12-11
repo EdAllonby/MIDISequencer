@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using JetBrains.Annotations;
 
-namespace Sequencer.View.Input
+namespace Sequencer.Visual.Input
 {
     public class MouseOperator : IMouseOperator
     {

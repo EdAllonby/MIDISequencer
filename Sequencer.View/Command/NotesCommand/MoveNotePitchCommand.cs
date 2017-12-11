@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Sequencer.View.Control;
+using Sequencer.Visual;
 
 namespace Sequencer.View.Command.NotesCommand
 {

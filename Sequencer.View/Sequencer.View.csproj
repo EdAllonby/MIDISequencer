@@ -64,6 +64,9 @@
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio, Version=1.8.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.3\lib\net35\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -105,41 +108,21 @@
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\DrawingUtilities.cs" />
-    <Compile Include="Control\IPositionAware.cs" />
-    <Compile Include="Control\ISequencerNotes.cs" />
-    <Compile Include="Control\IVisualNote.cs" />
-    <Compile Include="Control\IVisualNoteFactory.cs" />
     <Compile Include="Control\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Control\NoteState.cs" />
     <Compile Include="Control\RadialContextMenu\ContextMenuSegment.cs" />
     <Compile Include="Control\RadialContextMenu\NoteActionRadialContextMenuWrapper.cs" />
     <Compile Include="Control\RadialContextMenu\RadialContextMenu.cs" />
     <Compile Include="Control\RadialContextMenu\RadialCursorLine.cs" />
-    <Compile Include="Control\SelectedNotesEventArgs.cs" />
     <Compile Include="Control\SequencerControl.xaml.cs">
       <DependentUpon>SequencerControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Control\SequencerNotes.cs" />
-    <Compile Include="Control\VisualNote.cs" />
-    <Compile Include="Control\VisualNoteFactory.cs" />
     <Compile Include="Drawing\PositionIndicatorDrawer.cs" />
-    <Compile Include="Input\IMousePoint.cs" />
-    <Compile Include="Input\MousePoint.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteStartPositionFromInitialPointCommand.cs" />
     <Compile Include="Command\NotesCommand\IDeleteNotesCommand.cs" />
-    <Compile Include="Drawing\ISequencerCanvasWrapper.cs" />
-    <Compile Include="Drawing\ISequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerCanvasWrapper.cs" />
-    <Compile Include="Input\IKeyboardStateProcessor.cs" />
-    <Compile Include="Input\IKeyboardInput.cs" />
-    <Compile Include="Input\IMouseOperator.cs" />
-    <Compile Include="Input\IMouseStateProcessor.cs" />
-    <Compile Include="Input\KeyboardInput.cs" />
-    <Compile Include="Input\KeyboardStateProcessor.cs" />
-    <Compile Include="Input\MouseOperator.cs" />
     <Compile Include="Command\NotesCommand\DecrementVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\IncrementVelocityCommand.cs" />
     <Compile Include="Command\NotesCommand\ChangeVelocityCommand.cs" />
@@ -157,7 +140,6 @@
     <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromInitialPointCommand.cs" />
     <Compile Include="Console\ConsoleManager.cs" />
-    <Compile Include="Input\MouseStateProcessor.cs" />
     <Compile Include="Drawing\SequencerDimensionsCalculator.cs" />
     <Compile Include="Drawing\SequencerDrawer.cs" />
     <Compile Include="Command\SequencerKeyPressCommandHandler.cs" />
@@ -181,7 +163,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\NoteDrawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -216,6 +197,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sequencer.Audio\Sequencer.Audio.csproj">
+      <Project>{A4DD60B7-A760-4871-BCCA-B2FA604F8A28}</Project>
+      <Name>Sequencer.Audio</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
       <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
       <Name>Sequencer.Domain</Name>
@@ -235,6 +220,10 @@
     <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj">
       <Project>{68A8D4A6-B8EE-4684-8F1B-21B686014069}</Project>
       <Name>Sequencer.ViewModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sequencer.Visual\Sequencer.Visual.csproj">
+      <Project>{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}</Project>
+      <Name>Sequencer.Visual</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

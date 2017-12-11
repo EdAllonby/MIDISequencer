@@ -2,8 +2,8 @@
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Control;
-using Sequencer.View.Input;
+using Sequencer.Visual;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Command
 {
@@ -55,8 +55,7 @@ namespace Sequencer.View.Command
         private static void Handle([NotNull] KeyboardInput input,
             [NotNull] IDictionary<KeyboardInput, INotesCommand> noteCommands, [NotNull] IEnumerable<IVisualNote> notesToExecute)
         {
-            INotesCommand noteCommand;
-            noteCommands.TryGetValue(input, out noteCommand);
+            noteCommands.TryGetValue(input, out INotesCommand noteCommand);
             noteCommand?.Execute(notesToExecute);
         }
     }

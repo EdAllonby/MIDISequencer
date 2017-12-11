@@ -14,8 +14,18 @@ namespace Sequencer.Midi
         void Stop();
         void Pause();
 
-
         event EventHandler Started;
-        event EventHandler Tick;
+
+        event EventHandler<TickEventArgs> Tick;
+    }
+
+    public sealed class TickEventArgs : EventArgs
+    {
+        public int CurrentTick { get; }
+
+        public TickEventArgs(int currentTick)
+        {
+            CurrentTick = currentTick;
+        }
     }
 }

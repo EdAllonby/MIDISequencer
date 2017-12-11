@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Sequencer.View.Input
+namespace Sequencer.Visual.Input
 {
     public class MousePoint : IMousePoint
     {

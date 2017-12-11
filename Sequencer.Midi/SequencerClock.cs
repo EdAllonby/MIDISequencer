@@ -33,7 +33,7 @@ namespace Sequencer.Midi
                 clock.Start();
             }
 
-            Tick?.Invoke(this, e);
+            Tick?.Invoke(this, new TickEventArgs(Ticks));
         }
 
         public int Ticks
@@ -57,13 +57,13 @@ namespace Sequencer.Midi
             clock.Stop();
             clock.SetTicks(0);
 
-            Tick?.Invoke(this, EventArgs.Empty);
+            Tick?.Invoke(this, new TickEventArgs(Ticks));
         }
 
         public void Pause()
         {
             clock.Stop();
-            Tick?.Invoke(this, EventArgs.Empty);
+            Tick?.Invoke(this, new TickEventArgs(Ticks));
         }
 
         public int TicksPerQuarterNote
@@ -78,7 +78,7 @@ namespace Sequencer.Midi
             remove => clock.Started += value;
         }
 
-        public event EventHandler Tick;
+        public event EventHandler<TickEventArgs> Tick;
 
         public void Dispose()
         {

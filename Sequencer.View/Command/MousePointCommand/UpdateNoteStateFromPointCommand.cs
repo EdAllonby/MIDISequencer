@@ -2,9 +2,9 @@
 using JetBrains.Annotations;
 using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Control;
 using Sequencer.View.Drawing;
-using Sequencer.View.Input;
+using Sequencer.Visual;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Command.MousePointCommand
 {

@@ -1,4 +1,4 @@
-﻿namespace Sequencer.View.Control
+﻿namespace Sequencer.Visual
 {
     /// <summary>
     /// The states a note can be in.

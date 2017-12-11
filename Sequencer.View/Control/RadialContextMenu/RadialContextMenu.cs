@@ -8,8 +8,8 @@ using System.Windows.Shapes;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Utilities;
-using Sequencer.View.Input;
 using Sequencer.ViewModel;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Control.RadialContextMenu
 {

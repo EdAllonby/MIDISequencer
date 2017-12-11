@@ -7,9 +7,8 @@ using log4net;
 using Sequencer.Domain;
 using Sequencer.Shared;
 using Sequencer.Utilities;
-using Sequencer.View.Control;
 
-namespace Sequencer.View.Drawing
+namespace Sequencer.Visual
 {
     public sealed class NoteDrawer
     {

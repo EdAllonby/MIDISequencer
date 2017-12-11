@@ -10,9 +10,10 @@ namespace Sequencer.Domain
         private const int NotesPerOctave = 12;
         [NotNull] private readonly TimeSignature timeSignature;
 
-        public PitchAndPositionCalculator([NotNull] TimeSignature timeSignature)
+        public PitchAndPositionCalculator()
         {
-            this.timeSignature = timeSignature;
+            // TODO: Inject
+            this.timeSignature = new TimeSignature(4,4);
         }
 
         /// <summary>

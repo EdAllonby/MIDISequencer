@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
-namespace Sequencer.View.Control
+namespace Sequencer.Visual
 {
     public interface ISequencerNotes
     {
@@ -62,7 +62,15 @@ namespace Sequencer.View.Control
         [NotNull]
         [ItemNotNull]
         IEnumerable<IVisualNote> FindAllOtherNotes([NotNull] IEnumerable<IVisualNote> notesToIgnore);
+        
+        [NotNull]
+        [ItemNotNull]
+        IEnumerable<IVisualNote> FindNotesFromStartingPosition([NotNull] IPosition position);
 
+        [NotNull]
+        [ItemNotNull]
+        IEnumerable<IVisualNote> FindNotesFromEndingPosition([NotNull] IPosition position);
+        
         void NoteStateChanged();
     }
 }

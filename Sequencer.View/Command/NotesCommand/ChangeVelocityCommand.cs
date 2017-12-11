@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.View.Control;
+using Sequencer.Visual;
 
 namespace Sequencer.View.Command.NotesCommand
 {

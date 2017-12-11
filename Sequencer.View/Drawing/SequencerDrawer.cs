@@ -9,7 +9,7 @@ using Sequencer.Domain;
 using Sequencer.Midi;
 using Sequencer.Shared;
 using Sequencer.Utilities;
-using Sequencer.View.Control;
+using Sequencer.Visual;
 
 namespace Sequencer.View.Drawing
 {

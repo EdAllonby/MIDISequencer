@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="EnumerableType.cs" />
     <Compile Include="FrequencyCalculator.cs" />
+    <Compile Include="IFrequencyCalculator.cs" />
     <Compile Include="IGreaterThanOrEqualComparable.cs" />
     <Compile Include="ILessThanOrEqualComparable.cs" />
     <Compile Include="IPitchAndPositionCalculator.cs" />

@@ -5,7 +5,7 @@ using Sequencer.Audio.Calculator;
 
 namespace Sequencer.Audio
 {
-    public sealed class SignalProvider : WaveProvider32
+    public sealed class SignalProvider : WaveProvider32, ISignalProvider
     {
         [NotNull] private readonly EnvelopeGenerator envelope = new EnvelopeGenerator();
         [NotNull] private readonly IWaveformCalculator waveformCalculator;

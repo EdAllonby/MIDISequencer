@@ -6,7 +6,8 @@ using System.Windows.Media;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Utilities;
-using Sequencer.View.Input;
+using Sequencer.Visual;
+using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Control
 {
