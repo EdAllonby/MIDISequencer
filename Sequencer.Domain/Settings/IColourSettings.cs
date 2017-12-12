@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace Sequencer.Shared
+namespace Sequencer.Domain.Settings
 {
     public interface IColourSettings
     {

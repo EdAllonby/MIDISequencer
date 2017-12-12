@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 
 namespace Sequencer.Midi
 {
@@ -11,7 +11,6 @@ namespace Sequencer.Midi
 
         public TickCalculator([NotNull] IMusicalSettings musicalSettings)
         {
-            // TODO: Inject
             timeSignature = musicalSettings.TimeSignature;
             quarterNoteResolution = musicalSettings.TicksPerQuarterNote;
         }

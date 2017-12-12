@@ -2,12 +2,13 @@
 using JetBrains.Annotations;
 using NAudio.Wave;
 using Sequencer.Domain;
+using Sequencer.Domain.Settings;
 using Sequencer.Midi;
-using Sequencer.Shared;
 using Sequencer.Visual;
 
 namespace Sequencer.Audio
 {
+    [UsedImplicitly]
     public sealed class SequencerPlayer
     {
         [NotNull] private readonly Dictionary<IVisualNote, WaveOut> currentWaveOuts = new Dictionary<IVisualNote, WaveOut>();
@@ -26,7 +27,7 @@ namespace Sequencer.Audio
             sequencerClock.Tick += OnTick;
         }
 
-        private void OnTick(object sender, TickEventArgs e)
+        private void OnTick(object sender, [NotNull] TickEventArgs e)
         {
             var positionFromTick = new TickCalculator(musicalSettings);
             IPosition currentPosition = positionFromTick.CalculatePositionFromTick(e.CurrentTick);
@@ -35,7 +36,7 @@ namespace Sequencer.Audio
             StopNotes(currentPosition);
         }
 
-        private void PlayNotes(IPosition currentPosition)
+        private void PlayNotes([NotNull] IPosition currentPosition)
         {
             IEnumerable<IVisualNote> notesAtStartPosition = sequencerNotes.FindNotesFromStartingPosition(currentPosition);
 
@@ -53,7 +54,7 @@ namespace Sequencer.Audio
             }
         }
 
-        private void StopNotes(IPosition currentPosition)
+        private void StopNotes([NotNull] IPosition currentPosition)
         {
             IEnumerable<IVisualNote> notesAtEndPosition = sequencerNotes.FindNotesFromEndingPosition(currentPosition);
 

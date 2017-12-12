@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
-using Sequencer.Domain;
 
-namespace Sequencer.Shared
+namespace Sequencer.Domain.Settings
 {
     public interface IMusicalSettings
     {

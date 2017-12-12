@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 using Sequencer.View.Drawing;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;

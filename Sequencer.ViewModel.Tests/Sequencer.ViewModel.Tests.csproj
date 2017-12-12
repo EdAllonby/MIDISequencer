@@ -78,10 +78,6 @@
       <Project>{8ADB7C17-3648-4992-AAD4-C0E6D8B1D23B}</Project>
       <Name>Sequencer.Midi</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Shared\Sequencer.Shared.csproj">
-      <Project>{538D9626-9A18-4F76-BBD5-93495D794060}</Project>
-      <Name>Sequencer.Shared</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj">
       <Project>{68A8D4A6-B8EE-4684-8F1B-21B686014069}</Project>
       <Name>Sequencer.ViewModel</Name>

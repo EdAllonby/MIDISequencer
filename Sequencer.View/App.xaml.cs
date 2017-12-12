@@ -10,8 +10,8 @@ using log4net.Config;
 using Microsoft.Practices.ServiceLocation;
 using Sequencer.Audio;
 using Sequencer.Domain;
+using Sequencer.Domain.Settings;
 using Sequencer.Midi;
-using Sequencer.Shared;
 using Sequencer.View.Console;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
@@ -46,15 +46,11 @@ namespace Sequencer.View
             {
                 // ReSharper disable PossibleNullReferenceException
                 builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
-                builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings>().SingleInstance();
+                builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings, IAudioSettings>().SingleInstance();
                 builder.RegisterType<TickCalculator>().As<ITickCalculator>().SingleInstance();
                 builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
-
                 builder.RegisterType<PitchAndPositionCalculator>().As<IPitchAndPositionCalculator>().SingleInstance();
-
                 builder.RegisterType<FrequencyCalculator>().As<IFrequencyCalculator>().SingleInstance();
-
-
                 builder.RegisterType<SignalProviderFactory>().As<ISignalProviderFactory>().SingleInstance();
                 builder.RegisterType<SequencerNotes>().As<ISequencerNotes>().SingleInstance();
                 builder.RegisterType<SequencerPlayer>().SingleInstance();
@@ -67,7 +63,7 @@ namespace Sequencer.View
                 throw;
             }
             IContainer container = builder.Build();
-            SequencerPlayer player = container.Resolve<SequencerPlayer>();
+            container.Resolve<SequencerPlayer>();
             ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));
         }
 

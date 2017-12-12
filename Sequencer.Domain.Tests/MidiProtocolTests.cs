@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Sequencer.Domain.Settings;
 using Sequencer.Midi;
 
 namespace Sequencer.Domain.Tests
@@ -6,7 +7,7 @@ namespace Sequencer.Domain.Tests
     [TestFixture]
     internal class MidiProtocolTests
     {
-        private readonly IDigitalAudioProtocol protocol = new MidiProtocol(new PitchAndPositionCalculator());
+        private readonly IDigitalAudioProtocol protocol = new MidiProtocol(new PitchAndPositionCalculator(new SequencerSettings()));
 
         private static readonly object[] PitchMidiNumberCases =
         {

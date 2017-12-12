@@ -1,8 +1,8 @@
 ﻿using System.Windows.Media;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Domain.Settings;
 using Sequencer.Midi;
-using Sequencer.Shared;
 
 namespace Sequencer.Visual
 {

@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 using Sequencer.Utilities;
 
 namespace Sequencer.Visual

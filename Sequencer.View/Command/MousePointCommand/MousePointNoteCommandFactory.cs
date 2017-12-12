@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using log4net;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
 using Sequencer.View.Drawing;

@@ -1,7 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Sequencer.Domain;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 
 namespace Sequencer.Midi.Tests
 {

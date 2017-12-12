@@ -39,16 +39,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IColourSettings.cs" />
-    <Compile Include="IMusicalSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SequencerSettings.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
-      <Project>{2F107EEB-5405-4D9A-A21E-866FBD9E697B}</Project>
-      <Name>Sequencer.Domain</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using Sanford.Multimedia.Midi;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 
 namespace Sequencer.Midi
 {

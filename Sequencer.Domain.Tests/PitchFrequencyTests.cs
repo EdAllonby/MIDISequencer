@@ -1,11 +1,12 @@
 ﻿using NUnit.Framework;
+using Sequencer.Domain.Settings;
 
 namespace Sequencer.Domain.Tests
 {
     [TestFixture]
     internal class PitchFrequencyTests
     {
-        private readonly FrequencyCalculator calculator = new FrequencyCalculator(new PitchAndPositionCalculator());
+        private readonly FrequencyCalculator calculator = new FrequencyCalculator(new PitchAndPositionCalculator(new SequencerSettings()));
 
         // Realistically, we're not going to hear a difference between a frequency of 330Hz and 330.01Hz.
         private const double Tolerance = 0.01;

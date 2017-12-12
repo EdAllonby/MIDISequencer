@@ -1,12 +1,11 @@
 ﻿using System.Windows.Media;
-using Sequencer.Domain;
 
-namespace Sequencer.Shared
+namespace Sequencer.Domain.Settings
 {
     /// <summary>
     /// Holds the sequencer's currently assigned settings.
     /// </summary>
-    public sealed class SequencerSettings : IColourSettings, IMusicalSettings
+    public sealed class SequencerSettings : IColourSettings, IMusicalSettings, IAudioSettings
     {
         // Colour definitions
         public Color AccidentalKeyColour => Colors.Gray;
@@ -25,5 +24,8 @@ namespace Sequencer.Shared
         public Pitch LowestPitch => new Pitch(Note.A, 2);
         public TimeSignature TimeSignature => TimeSignature.FourFour;
         public int TicksPerQuarterNote => 96;
+
+        // Audio definitions
+        public int SampleRate => 44100;
     }
 }

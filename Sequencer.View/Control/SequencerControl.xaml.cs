@@ -6,8 +6,8 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using Microsoft.Practices.ServiceLocation;
 using Sequencer.Domain;
+using Sequencer.Domain.Settings;
 using Sequencer.Midi;
-using Sequencer.Shared;
 using Sequencer.View.Command;
 using Sequencer.View.Command.MousePointCommand;
 using Sequencer.View.Command.NotesCommand;
@@ -56,8 +56,9 @@ namespace Sequencer.View.Control
 
             SizeChanged += SequencerSizeChanged;
             notes = ServiceLocator.Current.GetInstance<ISequencerNotes>();
-
             notes.SelectedNotesChanged += SelectedNotesChanged;
+
+            pitchAndPositionCalculator = ServiceLocator.Current.GetInstance<IPitchAndPositionCalculator>();
 
             if (SequencerCanvas == null)
             {
@@ -65,7 +66,7 @@ namespace Sequencer.View.Control
             }
 
             ISequencerCanvasWrapper sequencerCanvasWrapper = new SequencerCanvasWrapper(SequencerCanvas);
-            pitchAndPositionCalculator = new PitchAndPositionCalculator();
+
             IDigitalAudioProtocol protocol = new MidiProtocol(pitchAndPositionCalculator);
 
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(protocol, sequencerCanvasWrapper, sequencerSettings, pitchAndPositionCalculator);

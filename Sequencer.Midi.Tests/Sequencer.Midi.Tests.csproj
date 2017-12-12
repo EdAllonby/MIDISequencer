@@ -49,7 +49,6 @@
       <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
@@ -64,10 +63,6 @@
     <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj">
       <Project>{8ADB7C17-3648-4992-AAD4-C0E6D8B1D23B}</Project>
       <Name>Sequencer.Midi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Shared\Sequencer.Shared.csproj">
-      <Project>{538D9626-9A18-4F76-BBD5-93495D794060}</Project>
-      <Name>Sequencer.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

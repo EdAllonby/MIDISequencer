@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Sequencer.Domain.Settings;
 
 namespace Sequencer.Domain
 {
@@ -10,10 +11,9 @@ namespace Sequencer.Domain
         private const int NotesPerOctave = 12;
         [NotNull] private readonly TimeSignature timeSignature;
 
-        public PitchAndPositionCalculator()
+        public PitchAndPositionCalculator([NotNull] IMusicalSettings musicalSettings)
         {
-            // TODO: Inject
-            this.timeSignature = new TimeSignature(4,4);
+            timeSignature = musicalSettings.TimeSignature;
         }
 
         /// <summary>

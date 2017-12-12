@@ -1,6 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Sequencer.Shared;
+using Sequencer.Domain.Settings;
 using Sequencer.View.Command.MousePointCommand;
 using Sequencer.View.Control;
 using Sequencer.View.Drawing;
