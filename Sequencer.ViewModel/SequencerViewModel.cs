@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -18,8 +17,7 @@ namespace Sequencer.ViewModel
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly IWpfDispatcher dispatcher;
         [NotNull] private readonly ITickCalculator tickCalculator;
-        private IPosition currentPosition;
-
+        [NotNull] private IPosition currentPosition = new Position(1, 1, 1);
         [NotNull] private NoteAction noteAction = NoteAction.Create;
         [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
         [CanBeNull] private object selectedObject;
@@ -56,11 +54,7 @@ namespace Sequencer.ViewModel
         [NotNull]
         public string Information
         {
-            [NotNull]
-            get
-            {
-                return $"Note Action {NoteAction}, {sequencerPlayState}";
-            }
+            [NotNull] get { return $"Note Action {NoteAction}, {sequencerPlayState}"; }
         }
 
         [NotNull]
@@ -129,7 +123,7 @@ namespace Sequencer.ViewModel
 
         public ICommand StopSequencer => new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
 
-        private void OnTick(object sender, TickEventArgs e)
+        private void OnTick(object sender, [NotNull] TickEventArgs e)
         {
             if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
             {
@@ -137,7 +131,7 @@ namespace Sequencer.ViewModel
                 dispatcher.DispatchToWpf(() => CurrentPosition = positionAtTick);
             }
         }
-        
+
         private bool CanExecuteStopCommand()
         {
             return SequencerPlayState != PlayState.Stop;

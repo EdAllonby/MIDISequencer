@@ -6,8 +6,8 @@ namespace Sequencer.Midi
 {
     public class TickCalculator : ITickCalculator
     {
-        [NotNull] private readonly TimeSignature timeSignature;
         private readonly int quarterNoteResolution;
+        [NotNull] private readonly TimeSignature timeSignature;
 
         public TickCalculator([NotNull] IMusicalSettings musicalSettings)
         {
@@ -19,7 +19,7 @@ namespace Sequencer.Midi
         {
             int currentBeat = (tick + quarterNoteResolution) / quarterNoteResolution;
 
-            var wrappedTick = tick % quarterNoteResolution;
+            int wrappedTick = tick % quarterNoteResolution;
             return Position.PositionFromBeat(currentBeat, wrappedTick, timeSignature);
         }
     }

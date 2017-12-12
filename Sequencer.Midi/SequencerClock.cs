@@ -10,10 +10,8 @@ namespace Sequencer.Midi
     /// </summary>
     public class SequencerClock : ISequencerClock, IDisposable
     {
-        private readonly int totalTicks;
         [NotNull] private readonly MidiInternalClock clock = new MidiInternalClock();
-
-        public int Tempo => clock.Tempo;
+        private readonly int totalTicks;
 
         public SequencerClock([NotNull] IMusicalSettings musicalSettings)
         {
@@ -25,16 +23,13 @@ namespace Sequencer.Midi
             clock.Tick += OnTick;
         }
 
-        private void OnTick(object sender, EventArgs e)
+        public void Dispose()
         {
-            if (Ticks == totalTicks)
-            {
-                clock.SetTicks(0);
-                clock.Start();
-            }
-
-            Tick?.Invoke(this, new TickEventArgs(Ticks));
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        public int Tempo => clock.Tempo;
 
         public int Ticks
         {
@@ -80,10 +75,15 @@ namespace Sequencer.Midi
 
         public event EventHandler<TickEventArgs> Tick;
 
-        public void Dispose()
+        private void OnTick(object sender, EventArgs e)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            if (Ticks == totalTicks)
+            {
+                clock.SetTicks(0);
+                clock.Start();
+            }
+
+            Tick?.Invoke(this, new TickEventArgs(Ticks));
         }
 
         protected virtual void Dispose(bool disposing)

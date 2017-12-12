@@ -54,7 +54,7 @@ namespace Sequencer.View
                 builder.RegisterType<SignalProviderFactory>().As<ISignalProviderFactory>().SingleInstance();
                 builder.RegisterType<SequencerNotes>().As<ISequencerNotes>().SingleInstance();
                 builder.RegisterType<SequencerPlayer>().SingleInstance();
-                builder.RegisterType<SequencerViewModel>().SingleInstance();         
+                builder.RegisterType<SequencerViewModel>().SingleInstance();
                 // ReSharper restore PossibleNullReferenceException
             }
             catch (Exception e)

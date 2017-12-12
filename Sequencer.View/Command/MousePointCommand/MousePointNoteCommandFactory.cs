@@ -4,7 +4,6 @@ using log4net;
 using Sequencer.Domain.Settings;
 using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Drawing;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;

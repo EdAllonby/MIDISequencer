@@ -8,8 +8,8 @@ namespace Sequencer.Audio
 {
     public class SignalProviderFactory : ISignalProviderFactory
     {
-        private readonly int sampleRate;
         [NotNull] private readonly IFrequencyCalculator frequencyCalculator;
+        private readonly int sampleRate;
 
         public SignalProviderFactory([NotNull] IAudioSettings audioSettings, [NotNull] IFrequencyCalculator frequencyCalculator)
         {

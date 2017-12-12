@@ -15,9 +15,9 @@ namespace Sequencer.Visual
     public class SequencerNotes : ISequencerNotes
     {
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(ISequencerNotes));
+        [NotNull] private readonly IMusicalSettings musicalSettings;
 
         [NotNull] [ItemNotNull] private readonly List<IVisualNote> notes = new List<IVisualNote>();
-        [NotNull] private readonly IMusicalSettings musicalSettings;
 
         public SequencerNotes([NotNull] IMusicalSettings musicalSettings)
         {
@@ -112,7 +112,7 @@ namespace Sequencer.Visual
         {
             return notes.Where(DoesPositionMatchNoteEndingPosition(position));
         }
-        
+
         public IEnumerable<IVisualNote> FindAllOtherNotes(IEnumerable<IVisualNote> notesToIgnore)
         {
             return notes.Except(notesToIgnore);
@@ -146,7 +146,7 @@ namespace Sequencer.Visual
         {
             return visualNote => visualNote != null && visualNote.EndPosition.PreviousPosition(musicalSettings.TimeSignature).Equals(position) && visualNote.Pitch.Equals(pitch);
         }
-        
+
         [NotNull]
         private Func<IVisualNote, bool> DoesPositionMatchNoteEndingPosition([NotNull] IPosition position)
         {

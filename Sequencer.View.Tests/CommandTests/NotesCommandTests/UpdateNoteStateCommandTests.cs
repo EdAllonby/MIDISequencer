@@ -3,7 +3,6 @@ using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Control;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
 

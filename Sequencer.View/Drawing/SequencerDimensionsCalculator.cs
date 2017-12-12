@@ -15,7 +15,7 @@ namespace Sequencer.View.Drawing
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
 
-        public SequencerDimensionsCalculator([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerCanvasWrapper sequencerCanvas, 
+        public SequencerDimensionsCalculator([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerCanvasWrapper sequencerCanvas,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator)
         {
             this.protocol = protocol;
@@ -23,6 +23,8 @@ namespace Sequencer.View.Drawing
             this.sequencerSettings = sequencerSettings;
             this.pitchAndPositionCalculator = pitchAndPositionCalculator;
         }
+
+        public double TickWidth => BeatWidth / sequencerSettings.TicksPerQuarterNote;
 
         /// <summary>
         /// The note heights the sequencer should display.
@@ -46,8 +48,6 @@ namespace Sequencer.View.Drawing
 
         public double SixteenthNoteWidth => BeatWidth / 4;
 
-        public double TickWidth => BeatWidth / sequencerSettings.TicksPerQuarterNote;
-
         public bool IsPointInsideNote(ISequencerNotes sequencerNotes, IMousePoint mousePoint)
         {
             return FindNoteFromPoint(sequencerNotes, mousePoint) != null;
@@ -61,7 +61,7 @@ namespace Sequencer.View.Drawing
 
         public double GetPointFromPosition(IPosition position)
         {
-            var beatPosition = position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth - BeatWidth;
+            double beatPosition = position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth - BeatWidth;
             return TickWidth * position.Ticks + beatPosition;
         }
 

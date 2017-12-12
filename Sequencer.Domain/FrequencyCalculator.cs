@@ -22,7 +22,7 @@ namespace Sequencer.Domain
         /// </summary>
         /// <param name="pitch">The pitch to find the frequency of.</param>
         /// <returns>the frequency of the given pitch in hertz.</returns>
-        public double PitchFrequency([NotNull] Pitch pitch)
+        public double PitchFrequency(Pitch pitch)
         {
             int halfStepsFromOrigin = pitchAndPositionCalculator.FindStepsFromPitches(originPitch, pitch);
 

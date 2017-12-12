@@ -21,11 +21,11 @@ namespace Sequencer.Midi
 
     public sealed class TickEventArgs : EventArgs
     {
-        public int CurrentTick { get; }
-
         public TickEventArgs(int currentTick)
         {
             CurrentTick = currentTick;
         }
+
+        public int CurrentTick { get; }
     }
 }

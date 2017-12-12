@@ -62,7 +62,7 @@ namespace Sequencer.Visual
         [NotNull]
         [ItemNotNull]
         IEnumerable<IVisualNote> FindAllOtherNotes([NotNull] IEnumerable<IVisualNote> notesToIgnore);
-        
+
         [NotNull]
         [ItemNotNull]
         IEnumerable<IVisualNote> FindNotesFromStartingPosition([NotNull] IPosition position);
@@ -70,7 +70,7 @@ namespace Sequencer.Visual
         [NotNull]
         [ItemNotNull]
         IEnumerable<IVisualNote> FindNotesFromEndingPosition([NotNull] IPosition position);
-        
+
         void NoteStateChanged();
     }
 }

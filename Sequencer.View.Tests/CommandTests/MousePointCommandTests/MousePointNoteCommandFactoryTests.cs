@@ -2,8 +2,6 @@
 using NUnit.Framework;
 using Sequencer.Domain.Settings;
 using Sequencer.View.Command.MousePointCommand;
-using Sequencer.View.Control;
-using Sequencer.View.Drawing;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;

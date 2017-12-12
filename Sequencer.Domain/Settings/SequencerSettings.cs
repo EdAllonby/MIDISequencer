@@ -7,6 +7,9 @@ namespace Sequencer.Domain.Settings
     /// </summary>
     public sealed class SequencerSettings : IColourSettings, IMusicalSettings, IAudioSettings
     {
+        // Audio definitions
+        public int SampleRate => 44100;
+
         // Colour definitions
         public Color AccidentalKeyColour => Colors.Gray;
 
@@ -19,13 +22,11 @@ namespace Sequencer.Domain.Settings
 
         // Musical definitions
         public int TotalNotes => 32;
+
         public int TotalMeasures => 1;
         public Velocity DefaultVelocity => new Velocity(64);
         public Pitch LowestPitch => new Pitch(Note.A, 2);
         public TimeSignature TimeSignature => TimeSignature.FourFour;
         public int TicksPerQuarterNote => 96;
-
-        // Audio definitions
-        public int SampleRate => 44100;
     }
 }

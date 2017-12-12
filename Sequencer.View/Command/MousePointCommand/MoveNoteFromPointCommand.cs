@@ -2,7 +2,6 @@
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.View.Command.NotesCommand;
-using Sequencer.View.Drawing;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
 

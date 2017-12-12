@@ -56,7 +56,7 @@ namespace Sequencer.Audio
             }
         }
 
-        public override int Read([NotNull] float[] buffer, int offset, int sampleCount)
+        public override int Read(float[] buffer, int offset, int sampleCount)
         {
             if (WaveFormat != null)
             {

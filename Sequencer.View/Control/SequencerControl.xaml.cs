@@ -15,6 +15,7 @@ using Sequencer.View.Drawing;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
+// ReSharper disable AssignNullToNotNullAttribute
 
 namespace Sequencer.View.Control
 {
@@ -55,10 +56,13 @@ namespace Sequencer.View.Control
             InitializeComponent();
 
             SizeChanged += SequencerSizeChanged;
+
+            // ReSharper disable PossibleNullReferenceException
             notes = ServiceLocator.Current.GetInstance<ISequencerNotes>();
             notes.SelectedNotesChanged += SelectedNotesChanged;
 
             pitchAndPositionCalculator = ServiceLocator.Current.GetInstance<IPitchAndPositionCalculator>();
+            // ReSharper restore PossibleNullReferenceException
 
             if (SequencerCanvas == null)
             {

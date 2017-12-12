@@ -7,6 +7,5 @@ namespace Sequencer.Audio
     {
         [NotNull]
         ISignalProvider CreateSignalProvider([NotNull] IVisualNote visualNote);
-
     }
 }

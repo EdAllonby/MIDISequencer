@@ -12,9 +12,9 @@ namespace Sequencer.Audio
     public sealed class SequencerPlayer
     {
         [NotNull] private readonly Dictionary<IVisualNote, WaveOut> currentWaveOuts = new Dictionary<IVisualNote, WaveOut>();
-        [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
-        [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly IMusicalSettings musicalSettings;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
 
         public SequencerPlayer([NotNull] ISignalProviderFactory signalProviderFactory,
             [NotNull] ISequencerNotes sequencerNotes, [NotNull] ISequencerClock sequencerClock,

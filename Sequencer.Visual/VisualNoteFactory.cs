@@ -7,10 +7,10 @@ namespace Sequencer.Visual
 {
     public class VisualNoteFactory : IVisualNoteFactory
     {
+        [NotNull] private readonly IDigitalAudioProtocol protocol;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvasWrapper;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        [NotNull] private readonly IDigitalAudioProtocol protocol;
 
         public VisualNoteFactory([NotNull] SequencerSettings sequencerSettings, [NotNull] IDigitalAudioProtocol protocol,
             [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] ISequencerCanvasWrapper sequencerCanvasWrapper)
