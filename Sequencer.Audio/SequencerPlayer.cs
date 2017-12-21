@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using NAudio.Wave;
 using Sequencer.Domain;
@@ -25,6 +26,15 @@ namespace Sequencer.Audio
             this.musicalSettings = musicalSettings;
 
             sequencerClock.Tick += OnTick;
+            sequencerClock.Stopped += OnClockStopped;
+        }
+
+        private void OnClockStopped(object sender, EventArgs e)
+        {
+            foreach (IVisualNote note in sequencerNotes.AllNotes)
+            {
+                StopNote(note);
+            }
         }
 
         private void OnTick(object sender, [NotNull] TickEventArgs e)
@@ -44,6 +54,7 @@ namespace Sequencer.Audio
             {
                 ISignalProvider signalProvider = signalProviderFactory.CreateSignalProvider(noteAtStartPosition);
                 signalProvider.NoteState = true;
+
                 if (!currentWaveOuts.ContainsKey(noteAtStartPosition))
                 {
                     var waveOut = new WaveOut();
@@ -60,13 +71,18 @@ namespace Sequencer.Audio
 
             foreach (IVisualNote noteAtEndPosition in notesAtEndPosition)
             {
-                bool didFind = currentWaveOuts.TryGetValue(noteAtEndPosition, out WaveOut value);
+                StopNote(noteAtEndPosition);
+            }
+        }
 
-                if (didFind)
-                {
-                    value.Stop();
-                    currentWaveOuts.Remove(noteAtEndPosition);
-                }
+        private void StopNote([NotNull] IVisualNote noteAtEndPosition)
+        {
+            bool didFind = currentWaveOuts.TryGetValue(noteAtEndPosition, out WaveOut value);
+
+            if (didFind)
+            {
+                value.Stop();
+                currentWaveOuts.Remove(noteAtEndPosition);
             }
         }
     }

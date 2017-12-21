@@ -18,6 +18,7 @@ namespace Sequencer.Visual
         /// All the notes in the sequencer.
         /// </summary>
         [NotNull]
+        [ItemNotNull]
         IEnumerable<IVisualNote> AllNotes { get; }
 
         event EventHandler<SelectedNotesEventArgs> SelectedNotesChanged;

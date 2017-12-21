@@ -73,6 +73,12 @@ namespace Sequencer.Midi
             remove => clock.Started += value;
         }
 
+        public event EventHandler Stopped
+        {
+            add => clock.Stopped += value;
+            remove => clock.Stopped += value;
+        }
+
         public event EventHandler<TickEventArgs> Tick;
 
         private void OnTick(object sender, EventArgs e)
