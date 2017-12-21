@@ -15,6 +15,7 @@ using Sequencer.View.Drawing;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
+
 // ReSharper disable AssignNullToNotNullAttribute
 
 namespace Sequencer.View.Control
@@ -112,6 +113,7 @@ namespace Sequencer.View.Control
             {
                 throw new NullReferenceException($"{nameof(DragSelectionBox)} is null.");
             }
+
             if (NoteAction == null)
             {
                 throw new NullReferenceException($"{nameof(NoteAction)} is null.");

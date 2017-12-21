@@ -36,6 +36,7 @@ namespace Sequencer.Domain
             {
                 return false;
             }
+
             if (ReferenceEquals(this, other))
             {
                 return true;

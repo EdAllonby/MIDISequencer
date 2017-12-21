@@ -33,10 +33,7 @@ namespace Sequencer.Visual
                 StrokeThickness = 0.5
             };
 
-            velocityRectangle = new Rectangle
-            {
-                Fill = new SolidColorBrush(sequencerSettings.LineColour)
-            };
+            velocityRectangle = new Rectangle { Fill = new SolidColorBrush(sequencerSettings.LineColour) };
 
             sequencer.AddChild(noteRectangle);
             sequencer.AddChild(velocityRectangle);

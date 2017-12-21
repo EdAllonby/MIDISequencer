@@ -66,10 +66,7 @@ namespace Sequencer.View.Control.RadialContextMenu
 
             pathData.Segments?.Add(arc);
 
-            var pathGeometry = new PathGeometry
-            {
-                Figures = { pathData }
-            };
+            var pathGeometry = new PathGeometry { Figures = { pathData } };
 
             segmentShape.Data = pathGeometry;
             Children.Add(segmentShape);

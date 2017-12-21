@@ -74,6 +74,7 @@ namespace Sequencer.Audio
                     {
                         buffer[n + offset] = 0;
                     }
+
                     sample++;
 
                     if (sample >= sampleRate)

@@ -62,6 +62,7 @@ namespace Sequencer.View
                 System.Console.WriteLine(e);
                 throw;
             }
+
             IContainer container = builder.Build();
             container.Resolve<SequencerPlayer>();
             ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(container));

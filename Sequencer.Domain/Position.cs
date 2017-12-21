@@ -36,14 +36,17 @@ namespace Sequencer.Domain
             {
                 return 0;
             }
+
             if (Measure > other.Measure)
             {
                 return 1;
             }
+
             if (Measure == other.Measure && Bar > other.Bar)
             {
                 return 1;
             }
+
             if (Measure == other.Measure && Bar == other.Bar && Beat > other.Beat)
             {
                 return 1;
