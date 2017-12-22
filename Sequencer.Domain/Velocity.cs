@@ -33,7 +33,7 @@ namespace Sequencer.Domain
 
         public bool Equals(Velocity other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Value == other.Value;
         }
@@ -57,9 +57,9 @@ namespace Sequencer.Domain
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is Velocity && Equals((Velocity) obj);
+            return obj is Velocity velocity && Equals(velocity);
         }
 
         public override int GetHashCode()

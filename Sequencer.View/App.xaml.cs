@@ -76,7 +76,7 @@ namespace Sequencer.View
         {
 #if DEBUG
             // Console must be started before configuring log4net.
-            ConsoleManager.Show();
+            ConsoleWindow.Show();
             SetupLogging("log4netDebug.config");
 #else
             SetupLogging("log4netRelease.config");

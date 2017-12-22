@@ -104,6 +104,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Console\ConsolePosition.cs" />
+    <Compile Include="Console\DesiredAccess.cs" />
+    <Compile Include="Console\StdHandle.cs" />
     <Compile Include="Control\DragSelectionBox.xaml.cs">
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>

@@ -1,93 +1,133 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
+using System.Text;
 
 namespace Sequencer.View.Console
 {
-    /// <summary>
-    /// Manages a console window in a windows application.
-    /// Can be used to explicitly open and close a console when project is not set to Output Type: Console Application
-    /// </summary>
-    public static class ConsoleManager
+    public static class ConsoleWindow
     {
-        private static bool HasConsole => UnsafeNativeMethods.GetConsoleWindow() != IntPtr.Zero;
+        private static readonly IntPtr InvalidHandleValue = new IntPtr(-1);
 
-        /// <summary>
-        /// Creates a new console instance if the process is not attached to a console already.
-        /// </summary>
-        public static void Show()
-        {
-            if (!HasConsole)
-            {
-                UnsafeNativeMethods.AllocConsole();
-                InvalidateOutAndError();
-            }
-        }
-
-        /// <summary>
-        /// If the process has a console attached to it, it will be detached and no longer visible. Writing to the System.Console
-        /// is still possible, but no output will be shown.
-        /// </summary>
         public static void Hide()
         {
-            if (HasConsole)
+            UnsafeNativeMethods.FreeConsole();
+        }
+
+        public static void Show(int bufferWidth = -1, bool breakRedirection = true, int consoleWidth = 800, int consoleHeight = 1000, int bufferHeight = 9999)
+        {
+            UnsafeNativeMethods.AllocConsole();
+            IntPtr stdOut = InvalidHandleValue;
+
+            if (breakRedirection)
             {
-                SetOutAndErrorNull();
-                UnsafeNativeMethods.FreeConsole();
+                UnredirectConsole(out stdOut, out _, out _);
+            }
+
+            Stream outStream = System.Console.OpenStandardOutput();
+            Stream errStream = System.Console.OpenStandardError();
+
+            Encoding encoding = Encoding.GetEncoding(UnsafeNativeMethods.MY_CODE_PAGE);
+            StreamWriter standardOutput = new StreamWriter(outStream, encoding), standardError = new StreamWriter(errStream, encoding);
+
+            if (bufferWidth == -1)
+            {
+                bufferWidth = 180;
+            }
+
+            try
+            {
+                standardOutput.AutoFlush = true;
+                standardError.AutoFlush = true;
+                System.Console.SetOut(standardOutput);
+                System.Console.SetError(standardError);
+                if (breakRedirection)
+                {
+                    var coord = new ConsolePosition
+                    {
+                        X = (short) bufferWidth,
+                        Y = (short) bufferHeight
+                    };
+
+                    UnsafeNativeMethods.SetConsoleScreenBufferSize(stdOut, coord);
+                }
+                else
+                {
+                    System.Console.SetBufferSize(bufferWidth, bufferHeight);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+            }
+
+            try
+            {
+                IntPtr hConsole = UnsafeNativeMethods.GetConsoleWindow();
+                UnsafeNativeMethods.MoveWindow(hConsole, 0, 500, 1000, 800, true);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
             }
         }
 
-        /// <summary>
-        /// Change between the two Console states.
-        /// </summary>
-        public static void Toggle()
+        public static void Maximize()
         {
-            if (HasConsole)
-            {
-                Hide();
-            }
-            else
-            {
-                Show();
-            }
+            Process p = Process.GetCurrentProcess();
+            UnsafeNativeMethods.ShowWindow(p.MainWindowHandle, 3);
         }
 
-        private static void InvalidateOutAndError()
+        public static void UnredirectConsole(out IntPtr stdOut, out IntPtr stdIn, out IntPtr stdErr)
         {
-            Type type = typeof(System.Console);
-
-            FieldInfo consoleOut = type.GetField("_out",
-                BindingFlags.Static | BindingFlags.NonPublic);
-
-            FieldInfo consoleError = type.GetField("_error",
-                BindingFlags.Static | BindingFlags.NonPublic);
-
-            MethodInfo consoleInitializeStdOutError = type.GetMethod("InitializeStdOutError",
-                BindingFlags.Static | BindingFlags.NonPublic);
-
-            if (consoleOut != null)
-            {
-                consoleOut.SetValue(null, null);
-            }
-
-            if (consoleError != null)
-            {
-                consoleError.SetValue(null, null);
-            }
-
-            if (consoleInitializeStdOutError != null)
-            {
-                consoleInitializeStdOutError.Invoke(null, new object[] { true });
-            }
+            UnsafeNativeMethods.SetStdHandle(StdHandle.Output, stdOut = GetConsoleStandardOutput());
+            UnsafeNativeMethods.SetStdHandle(StdHandle.Input, stdIn = GetConsoleStandardInput());
+            UnsafeNativeMethods.SetStdHandle(StdHandle.Error, stdErr = GetConsoleStandardError());
         }
 
-        private static void SetOutAndErrorNull()
+        private static IntPtr GetConsoleStandardInput()
         {
-            if (TextWriter.Null != null)
-            {
-                System.Console.SetOut(TextWriter.Null);
-                System.Console.SetError(TextWriter.Null);
-            }
+            IntPtr handle = UnsafeNativeMethods.CreateFile
+            ("CONIN$"
+                , DesiredAccess.GenericRead | DesiredAccess.GenericWrite
+                , FileShare.ReadWrite
+                , IntPtr.Zero
+                , FileMode.Open
+                , FileAttributes.Normal
+                , IntPtr.Zero
+            );
+
+            return handle == InvalidHandleValue ? InvalidHandleValue : handle;
+        }
+
+        private static IntPtr GetConsoleStandardOutput()
+        {
+            IntPtr handle = UnsafeNativeMethods.CreateFile
+            ("CONOUT$"
+                , DesiredAccess.GenericWrite | DesiredAccess.GenericWrite
+                , FileShare.ReadWrite
+                , IntPtr.Zero
+                , FileMode.Open
+                , FileAttributes.Normal
+                , IntPtr.Zero
+            );
+
+            return handle == InvalidHandleValue ? InvalidHandleValue : handle;
+        }
+
+        private static IntPtr GetConsoleStandardError()
+        {
+            IntPtr handle = UnsafeNativeMethods.CreateFile
+            ("CONERR$"
+                , DesiredAccess.GenericWrite | DesiredAccess.GenericWrite
+                , FileShare.ReadWrite
+                , IntPtr.Zero
+                , FileMode.Open
+                , FileAttributes.Normal
+                , IntPtr.Zero
+            );
+
+            return handle == InvalidHandleValue ? InvalidHandleValue : handle;
         }
     }
 }
