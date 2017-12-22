@@ -2,7 +2,7 @@
 
 namespace Sequencer.Visual.Input
 {
-    public class MousePoint : IMousePoint
+    public struct MousePoint : IMousePoint
     {
         public MousePoint(Point point)
         {
@@ -12,6 +12,7 @@ namespace Sequencer.Visual.Input
         public double X => Point.X;
 
         public double Y => Point.Y;
+
         public Point Point { get; }
     }
 }

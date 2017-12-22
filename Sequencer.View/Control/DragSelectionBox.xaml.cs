@@ -4,8 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using JetBrains.Annotations;
-using log4net;
-using Sequencer.Utilities;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
 
@@ -21,8 +19,6 @@ namespace Sequencer.View.Control
         /// </summary>
         private const double DragThreshold = 5;
 
-        [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(DragSelectionBox));
-
         /// <summary>
         /// Set to 'true' when the left mouse-button is down.
         /// </summary>
@@ -31,7 +27,7 @@ namespace Sequencer.View.Control
         /// <summary>
         /// Records the location of the mouse (relative to the window) when the left-mouse button has pressed down.
         /// </summary>
-        [CanBeNull] private IMousePoint origMouseDownPoint;
+        [NotNull] private IMousePoint origMouseDownPoint = new MousePoint();
 
         public DragSelectionBox()
         {
@@ -64,27 +60,20 @@ namespace Sequencer.View.Control
         /// <param name="newPosition">The new position to update the selection box dimensions with.</param>
         public void UpdateDragSelectionBox([NotNull] IMousePoint newPosition)
         {
-            if (origMouseDownPoint != null)
+            if (IsDragging)
             {
-                if (IsDragging)
-                {
-                    UpdateDragSelectionRectSize(origMouseDownPoint, newPosition);
-                }
-                else if (isLeftMouseButtonDownOnWindow)
-                {
-                    Vector? dragDelta = newPosition.Point - origMouseDownPoint?.Point;
-                    double dragDistance = Math.Abs(dragDelta.GetValueOrDefault().Length);
-                    if (dragDistance > DragThreshold)
-                    {
-                        IsDragging = true;
-
-                        InitDragSelectionRect(origMouseDownPoint, newPosition);
-                    }
-                }
+                UpdateDragSelectionRectSize(origMouseDownPoint, newPosition);
             }
-            else
+            else if (isLeftMouseButtonDownOnWindow)
             {
-                Log.Warn($"{nameof(origMouseDownPoint)} is null");
+                Vector? dragDelta = newPosition.Point - origMouseDownPoint?.Point;
+                double dragDistance = Math.Abs(dragDelta.GetValueOrDefault().Length);
+                if (dragDistance > DragThreshold)
+                {
+                    IsDragging = true;
+
+                    InitDragSelectionRect(origMouseDownPoint, newPosition);
+                }
             }
         }
 
