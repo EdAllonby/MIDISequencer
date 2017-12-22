@@ -30,7 +30,9 @@ namespace Sequencer.Visual
             noteRectangle = new Rectangle
             {
                 Stroke = new SolidColorBrush(sequencerSettings.LineColour),
-                StrokeThickness = 0.5
+                StrokeThickness = 0.5,
+                RadiusX = 5,
+                RadiusY = 5
             };
 
             velocityRectangle = new Rectangle { Fill = new SolidColorBrush(sequencerSettings.LineColour) };
