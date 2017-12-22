@@ -216,16 +216,19 @@ namespace Sequencer.View.Control
         private void SetCursor([NotNull] IMousePoint newMousePoint)
         {
             IVisualNote noteAtStartingPoint = sequencerDimensionsCalculator.NoteAtStartingPoint(notes, newMousePoint);
+
+            Cursor noteResizeCursor = Cursors.SizeWE;
+
             if (noteAtStartingPoint != null)
             {
-                Mouse.OverrideCursor = Cursors.No;
+                Mouse.OverrideCursor = noteResizeCursor;
                 return;
             }
 
             IVisualNote noteAtEndingPoint = sequencerDimensionsCalculator.NoteAtEndingPoint(notes, newMousePoint);
             if (noteAtEndingPoint != null)
             {
-                Mouse.OverrideCursor = Cursors.ArrowCD;
+                Mouse.OverrideCursor = noteResizeCursor;
                 return;
             }
 
