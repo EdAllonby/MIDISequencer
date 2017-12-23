@@ -9,11 +9,13 @@ namespace Sequencer.Domain
     public class PitchAndPositionCalculator : IPitchAndPositionCalculator
     {
         private const int NotesPerOctave = 12;
+        private readonly int ticksPerQuarterNote;
         [NotNull] private readonly TimeSignature timeSignature;
 
         public PitchAndPositionCalculator([NotNull] IMusicalSettings musicalSettings)
         {
             timeSignature = musicalSettings.TimeSignature;
+            ticksPerQuarterNote = musicalSettings.TicksPerQuarterNote;
         }
 
         /// <summary>
@@ -38,9 +40,9 @@ namespace Sequencer.Domain
         /// <param name="newPosition">The second position to calculate the difference from origin.</param>
         /// <returns>The different in beats between two positions.</returns>
         [Pure]
-        public int FindBeatsBetweenPositions(IPosition initialPosition, IPosition newPosition)
+        public int FindTicksBetweenPositions(IPosition initialPosition, IPosition newPosition)
         {
-            return newPosition.SummedBeat(timeSignature) - initialPosition.SummedBeat(timeSignature);
+            return newPosition.TotalTicks(timeSignature, ticksPerQuarterNote) - initialPosition.TotalTicks(timeSignature, ticksPerQuarterNote);
         }
     }
 }

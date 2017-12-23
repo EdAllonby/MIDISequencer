@@ -15,8 +15,8 @@ namespace Sequencer.View.Command.MousePointCommand
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        private int beatsDelta;
         [NotNull] private IPosition initialEndPosition;
+        private int ticksDelta;
 
         public UpdateNoteEndPositionFromInitialPointCommand([NotNull] IMousePoint initialMousePoint,
             [NotNull] IMouseOperator mouseOperator, [NotNull] ISequencerNotes sequencerNotes,
@@ -35,18 +35,18 @@ namespace Sequencer.View.Command.MousePointCommand
         {
             IPosition newEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-            int newBeatsDelta = newEndPosition.SummedBeat(sequencerSettings.TimeSignature) -
-                                initialEndPosition.SummedBeat(sequencerSettings.TimeSignature);
+            int newTicksDelta = newEndPosition.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote) -
+                                initialEndPosition.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
 
-            if (newBeatsDelta != beatsDelta)
+            if (newTicksDelta != ticksDelta)
             {
-                beatsDelta = newBeatsDelta;
+                ticksDelta = newTicksDelta;
 
                 initialEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
                 foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
                 {
-                    selectedNote.EndPosition = selectedNote.EndPosition.PositionRelativeByBeats(beatsDelta, sequencerSettings.TimeSignature);
+                    selectedNote.EndPosition = selectedNote.EndPosition.PositionRelativeByTicks(ticksDelta, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
                 }
             }
         }

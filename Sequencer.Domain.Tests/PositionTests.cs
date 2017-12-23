@@ -43,7 +43,10 @@ namespace Sequencer.Domain.Tests
         [TestCaseSource(nameof(BeatPositionCases))]
         public void BeatShouldReturnCorrectPosition(int beat, IPosition expectedPosition)
         {
-            IPosition actualPosition = Position.PositionFromBeat(beat, 0, standardTimeSignature);
+            const int ticksPerQuarterNote = 96;
+            int tick = (beat - 1) * ticksPerQuarterNote;
+
+            IPosition actualPosition = Position.PositionFromTick(tick, standardTimeSignature, ticksPerQuarterNote);
             Assert.AreEqual(expectedPosition, actualPosition);
         }
 
@@ -51,7 +54,7 @@ namespace Sequencer.Domain.Tests
         [TestCaseSource(nameof(NextPositionCases))]
         public void NextPositionShouldBeCorrect(IPosition initialPosition, IPosition expectedNextPosition)
         {
-            IPosition actualNextPosition = initialPosition.NextPosition(standardTimeSignature);
+            IPosition actualNextPosition = initialPosition.NextPosition(NoteResolution.Quarter, standardTimeSignature, 96);
 
             Assert.AreEqual(expectedNextPosition, actualNextPosition);
         }
@@ -92,6 +95,16 @@ namespace Sequencer.Domain.Tests
             Assert.IsTrue(smallerPosition <= largerPosition);
         }
 
+
+        [Test]
+        public void Position_2_1_4_93_IsSmallerThan_Position_2_1_4_94()
+        {
+            var firstPosition = new Position(2, 1, 4, 93);
+            var secondPosition = new Position(2, 1, 4, 94);
+
+            Assert.IsTrue(firstPosition < secondPosition);
+        }
+
         [Test]
         public void Position_3_3_1_IsEqualTo_Position_3_3_1()
         {
@@ -117,6 +130,15 @@ namespace Sequencer.Domain.Tests
             var secondPosition = new Position(5, 2, 2);
 
             Assert.IsTrue(firstPosition >= secondPosition);
+        }
+
+        [Test]
+        public void Position_9_1_2_21_IsEqualTo_Position_9_1_2_21()
+        {
+            var firstPosition = new Position(9, 1, 2, 21);
+            var secondPosition = new Position(9, 1, 2, 21);
+
+            Assert.IsTrue(firstPosition.Equals(secondPosition));
         }
 
         [Test]

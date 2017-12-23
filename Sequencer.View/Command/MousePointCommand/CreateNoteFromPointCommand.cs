@@ -33,7 +33,7 @@ namespace Sequencer.View.Command.MousePointCommand
         [NotNull]
         private IPosition GetDefaultEndPosition([NotNull] IPosition notePosition)
         {
-            return notePosition.NextPosition(sequencerSettings.TimeSignature);
+            return notePosition.NextPosition(sequencerSettings.NoteResolution, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
         }
 
         protected override void DoExecute(IMousePoint mousePoint)

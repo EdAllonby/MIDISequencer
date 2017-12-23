@@ -18,5 +18,7 @@ namespace Sequencer.Domain.Settings
         TimeSignature TimeSignature { get; }
 
         int TicksPerQuarterNote { get; }
+
+        NoteResolution NoteResolution { get; }
     }
 }

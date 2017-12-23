@@ -53,7 +53,7 @@ namespace Sequencer.Visual
             get => Tone.StartPosition;
             set
             {
-                if (Tone.StartPosition.NextPosition(sequencerSettings.TimeSignature).IsLessThan(Tone.EndPosition))
+                if (Tone.StartPosition.NextPosition(sequencerSettings.NoteResolution, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote).IsLessThan(Tone.EndPosition))
                 {
                     Tone.StartPosition = value;
                     Draw();
@@ -119,11 +119,11 @@ namespace Sequencer.Visual
         /// <summary>
         /// Moves the start and end positions of this visual note.
         /// </summary>
-        /// <param name="beatsToMove">How many beats to move this visual note.</param>
-        public void MovePositionRelativeTo(int beatsToMove)
+        /// <param name="ticksToMove">How many beats to move this visual note.</param>
+        public void MovePositionRelativeTo(int ticksToMove)
         {
-            StartPosition = StartPosition.PositionRelativeByBeats(beatsToMove, sequencerSettings.TimeSignature);
-            EndPosition = EndPosition.PositionRelativeByBeats(beatsToMove, sequencerSettings.TimeSignature);
+            StartPosition = StartPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            EndPosition = EndPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
         }
 
         /// <summary>

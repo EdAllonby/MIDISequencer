@@ -4,5 +4,5 @@
     {
         public short X;
         public short Y;
-    };
+    }
 }

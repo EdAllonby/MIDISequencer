@@ -13,14 +13,16 @@ namespace Sequencer.Domain
         int Ticks { get; }
 
         [NotNull]
-        IPosition PreviousPosition([NotNull] TimeSignature timeSignature);
+        IPosition PreviousPosition(NoteResolution resolution, [NotNull] TimeSignature timeSignature, int ticksPerQuarterNote);
 
         [NotNull]
-        IPosition NextPosition([NotNull] TimeSignature timeSignature);
+        IPosition NextPosition(NoteResolution resolution, [NotNull] TimeSignature timeSignature, int ticksPerQuarterNote);
 
         [NotNull]
-        IPosition PositionRelativeByBeats(int beatDelta, [NotNull] TimeSignature timeSignature);
+        IPosition PositionRelativeByTicks(int tickDelta, [NotNull] TimeSignature timeSignature, int ticksPerQuarterNote);
 
         int SummedBeat([NotNull] TimeSignature timeSignature);
+
+        int TotalTicks([NotNull] TimeSignature timeSignature, int ticksPerQuarterNote);
     }
 }

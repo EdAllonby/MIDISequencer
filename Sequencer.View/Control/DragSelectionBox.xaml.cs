@@ -66,8 +66,8 @@ namespace Sequencer.View.Control
             }
             else if (isLeftMouseButtonDownOnWindow)
             {
-                Vector? dragDelta = newPosition.Point - origMouseDownPoint?.Point;
-                double dragDistance = Math.Abs(dragDelta.GetValueOrDefault().Length);
+                Vector dragDelta = newPosition.Point - origMouseDownPoint.Point;
+                double dragDistance = Math.Abs(dragDelta.Length);
                 if (dragDistance > DragThreshold)
                 {
                     IsDragging = true;

@@ -55,14 +55,17 @@ namespace Sequencer.View.Drawing
 
         public IPosition FindPositionFromPoint(IMousePoint mousePosition)
         {
-            var beat = (int) Math.Ceiling(mousePosition.X / BeatWidth);
-            return Position.PositionFromBeat(beat, 0, sequencerSettings.TimeSignature);
+            // TODO: Resolution
+
+            var tick = (int) Math.Ceiling(mousePosition.X / TickWidth);
+
+            return Position.PositionFromTick(tick, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
         }
 
         public double GetPointFromPosition(IPosition position)
         {
-            double beatPosition = position.SummedBeat(sequencerSettings.TimeSignature) * BeatWidth - BeatWidth;
-            return TickWidth * position.Ticks + beatPosition;
+            // TODO: Tests
+            return TickWidth * position.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
         }
 
         public double GetPointFromPitch(Pitch pitch)

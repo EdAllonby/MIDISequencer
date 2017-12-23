@@ -144,7 +144,7 @@ namespace Sequencer.Visual
         [NotNull]
         private Func<IVisualNote, bool> DoesPitchAndPositionMatchCurrentNoteEndingPosition([NotNull] IPosition position, [NotNull] Pitch pitch)
         {
-            return visualNote => visualNote != null && visualNote.EndPosition.PreviousPosition(musicalSettings.TimeSignature).Equals(position) && visualNote.Pitch.Equals(pitch);
+            return visualNote => visualNote != null && visualNote.EndPosition.PreviousPosition(musicalSettings.NoteResolution, musicalSettings.TimeSignature, musicalSettings.TicksPerQuarterNote).Equals(position) && visualNote.Pitch.Equals(pitch);
         }
 
         [NotNull]

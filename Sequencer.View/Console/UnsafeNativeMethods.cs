@@ -17,8 +17,6 @@ namespace Sequencer.View.Console
 
         private const string User32DllName = "user32.dll";
 
-        private const int STD_OUTPUT_HANDLE = -11;
-        private const int STD_ERROR_HANDLE = -12;
         public const int MY_CODE_PAGE = 437;
 
 
@@ -89,24 +87,6 @@ namespace Sequencer.View.Console
             , [MarshalAs(UnmanagedType.U4)] FileMode dwCreationDisposition
             , [MarshalAs(UnmanagedType.U4)] FileAttributes dwFlagsAndAttributes
             , IntPtr hTemplateFile
-        );
-
-        [DllImport(Kernel32DllName,
-            EntryPoint = "GetStdHandle",
-            SetLastError = true,
-            CharSet = CharSet.Auto,
-            CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr GetStdHandle(int nStdHandle);
-
-        [DllImport(Kernel32DllName, SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern IntPtr CreateFile(
-            string lpFileName,
-            uint dwDesiredAccess,
-            uint dwShareMode,
-            uint lpSecurityAttributes,
-            uint dwCreationDisposition,
-            uint dwFlagsAndAttributes,
-            uint hTemplateFile
         );
     }
 }

@@ -24,7 +24,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             var mockNextPosition = new Mock<IPosition>();
             var mockCreatedNote = new Mock<IVisualNote>();
 
-            mockNotePosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
+            mockNotePosition.Setup(x => x.NextPosition(It.IsAny<NoteResolution>(), It.IsAny<TimeSignature>(), It.IsAny<int>())).Returns(mockNextPosition.Object);
             mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
             mockSequencerCalculator.Setup(x => x.FindNoteFromPoint(mockSequencerNotes.Object, mockMousePoint.Object)).Returns(mockNoteToDelete.Object);
             mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockMousePoint.Object)).Returns(mockNotePosition.Object);

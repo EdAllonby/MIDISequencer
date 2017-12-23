@@ -5,18 +5,18 @@ namespace Sequencer.View.Command.NotesCommand
 {
     public sealed class MoveNotePositionCommand : INotesCommand
     {
-        private readonly int beatsToMove;
+        private readonly int ticksToMove;
 
-        public MoveNotePositionCommand(int beatsToMove)
+        public MoveNotePositionCommand(int ticksToMove)
         {
-            this.beatsToMove = beatsToMove;
+            this.ticksToMove = ticksToMove;
         }
 
         public void Execute(IEnumerable<IVisualNote> notes)
         {
             foreach (IVisualNote visualNote in notes)
             {
-                visualNote.MovePositionRelativeTo(beatsToMove);
+                visualNote.MovePositionRelativeTo(ticksToMove);
             }
         }
     }

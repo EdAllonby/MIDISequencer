@@ -15,8 +15,8 @@ namespace Sequencer.View.Command.MousePointCommand
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        private int beatsDelta;
         [NotNull] private IPosition initialStartPosition;
+        private int ticksDelta;
 
         public UpdateNoteStartPositionFromInitialPointCommand([NotNull] IMousePoint initialMousePoint, [NotNull] IMouseOperator mouseOperator,
             [NotNull] ISequencerNotes sequencerNotes, [NotNull] SequencerSettings sequencerSettings,
@@ -35,18 +35,18 @@ namespace Sequencer.View.Command.MousePointCommand
         {
             IPosition newStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-            int newBeatsDelta = newStartPosition.SummedBeat(sequencerSettings.TimeSignature) -
-                                initialStartPosition.SummedBeat(sequencerSettings.TimeSignature);
+            int newTicksDelta = newStartPosition.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote) -
+                                initialStartPosition.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
 
-            if (newBeatsDelta != beatsDelta)
+            if (newTicksDelta != ticksDelta)
             {
-                beatsDelta = newBeatsDelta;
+                ticksDelta = newTicksDelta;
 
                 initialStartPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
                 foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
                 {
-                    selectedNote.StartPosition = selectedNote.StartPosition.PositionRelativeByBeats(beatsDelta, sequencerSettings.TimeSignature);
+                    selectedNote.StartPosition = selectedNote.StartPosition.PositionRelativeByTicks(ticksDelta, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
                 }
             }
         }

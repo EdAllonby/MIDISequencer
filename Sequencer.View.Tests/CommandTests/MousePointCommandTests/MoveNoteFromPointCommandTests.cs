@@ -31,7 +31,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 
             mockKeyboardStateProcessor.Setup(x => x.IsKeyDown(Key.LeftShift)).Returns(false);
             calculator.Setup(x => x.FindStepsFromPitches(It.IsAny<Pitch>(), It.IsAny<Pitch>())).Returns(relativePitchesToMove);
-            endPosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
+            endPosition.Setup(x => x.NextPosition(It.IsAny<NoteResolution>(), It.IsAny<TimeSignature>(), It.IsAny<int>())).Returns(mockNextPosition.Object);
             mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
 
             mockSequencerNotes.Setup(x => x.SelectedNotes).Returns(new List<IVisualNote> { mockNoteToMove.Object });
@@ -61,7 +61,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             var mockNextPosition = new Mock<IPosition>();
 
             mockPitchStepCalculator.Setup(x => x.FindStepsFromPitches(It.IsAny<Pitch>(), It.IsAny<Pitch>())).Returns(0);
-            endPosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
+            endPosition.Setup(x => x.NextPosition(It.IsAny<NoteResolution>(), It.IsAny<TimeSignature>(), It.IsAny<int>())).Returns(mockNextPosition.Object);
             mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
 
             mockSequencerNotes.Setup(x => x.SelectedNotes).Returns(new List<IVisualNote> { mockNoteToMove.Object });
@@ -92,8 +92,8 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             var relativeBeatsToMove = 12;
 
             mockKeyboardStateProcessor.Setup(x => x.IsKeyDown(Key.LeftShift)).Returns(false);
-            calculator.Setup(x => x.FindBeatsBetweenPositions(It.IsAny<IPosition>(), It.IsAny<IPosition>())).Returns(relativeBeatsToMove);
-            endPosition.Setup(x => x.NextPosition(It.IsAny<TimeSignature>())).Returns(mockNextPosition.Object);
+            calculator.Setup(x => x.FindTicksBetweenPositions(It.IsAny<IPosition>(), It.IsAny<IPosition>())).Returns(relativeBeatsToMove);
+            endPosition.Setup(x => x.NextPosition(It.IsAny<NoteResolution>(), It.IsAny<TimeSignature>(), It.IsAny<int>())).Returns(mockNextPosition.Object);
             mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
 
             mockSequencerNotes.Setup(x => x.SelectedNotes).Returns(new List<IVisualNote> { mockNoteToMove.Object });

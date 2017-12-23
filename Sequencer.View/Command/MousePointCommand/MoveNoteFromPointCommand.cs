@@ -14,10 +14,10 @@ namespace Sequencer.View.Command.MousePointCommand
         [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
-        private int beatsDelta;
         [NotNull] private IMousePoint initialMousePitch;
         [NotNull] private IMousePoint initialMousePoint;
         private int lastHalfStepDifference;
+        private int ticksDelta;
 
         public MoveNoteFromPointCommand([NotNull] IKeyboardStateProcessor keyboardStateProcessor,
             [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IMousePoint initialMousePoint,
@@ -40,15 +40,15 @@ namespace Sequencer.View.Command.MousePointCommand
             IPosition initialPosition = sequencerDimensionsCalculator.FindPositionFromPoint(initialMousePoint);
             IPosition newPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePoint);
 
-            int newBeatsDelta = pitchAndPositionCalculator.FindBeatsBetweenPositions(initialPosition, newPosition);
+            int newTicksDelta = pitchAndPositionCalculator.FindTicksBetweenPositions(initialPosition, newPosition);
 
-            if (newBeatsDelta != beatsDelta)
+            if (newTicksDelta != ticksDelta)
             {
-                beatsDelta = newBeatsDelta;
+                ticksDelta = newTicksDelta;
 
                 initialMousePoint = mousePoint;
 
-                var moveNotePositionCommand = new MoveNotePositionCommand(beatsDelta);
+                var moveNotePositionCommand = new MoveNotePositionCommand(ticksDelta);
                 moveNotePositionCommand.Execute(sequencerNotes.SelectedNotes);
             }
         }

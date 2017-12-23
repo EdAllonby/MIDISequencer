@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Domain.Settings;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
 
@@ -11,16 +12,16 @@ namespace Sequencer.View.Command.MousePointCommand
     public sealed class UpdateNewlyCreatedNoteCommand : MousePointNoteCommand
     {
         [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly IMusicalSettings musicalSettings;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
-        [NotNull] private readonly TimeSignature timeSignature;
 
         public UpdateNewlyCreatedNoteCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
-            [NotNull] TimeSignature timeSignature, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] IMusicalSettings musicalSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
         {
             this.sequencerNotes = sequencerNotes;
             this.mouseOperator = mouseOperator;
-            this.timeSignature = timeSignature;
+            this.musicalSettings = musicalSettings;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
         }
 
@@ -29,7 +30,7 @@ namespace Sequencer.View.Command.MousePointCommand
         protected override void DoExecute(IMousePoint mousePosition)
         {
             IPosition currentEndPosition = sequencerDimensionsCalculator.FindPositionFromPoint(mousePosition);
-            IPosition nextPosition = currentEndPosition.NextPosition(timeSignature);
+            IPosition nextPosition = currentEndPosition.NextPosition(musicalSettings.NoteResolution, musicalSettings.TimeSignature, musicalSettings.TicksPerQuarterNote);
 
             foreach (IVisualNote selectedNote in sequencerNotes.SelectedNotes)
             {

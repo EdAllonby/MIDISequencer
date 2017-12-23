@@ -17,10 +17,7 @@ namespace Sequencer.Midi
 
         public IPosition CalculatePositionFromTick(int tick)
         {
-            int currentBeat = (tick + quarterNoteResolution) / quarterNoteResolution;
-
-            int wrappedTick = tick % quarterNoteResolution;
-            return Position.PositionFromBeat(currentBeat, wrappedTick, timeSignature);
+            return Position.PositionFromTick(tick, timeSignature, quarterNoteResolution);
         }
     }
 }

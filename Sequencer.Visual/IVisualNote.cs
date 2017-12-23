@@ -25,7 +25,9 @@ namespace Sequencer.Visual
 
         void Draw();
         void MovePitchRelativeTo(int halfStepsToMove);
-        void MovePositionRelativeTo(int beatsToMove);
+
+        void MovePositionRelativeTo(int ticksToMove);
+
         void Remove();
     }
 }

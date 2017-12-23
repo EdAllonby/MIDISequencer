@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace Sequencer.Domain
 {
@@ -52,6 +53,11 @@ namespace Sequencer.Domain
                 return 1;
             }
 
+            if (Measure == other.Measure && Bar == other.Bar && Beat == other.Beat && Ticks > other.Ticks)
+            {
+                return 1;
+            }
+
             return -1;
         }
 
@@ -65,30 +71,43 @@ namespace Sequencer.Domain
             return (Measure - 1) * timeSignature.BeatsPerMeasure + (Bar - 1) * timeSignature.BeatsPerBar + Beat;
         }
 
+        public int TotalTicks(TimeSignature timeSignature, int ticksPerQuarterNote)
+        {
+            int beatTicks = (SummedBeat(timeSignature) - 1) * ticksPerQuarterNote;
+
+            return beatTicks + Ticks;
+        }
+
         /// <summary>
         /// Get the next <see cref="IPosition" />.
         /// </summary>
+        /// <param name="resolution">The next position using the current note resolution.</param>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the next <see cref="IPosition" />.</param>
+        /// <param name="ticksPerQuarterNote">Ticks per quarter note.</param>
         /// <returns>The next <see cref="IPosition" />.</returns>
-        public IPosition NextPosition(TimeSignature timeSignature)
+        public IPosition NextPosition(NoteResolution resolution, TimeSignature timeSignature, int ticksPerQuarterNote)
         {
-            return PositionRelativeByBeats(1, timeSignature);
+            int tickDelta = GetTicksForResolution(resolution, ticksPerQuarterNote);
+            return PositionRelativeByTicks(tickDelta, timeSignature, ticksPerQuarterNote);
         }
 
         /// <summary>
         /// Get the previous <see cref="IPosition" />.
         /// </summary>
+        /// <param name="resolution">The previous position using the current note resolution.</param>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use to calculate the previous <see cref="IPosition" />.</param>
+        /// <param name="ticksPerQuarterNote">Ticks per quarter note.</param>
         /// <returns>The previous <see cref="IPosition" />.</returns>
-        public IPosition PreviousPosition(TimeSignature timeSignature)
+        public IPosition PreviousPosition(NoteResolution resolution, TimeSignature timeSignature, int ticksPerQuarterNote)
         {
-            return PositionRelativeByBeats(-1, timeSignature);
+            int tickDelta = -1 * GetTicksForResolution(resolution, ticksPerQuarterNote);
+            return PositionRelativeByTicks(tickDelta, timeSignature, ticksPerQuarterNote);
         }
 
-        public IPosition PositionRelativeByBeats(int beatDelta, TimeSignature timeSignature)
+        public IPosition PositionRelativeByTicks(int tickDelta, TimeSignature timeSignature, int ticksPerQuarterNote)
         {
-            int totalBeats = SummedBeat(timeSignature);
-            return PositionFromBeat(totalBeats + beatDelta, 0, timeSignature);
+            int totalTicks = TotalTicks(timeSignature, ticksPerQuarterNote);
+            return PositionFromTick(totalTicks + tickDelta, timeSignature, ticksPerQuarterNote);
         }
 
         public bool IsGreaterThan(IPosition other)
@@ -115,25 +134,29 @@ namespace Sequencer.Domain
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Measure == other.Measure && Bar == other.Bar && Beat == other.Beat;
+            return Measure == other.Measure && Bar == other.Bar && Beat == other.Beat && Ticks == other.Ticks;
         }
 
         /// <summary>
         /// Get the position from origin of a sum of beats.
         /// </summary>
-        /// <param name="totalBeats">The summed beats to the particular position.</param>
-        /// <param name="tick">The tick of the current position.</param>
+        /// <param name="totalTicks">The summed ticks to the particular position.</param>
         /// <param name="timeSignature">The <see cref="TimeSignature" /> to use in calculation.</param>
+        /// <param name="ticksPerQuarterNote">Ticks per quarter note.</param>
         /// <returns>The position from origin of the summed beats.</returns>
         [NotNull]
-        public static IPosition PositionFromBeat(int totalBeats, int tick, [NotNull] TimeSignature timeSignature)
+        public static IPosition PositionFromTick(int totalTicks, [NotNull] TimeSignature timeSignature, int ticksPerQuarterNote)
         {
+            var totalBeats = (int) Math.Floor(totalTicks / (decimal) ticksPerQuarterNote) + 1;
+
             int measures = 1 + (totalBeats - 1) / timeSignature.BeatsPerMeasure;
             int remainingBeatsForBars = totalBeats - timeSignature.BeatsPerMeasure * (measures - 1);
             int bars = 1 + (remainingBeatsForBars - 1) / timeSignature.BeatsPerBar;
             int remainingBeats = remainingBeatsForBars - timeSignature.BeatsPerBar * (bars - 1);
 
-            return new Position(measures, bars, remainingBeats, tick);
+            int remainingTicks = totalTicks - (totalBeats - 1) * ticksPerQuarterNote;
+
+            return new Position(measures, bars, remainingBeats, remainingTicks);
         }
 
         public override bool Equals(object obj)
@@ -177,6 +200,25 @@ namespace Sequencer.Domain
         public override string ToString()
         {
             return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}, Sub-Beat {Ticks}";
+        }
+
+        private int GetTicksForResolution(NoteResolution resolution, int ticksPerQuarterNote)
+        {
+            switch (resolution)
+            {
+                case NoteResolution.Whole:
+                    return ticksPerQuarterNote * 4;
+                case NoteResolution.Half:
+                    return ticksPerQuarterNote * 2;
+                case NoteResolution.Quarter:
+                    return ticksPerQuarterNote;
+                case NoteResolution.Eighth:
+                    return ticksPerQuarterNote / 2;
+                case NoteResolution.Sixteenth:
+                    return ticksPerQuarterNote / 4;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(resolution), resolution, null);
+            }
         }
     }
 }
