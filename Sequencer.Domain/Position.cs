@@ -87,7 +87,7 @@ namespace Sequencer.Domain
         /// <returns>The next <see cref="IPosition" />.</returns>
         public IPosition NextPosition(NoteResolution resolution, TimeSignature timeSignature, int ticksPerQuarterNote)
         {
-            int tickDelta = GetTicksForResolution(resolution, ticksPerQuarterNote);
+            int tickDelta = NoteResolutionCalculator.GetTicksForResolution(resolution, ticksPerQuarterNote);
             return PositionRelativeByTicks(tickDelta, timeSignature, ticksPerQuarterNote);
         }
 
@@ -100,7 +100,7 @@ namespace Sequencer.Domain
         /// <returns>The previous <see cref="IPosition" />.</returns>
         public IPosition PreviousPosition(NoteResolution resolution, TimeSignature timeSignature, int ticksPerQuarterNote)
         {
-            int tickDelta = -1 * GetTicksForResolution(resolution, ticksPerQuarterNote);
+            int tickDelta = -1 * NoteResolutionCalculator.GetTicksForResolution(resolution, ticksPerQuarterNote);
             return PositionRelativeByTicks(tickDelta, timeSignature, ticksPerQuarterNote);
         }
 
@@ -200,25 +200,6 @@ namespace Sequencer.Domain
         public override string ToString()
         {
             return $"Measure: {Measure}, Bar: {Bar}, Beat: {Beat}, Sub-Beat {Ticks}";
-        }
-
-        private int GetTicksForResolution(NoteResolution resolution, int ticksPerQuarterNote)
-        {
-            switch (resolution)
-            {
-                case NoteResolution.Whole:
-                    return ticksPerQuarterNote * 4;
-                case NoteResolution.Half:
-                    return ticksPerQuarterNote * 2;
-                case NoteResolution.Quarter:
-                    return ticksPerQuarterNote;
-                case NoteResolution.Eighth:
-                    return ticksPerQuarterNote / 2;
-                case NoteResolution.Sixteenth:
-                    return ticksPerQuarterNote / 4;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(resolution), resolution, null);
-            }
         }
     }
 }

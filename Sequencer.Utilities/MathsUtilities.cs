@@ -48,6 +48,32 @@ namespace Sequencer.Utilities
             }
         }
 
+        /// <summary>
+        /// Finds the nearest value based on a multiple
+        /// </summary>
+        /// <param name="value">The value to calculate nearest multiple.</param>
+        /// <param name="multiple">The multiple used in the calculation.</param>
+        /// <returns></returns>
+        [Pure]
+        public static int NearestValue(double value, int multiple)
+        {
+            if (multiple <= 0)
+            {
+                throw new ArgumentException("multiple must be greater than 0");
+            }
+
+            double remainder = value % multiple;
+
+            double result = value - remainder;
+
+            if (remainder >= multiple / 2.0)
+            {
+                result += multiple;
+            }
+
+            return (int) result;
+        }
+
         [Pure]
         private static double ToRadians(double degrees)
         {

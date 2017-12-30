@@ -13,7 +13,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
     public sealed class DeleteNoteFromPointCommandTests
     {
         [Test]
-        public void DeleteNoteTest()
+        public void DeleteNoteFromPointTest()
         {
             var mockSequencerNotes = new Mock<ISequencerNotes>();
             var sequencerCalculatorStub = new Mock<ISequencerDimensionsCalculator>();

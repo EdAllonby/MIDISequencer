@@ -10,7 +10,7 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
     public class DeleteNotesCommandTests
     {
         [Test]
-        public void DeleteNoteTest()
+        public void DeleteNotesTest()
         {
             var mockSequencerNotes = new Mock<ISequencerNotes>();
 

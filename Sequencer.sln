@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.ViewModel", "Sequencer.ViewModel\Sequencer.ViewModel.csproj", "{68A8D4A6-B8EE-4684-8F1B-21B686014069}"
 EndProject
@@ -26,6 +26,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.ViewModel.Tests", "Sequencer.ViewModel.Tests\Sequencer.ViewModel.Tests.csproj", "{FDDC2848-1DBE-402A-B58C-E94B3B0B5821}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.Visual", "Sequencer.Visual\Sequencer.Visual.csproj", "{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sequencer.Utilities.Tests", "Sequencer.Utilities.Tests\Sequencer.Utilities.Tests.csproj", "{78C0D4A2-953E-4088-B239-BC68C1BBBDE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78C0D4A2-953E-4088-B239-BC68C1BBBDE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78C0D4A2-953E-4088-B239-BC68C1BBBDE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78C0D4A2-953E-4088-B239-BC68C1BBBDE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78C0D4A2-953E-4088-B239-BC68C1BBBDE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -47,6 +47,7 @@
     <Compile Include="IPitchAndPositionCalculator.cs" />
     <Compile Include="IPosition.cs" />
     <Compile Include="NoteResolution.cs" />
+    <Compile Include="NoteResolutionCalculator.cs" />
     <Compile Include="PitchAndPositionCalculator.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="Pitch.cs" />

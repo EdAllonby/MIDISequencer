@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
+using Sequencer.Utilities;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
 
@@ -55,11 +56,13 @@ namespace Sequencer.View.Drawing
 
         public IPosition FindPositionFromPoint(IMousePoint mousePosition)
         {
-            // TODO: Resolution
+            NoteResolution currentResolution = sequencerSettings.NoteResolution;
 
             var tick = (int) Math.Ceiling(mousePosition.X / TickWidth);
 
-            return Position.PositionFromTick(tick, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            int closestTick = FindClosestTickUsingResolution(tick, currentResolution);
+
+            return Position.PositionFromTick(closestTick, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
         }
 
         public double GetPointFromPosition(IPosition position)
@@ -114,6 +117,13 @@ namespace Sequencer.View.Drawing
             Pitch mousePitch = FindPitchFromPoint(point);
 
             return sequencerNotes.FindNoteFromEndingPositionAndPitch(mousePosition, mousePitch);
+        }
+
+        private int FindClosestTickUsingResolution(int tick, NoteResolution currentResolution)
+        {
+            int resolutionMultiple = NoteResolutionCalculator.GetTicksForResolution(currentResolution, sequencerSettings.TicksPerQuarterNote);
+
+            return MathsUtilities.NearestValue(tick, resolutionMultiple);
         }
     }
 }

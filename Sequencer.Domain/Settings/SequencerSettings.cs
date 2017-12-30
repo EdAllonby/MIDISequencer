@@ -28,6 +28,6 @@ namespace Sequencer.Domain.Settings
         public Pitch LowestPitch => new Pitch(Note.A, 2);
         public TimeSignature TimeSignature => TimeSignature.FourFour;
         public int TicksPerQuarterNote => 96;
-        public NoteResolution NoteResolution => NoteResolution.Quarter;
+        public NoteResolution NoteResolution => NoteResolution.Sixteenth;
     }
 }
