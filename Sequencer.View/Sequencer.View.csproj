@@ -104,6 +104,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\MousePointCommand\EmptyMousePointCommand.cs" />
     <Compile Include="Console\ConsolePosition.cs" />
     <Compile Include="Console\DesiredAccess.cs" />
     <Compile Include="Console\StdHandle.cs" />

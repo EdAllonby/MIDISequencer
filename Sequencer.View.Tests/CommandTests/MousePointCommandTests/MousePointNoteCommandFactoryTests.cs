@@ -48,5 +48,14 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 
             Assert.IsInstanceOf<UpdateNoteStateFromPointCommand>(mouseCommand);
         }
+
+
+        [Test]
+        public void FindCommand_WithUnsupportedNoteAction_ReturnsEmptyMousePointCommand()
+        {
+            IMousePointNoteCommand mouseCommand = factory.FindCommand(NoteAction.None);
+
+            Assert.IsInstanceOf<EmptyMousePointCommand>(mouseCommand);
+        }
     }
 }

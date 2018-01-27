@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 
@@ -9,10 +8,10 @@ namespace Sequencer.ViewModel
     {
         protected VisualEnumerableType(int value, [NotNull] string displayName, [CanBeNull] Bitmap visual) : base(value, displayName)
         {
-            Visual = visual ?? throw new ArgumentNullException(nameof(visual));
+            Visual = visual;
         }
 
-        [NotNull]
+        [CanBeNull]
         public Bitmap Visual { get; }
     }
 }

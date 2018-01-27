@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using log4net;
 using Sequencer.Domain.Settings;
-using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
@@ -32,16 +30,6 @@ namespace Sequencer.View.Command.MousePointCommand
             bool commandFound = noteCommandRegistry.TryGetValue(noteAction, out IMousePointNoteCommand matchingCommand);
 
             return commandFound ? matchingCommand : new EmptyMousePointCommand();
-        }
-
-        private class EmptyMousePointCommand : IMousePointNoteCommand
-        {
-            [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(EmptyMousePointCommand));
-
-            public void Execute(IMousePoint mousePoint)
-            {
-                Log.Warn("Null Mouse Point Command Execute.");
-            }
         }
     }
 }

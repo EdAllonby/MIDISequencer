@@ -74,7 +74,7 @@ namespace Sequencer.View.Control.RadialContextMenu
             double segmentIconSize = Math.Min(pathGeometry.Bounds.Width, pathGeometry.Bounds.Height);
             var segmentIcon = new Image
             {
-                Source = MenuItem.Visual.ToBitmapImage(),
+                Source = MenuItem.Visual?.ToBitmapImage(),
                 Stretch = Stretch.Fill,
                 Height = segmentIconSize * 0.7,
                 Width = segmentIconSize * 0.7
