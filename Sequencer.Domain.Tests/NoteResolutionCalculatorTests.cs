@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System;
+using Moq;
+using NUnit.Framework;
 
 namespace Sequencer.Domain.Tests
 {
@@ -13,7 +15,7 @@ namespace Sequencer.Domain.Tests
             new object[] { NoteResolution.Eighth, 96, 48 },
             new object[] { NoteResolution.Sixteenth, 96, 24 },
         };
-        
+
         [Test]
         [TestCaseSource(nameof(NoteResolutionCases))]
         public void GetTicksForResolutionTests(NoteResolution noteResolution, int tick, int expectedTicks)
@@ -21,6 +23,12 @@ namespace Sequencer.Domain.Tests
             int actualTicks = NoteResolutionCalculator.GetTicksForResolution(noteResolution, tick);
 
             Assert.AreEqual(expectedTicks, actualTicks);
+        }
+
+        [Test]
+        public void UnsupportedNoteResolution_ThrowsArgumentOutOfRangeException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => NoteResolutionCalculator.GetTicksForResolution((NoteResolution) (-1), It.IsAny<int>()));
         }
     }
 }
