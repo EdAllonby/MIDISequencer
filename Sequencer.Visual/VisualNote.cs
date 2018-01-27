@@ -28,19 +28,19 @@ namespace Sequencer.Visual
             get => Tone.Pitch;
             private set
             {
-                Tone.Pitch = value;
+                Tone = new Tone(value, Tone.Velocity, Tone.StartPosition, Tone.EndPosition);
                 Draw();
             }
         }
 
-        public Tone Tone { get; }
+        public Tone Tone { get; private set; }
 
         public Velocity Velocity
         {
             get => Tone.Velocity;
             set
             {
-                Tone.Velocity = value;
+                Tone = new Tone(Tone.Pitch, value, Tone.StartPosition, Tone.EndPosition);
                 Draw();
             }
         }
@@ -55,7 +55,7 @@ namespace Sequencer.Visual
             {
                 if (Tone.StartPosition.NextPosition(sequencerSettings.NoteResolution, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote).IsLessThan(Tone.EndPosition))
                 {
-                    Tone.StartPosition = value;
+                    Tone = new Tone(Tone.Pitch, Tone.Velocity, value, Tone.EndPosition);
                     Draw();
                 }
             }
@@ -71,7 +71,7 @@ namespace Sequencer.Visual
             {
                 if (!EndPosition.Equals(value) && value.IsGreaterThan(StartPosition))
                 {
-                    Tone.EndPosition = value;
+                    Tone = new Tone(Tone.Pitch, Tone.Velocity, Tone.StartPosition, value);
                     Draw();
                 }
             }

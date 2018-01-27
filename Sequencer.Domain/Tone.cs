@@ -10,37 +10,24 @@ namespace Sequencer.Domain
     /// </summary>
     public sealed class Tone
     {
-        [NotNull] private IPosition endPosition;
-
-
         public Tone([NotNull] Pitch pitch, [NotNull] Velocity velocity, [NotNull] IPosition startPosition, [NotNull] IPosition endPosition)
         {
             Pitch = pitch;
             Velocity = velocity;
             StartPosition = startPosition;
-            this.endPosition = endPosition;
+            EndPosition = endPosition.IsGreaterThan(StartPosition) ? endPosition : startPosition;
         }
 
         [NotNull]
-        public Pitch Pitch { get; set; }
+        public Pitch Pitch { get; }
 
         [NotNull]
-        public Velocity Velocity { get; set; }
+        public Velocity Velocity { get; }
 
         [NotNull]
-        public IPosition StartPosition { get; set; }
+        public IPosition StartPosition { get; }
 
         [NotNull]
-        public IPosition EndPosition
-        {
-            get => endPosition;
-            set
-            {
-                if (value.IsGreaterThan(StartPosition))
-                {
-                    endPosition = value;
-                }
-            }
-        }
+        public IPosition EndPosition { get; }
     }
 }
