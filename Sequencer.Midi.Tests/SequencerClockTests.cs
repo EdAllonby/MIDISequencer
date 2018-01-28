@@ -29,55 +29,6 @@ namespace Sequencer.Midi.Tests
         }
 
         [Test]
-        public void DefaultTempo_Is120BeatsPerMinute()
-        {
-            SequencerClock sequencerClock = GetSequencerClock();
-
-            Assert.AreEqual(120, sequencerClock.BeatsPerMinute);
-        }
-
-        [Test]
-        public void Pause_KeepsTicks()
-        {
-            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
-            var mockInternalClock = new Mock<IInternalClock>();
-
-            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
-            
-            clock.Pause();
-
-            mockInternalClock.Verify(x=>x.Stop(), Times.Once);
-            mockInternalClock.VerifySet(x => x.Ticks = It.IsAny<int>(), Times.Never);
-        }
-
-        [Test]
-        public void Stop_SetsTicksBackToZero()
-        {
-            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
-            var mockInternalClock = new Mock<IInternalClock>();
-
-            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
-            
-            clock.Stop();
-
-            mockInternalClock.Verify(x => x.Stop(), Times.Once);
-            mockInternalClock.VerifySet(x=>x.Ticks = 0, Times.Once);
-        }
-
-        [Test]
-        public void Start_CallsContinue()
-        {
-            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
-            var mockInternalClock = new Mock<IInternalClock>();
-
-            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
-
-            clock.Start();
-
-            mockInternalClock.Verify(x => x.Continue(), Times.Once);
-        }
-        
-        [Test]
         public void Continue_CallsContinue()
         {
             Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
@@ -88,6 +39,14 @@ namespace Sequencer.Midi.Tests
             clock.Continue();
 
             mockInternalClock.Verify(x => x.Continue(), Times.Once);
+        }
+
+        [Test]
+        public void DefaultTempo_Is120BeatsPerMinute()
+        {
+            SequencerClock sequencerClock = GetSequencerClock();
+
+            Assert.AreEqual(120, sequencerClock.BeatsPerMinute);
         }
 
         [Test]
@@ -102,24 +61,6 @@ namespace Sequencer.Midi.Tests
             var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
 
             Assert.AreEqual(expectedTicks, clock.Ticks);
-        }
-
-        [Test]
-        public void OnTick_ResetsTickCount_WhenPassingTotalTicks()
-        {
-            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
-            var mockInternalClock = new Mock<IInternalClock>();
-            mockInternalClock.Setup(x => x.Ppqn).Returns(120);
-            mockInternalClock.Setup(x => x.Ticks).Returns(7680); // last tick before loop.
-
-            IInternalClock internalClock = mockInternalClock.Object;
-
-            var unused = new SequencerClock(mockSettings.Object, internalClock);
-
-            mockInternalClock.Raise(x=>x.Tick += null, EventArgs.Empty);
-
-            mockInternalClock.VerifySet(x=>x.Ticks = 0, Times.Once);
-            mockInternalClock.Verify(x => x.Start(), Times.Once);
         }
 
         [Test]
@@ -138,6 +79,65 @@ namespace Sequencer.Midi.Tests
 
             mockInternalClock.VerifySet(x => x.Ticks = It.IsAny<int>(), Times.Never);
             mockInternalClock.Verify(x => x.Start(), Times.Never);
+        }
+
+        [Test]
+        public void OnTick_ResetsTickCount_WhenPassingTotalTicks()
+        {
+            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
+            var mockInternalClock = new Mock<IInternalClock>();
+            mockInternalClock.Setup(x => x.Ppqn).Returns(120);
+            mockInternalClock.Setup(x => x.Ticks).Returns(7680); // last tick before loop.
+
+            IInternalClock internalClock = mockInternalClock.Object;
+
+            var unused = new SequencerClock(mockSettings.Object, internalClock);
+
+            mockInternalClock.Raise(x => x.Tick += null, EventArgs.Empty);
+
+            mockInternalClock.VerifySet(x => x.Ticks = 0, Times.Once);
+            mockInternalClock.Verify(x => x.Start(), Times.Once);
+        }
+
+        [Test]
+        public void Pause_KeepsTicks()
+        {
+            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
+            var mockInternalClock = new Mock<IInternalClock>();
+
+            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
+
+            clock.Pause();
+
+            mockInternalClock.Verify(x => x.Stop(), Times.Once);
+            mockInternalClock.VerifySet(x => x.Ticks = It.IsAny<int>(), Times.Never);
+        }
+
+        [Test]
+        public void Start_CallsContinue()
+        {
+            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
+            var mockInternalClock = new Mock<IInternalClock>();
+
+            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
+
+            clock.Start();
+
+            mockInternalClock.Verify(x => x.Continue(), Times.Once);
+        }
+
+        [Test]
+        public void Stop_SetsTicksBackToZero()
+        {
+            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
+            var mockInternalClock = new Mock<IInternalClock>();
+
+            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
+
+            clock.Stop();
+
+            mockInternalClock.Verify(x => x.Stop(), Times.Once);
+            mockInternalClock.VerifySet(x => x.Ticks = 0, Times.Once);
         }
     }
 }

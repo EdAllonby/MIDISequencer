@@ -6,8 +6,7 @@ namespace Sequencer.Midi
 {
     public class InternalClock : IInternalClock
     {
-        [NotNull]
-        private readonly MidiInternalClock internalClockImplementation = new MidiInternalClock();
+        [NotNull] private readonly MidiInternalClock internalClockImplementation = new MidiInternalClock();
 
         public void Dispose()
         {
@@ -32,11 +31,6 @@ namespace Sequencer.Midi
         {
             get => internalClockImplementation.Ppqn;
             set => internalClockImplementation.Ppqn = value;
-        }
-
-        public void SetTicks(int value)
-        {
-            internalClockImplementation.SetTicks(value);
         }
 
         public void Continue()
@@ -64,6 +58,11 @@ namespace Sequencer.Midi
         public void Start()
         {
             internalClockImplementation.Start();
+        }
+
+        public void SetTicks(int value)
+        {
+            internalClockImplementation.SetTicks(value);
         }
     }
 }

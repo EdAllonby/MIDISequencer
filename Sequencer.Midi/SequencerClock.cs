@@ -21,15 +21,15 @@ namespace Sequencer.Midi
             clock.Tick += OnTick;
         }
 
+        public double BeatsPerMinute => 60000000.0 / MicrosecondsPerQuarterNote;
+
+        private int MicrosecondsPerQuarterNote => clock.Tempo;
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        public double BeatsPerMinute => 60000000.0 / MicrosecondsPerQuarterNote;
-
-        private int MicrosecondsPerQuarterNote => clock.Tempo;
 
         public int Ticks => clock.Ticks;
 
