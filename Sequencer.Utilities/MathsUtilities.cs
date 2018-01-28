@@ -21,31 +21,22 @@ namespace Sequencer.Utilities
         }
 
         /// <summary>
-        /// Convert from polar coordinates to rectangular coordinates.
+        /// Convert from polar coordinates to cartesian coordinates.
         /// Only works for points to the left of the origin.
         /// </summary>
         /// <param name="origin">The starting coordinate of the polar coordinates.</param>
         /// <param name="radius">The radius of the point in pixels.</param>
         /// <param name="degrees">The angle of the point in radians.</param>
-        /// <returns>The point in rectangular coordinates.</returns>
+        /// <returns>The point in cartesian coordinates.</returns>
         [Pure]
-        public static Point PolarToRectangular(Point origin, double radius, double degrees)
+        public static Point PolarToCartesian(Point origin, double radius, double degrees)
         {
-            try
-            {
-                double degreesInRadians = ToRadians(degrees);
+            double degreesInRadians = ToRadians(degrees);
 
-                double x = origin.X + radius * Math.Cos(degreesInRadians);
-                double y = origin.Y + radius * Math.Sin(degreesInRadians);
+            double x = origin.X + radius * Math.Cos(degreesInRadians);
+            double y = origin.Y + radius * Math.Sin(degreesInRadians);
 
-                return new Point(x, y);
-            }
-            catch (OverflowException ex)
-            {
-                ex.Data.Add("Screen polar Radius", radius);
-                ex.Data.Add("Screen polar Theta", degrees);
-                throw;
-            }
+            return new Point(x, y);
         }
 
         /// <summary>

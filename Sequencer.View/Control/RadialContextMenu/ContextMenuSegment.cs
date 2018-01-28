@@ -45,14 +45,14 @@ namespace Sequencer.View.Control.RadialContextMenu
             };
 
             //  start angle line
-            Point arcStartPosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius, startAngle);
+            Point arcStartPosition = MathsUtilities.PolarToCartesian(startingPoint, menuRadius, startAngle);
 
             var lineToArc = new LineSegment { Point = arcStartPosition };
 
             pathData.Segments?.Add(lineToArc);
 
             // outer arc
-            Point arcEndPosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius, endAngle);
+            Point arcEndPosition = MathsUtilities.PolarToCartesian(startingPoint, menuRadius, endAngle);
 
             var arcSize = new Size(menuRadius, menuRadius);
 
@@ -89,7 +89,7 @@ namespace Sequencer.View.Control.RadialContextMenu
 
             double midAngle = endAngle - angle / 2;
 
-            Point imagePosition = MathsUtilities.PolarToRectangular(startingPoint, menuRadius * 0.5, midAngle);
+            Point imagePosition = MathsUtilities.PolarToCartesian(startingPoint, menuRadius * 0.5, midAngle);
 
             segmentIcon.SetCentreOnCanvas(imagePosition);
 

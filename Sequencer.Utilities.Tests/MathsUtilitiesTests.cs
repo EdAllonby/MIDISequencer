@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using NUnit.Framework;
 
 namespace Sequencer.Utilities.Tests
@@ -32,7 +33,15 @@ namespace Sequencer.Utilities.Tests
             new object[] { 9, 0, 10, 9 },
             new object[] { 13, 0, 10, 10 }
         };
-        
+
+        private static readonly object[] PolarToCartesianCases =
+        {
+            new object[] { new Point(0, 0), 56, 27, new Point(49.9, 25.42) },
+            new object[] { new Point(1, 1), 56, 27, new Point(50.9, 26.42) },
+            new object[] { new Point(0, 0), 100, 90, new Point(0, 100) },
+            new object[] { new Point(0, -100), 100, 90, new Point(0, 0) }
+        };
+
         [Test]
         public void NearestValue_MultipleMustBeGreaterThan0()
         {
@@ -59,6 +68,17 @@ namespace Sequencer.Utilities.Tests
             int actual = value.Clamp(min, max);
 
             Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(PolarToCartesianCases))]
+        public void PolarToCartesianTests(Point origin, double radius, double degrees, Point expected)
+        {
+            Point actual = MathsUtilities.PolarToCartesian(origin, radius, degrees);
+
+            const double tolerance = 0.01;
+            Assert.That(actual.X, Is.InRange(expected.X - tolerance, expected.X + tolerance));
+            Assert.That(actual.Y, Is.InRange(expected.Y - tolerance, expected.Y + tolerance));
         }
     }
 }

@@ -98,7 +98,7 @@ namespace Sequencer.View.Control.RadialContextMenu
                 // We want to start calculating where the azimuth is on the Y axis.
                 // So, we tranlate all angles by -90 degrees to rotate from X to Y.
                 double startAngle = angle - 90;
-                Point lineEndPoint = MathsUtilities.PolarToRectangular(point.Point, MenuRadius, startAngle);
+                Point lineEndPoint = MathsUtilities.PolarToCartesian(point.Point, MenuRadius, startAngle);
 
                 Line seperatorLine = CreateSeperatorLine(point.Point, lineEndPoint);
 
