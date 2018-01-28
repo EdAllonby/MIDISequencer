@@ -1,20 +1,18 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Sanford.Multimedia.Midi;
 using Sequencer.Domain.Settings;
 
 namespace Sequencer.Midi
 {
-    /// <summary>
-    /// Currently just a wrapper for the <see cref="MidiInternalClock" />.
-    /// </summary>
     public class SequencerClock : ISequencerClock, IDisposable
     {
-        [NotNull] private readonly MidiInternalClock clock = new MidiInternalClock();
+        [NotNull] private readonly IInternalClock clock;
         private readonly int totalTicks;
 
-        public SequencerClock([NotNull] IMusicalSettings musicalSettings)
+        public SequencerClock([NotNull] IMusicalSettings musicalSettings, [NotNull] IInternalClock internalClock)
         {
+            clock = internalClock;
+
             TicksPerQuarterNote = musicalSettings.TicksPerQuarterNote;
 
             int totalBeats = musicalSettings.TotalMeasures * musicalSettings.TimeSignature.BeatsPerMeasure;
@@ -29,13 +27,11 @@ namespace Sequencer.Midi
             GC.SuppressFinalize(this);
         }
 
-        public int Tempo => clock.Tempo;
+        public double BeatsPerMinute => 60000000.0 / MicrosecondsPerQuarterNote;
 
-        public int Ticks
-        {
-            get => clock.Ticks;
-            set => clock.SetTicks(value);
-        }
+        private int MicrosecondsPerQuarterNote => clock.Tempo;
+
+        public int Ticks => clock.Ticks;
 
         public void Start()
         {
@@ -50,7 +46,7 @@ namespace Sequencer.Midi
         public void Stop()
         {
             clock.Stop();
-            clock.SetTicks(0);
+            clock.Ticks = 0;
 
             Tick?.Invoke(this, new TickEventArgs(Ticks));
         }
@@ -85,7 +81,7 @@ namespace Sequencer.Midi
         {
             if (Ticks == totalTicks)
             {
-                clock.SetTicks(0);
+                clock.Ticks = 0;
                 clock.Start();
             }
 

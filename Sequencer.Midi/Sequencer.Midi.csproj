@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IDigitalAudioProtocol.cs" />
+    <Compile Include="IInternalClock.cs" />
+    <Compile Include="InternalClock.cs" />
     <Compile Include="ISequencerClock.cs" />
     <Compile Include="ITickCalculator.cs" />
     <Compile Include="MidiProtocol.cs" />

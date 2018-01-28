@@ -48,6 +48,7 @@ namespace Sequencer.View
                 builder.RegisterType<WpfDispatcher>().As<IWpfDispatcher>().SingleInstance();
                 builder.RegisterType<SequencerSettings>().As<IColourSettings, IMusicalSettings, IAudioSettings>().SingleInstance();
                 builder.RegisterType<TickCalculator>().As<ITickCalculator>().SingleInstance();
+                builder.RegisterType<InternalClock>().As<IInternalClock>().SingleInstance();
                 builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
                 builder.RegisterType<PitchAndPositionCalculator>().As<IPitchAndPositionCalculator>().SingleInstance();
                 builder.RegisterType<FrequencyCalculator>().As<IFrequencyCalculator>().SingleInstance();

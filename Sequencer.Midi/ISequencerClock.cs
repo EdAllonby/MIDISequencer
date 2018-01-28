@@ -4,7 +4,6 @@ namespace Sequencer.Midi
 {
     public interface ISequencerClock
     {
-        int Tempo { get; }
         int Ticks { get; }
 
         int TicksPerQuarterNote { get; }
