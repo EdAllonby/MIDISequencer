@@ -8,12 +8,16 @@ namespace Sequencer.Domain.Tests
     [TestFixture]
     public class EnumerableTypeTests
     {
-        [Test]
-        public void EnumerableTypeCountTest()
+        private class EnumerableTypeTestClass : EnumerableType<EnumerableTypeTestClass>
         {
-            int count = EnumerableTypeTestClass.Count;
+            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType1 = new EnumerableTypeTestClass(0, "EnumerableType1");
+            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType2 = new EnumerableTypeTestClass(1, "EnumerableType2");
+            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType3 = new EnumerableTypeTestClass(2, "EnumerableType3");
+            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType4 = new EnumerableTypeTestClass(3, "EnumerableType4");
 
-            Assert.AreEqual(4, count);
+            private EnumerableTypeTestClass(int value, string displayName) : base(value, displayName)
+            {
+            }
         }
 
         [Test]
@@ -26,34 +30,30 @@ namespace Sequencer.Domain.Tests
                 EnumerableTypeTestClass.EnumerableType1,
                 EnumerableTypeTestClass.EnumerableType2,
                 EnumerableTypeTestClass.EnumerableType3,
-                EnumerableTypeTestClass.EnumerableType4,
+                EnumerableTypeTestClass.EnumerableType4
             };
 
             CollectionAssert.AreEquivalent(expected, all);
         }
 
         [Test]
-        public void FromValue_WhenNoneExists_ThrowsApplicationException()
+        public void EnumerableTypeCountTest()
         {
-            Assert.Throws<ApplicationException>(() => EnumerableTypeTestClass.FromValue(-1));
+            int count = EnumerableTypeTestClass.Count;
+
+            Assert.AreEqual(4, count);
         }
-        
+
         [Test]
         public void FromDisplayName_WhenNoneExists_ThrowsApplicationException()
         {
             Assert.Throws<ApplicationException>(() => EnumerableTypeTestClass.FromDisplayName("unexpected"));
         }
 
-        private class EnumerableTypeTestClass : EnumerableType<EnumerableTypeTestClass>
+        [Test]
+        public void FromValue_WhenNoneExists_ThrowsApplicationException()
         {
-            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType1 = new EnumerableTypeTestClass(0, "EnumerableType1");
-            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType2 = new EnumerableTypeTestClass(1, "EnumerableType2");
-            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType3 = new EnumerableTypeTestClass(2, "EnumerableType3");
-            [UsedImplicitly] [NotNull] public static readonly EnumerableTypeTestClass EnumerableType4 = new EnumerableTypeTestClass(3, "EnumerableType4");
-
-            private EnumerableTypeTestClass(int value, string displayName) : base(value, displayName)
-            {
-            }
+            Assert.Throws<ApplicationException>(() => EnumerableTypeTestClass.FromValue(-1));
         }
     }
 }

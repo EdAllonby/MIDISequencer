@@ -43,6 +43,15 @@ namespace Sequencer.Utilities.Tests
         };
 
         [Test]
+        [TestCaseSource(nameof(ClampCases))]
+        public void ClampTests(int value, int min, int max, int expected)
+        {
+            int actual = value.Clamp(min, max);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
         public void NearestValue_MultipleMustBeGreaterThan0()
         {
             // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
@@ -59,15 +68,6 @@ namespace Sequencer.Utilities.Tests
             int actualValue = MathsUtilities.NearestValue(value, multiple);
 
             Assert.AreEqual(expectedValue, actualValue);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(ClampCases))]
-        public void ClampTests(int value, int min, int max, int expected)
-        {
-            int actual = value.Clamp(min, max);
-
-            Assert.AreEqual(expected, actual);
         }
 
         [Test]
