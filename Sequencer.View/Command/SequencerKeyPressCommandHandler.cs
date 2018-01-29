@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
 using JetBrains.Annotations;
+using Sequencer.Domain.Settings;
 using Sequencer.View.Command.NotesCommand;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
@@ -17,15 +18,16 @@ namespace Sequencer.View.Command
 
         [NotNull] private readonly ISequencerNotes notes;
 
-        public SequencerKeyPressCommandHandler([NotNull] ISequencerNotes notes, [NotNull] IKeyboardStateProcessor keyboardStateProcessor)
+        public SequencerKeyPressCommandHandler([NotNull] IMusicalSettings musicalSettings, [NotNull] ISequencerNotes notes, [NotNull] IKeyboardStateProcessor keyboardStateProcessor)
         {
+            var ticksPerSixteenthNote = musicalSettings.TicksPerQuarterNote / 4;
+
             noteCommandsForSelectedNotes = new Dictionary<KeyboardInput, INotesCommand>
             {
-                { new KeyboardInput(Key.A), new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected) },
-                { new KeyboardInput(Key.Right), new MoveNotePositionCommand(1) },
+                { new KeyboardInput(Key.Right), new MoveNotePositionCommand(ticksPerSixteenthNote) },
                 { new KeyboardInput(Key.Add), new IncrementVelocityCommand(5) },
                 { new KeyboardInput(Key.Subtract), new DecrementVelocityCommand(5) },
-                { new KeyboardInput(Key.Left), new MoveNotePositionCommand(-1) },
+                { new KeyboardInput(Key.Left), new MoveNotePositionCommand(-ticksPerSixteenthNote) },
                 { new KeyboardInput(Key.Up), new MoveNotePitchCommand(1) },
                 { new KeyboardInput(Key.Down), new MoveNotePitchCommand(-1) },
                 { new KeyboardInput(Key.Delete), new DeleteNotesCommand(notes) }

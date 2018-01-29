@@ -83,7 +83,7 @@ namespace Sequencer.View.Control
             sequencerDrawer = new SequencerDrawer(protocol, sequencerCanvasWrapper, notes, sequencerDimensionsCalculator, sequencerSettings);
             positionIndicatorDrawer = new PositionIndicatorDrawer(sequencerSettings, sequencerCanvasWrapper, sequencerDimensionsCalculator);
 
-            keyPressCommandHandler = new SequencerKeyPressCommandHandler(notes, keyboardStateProcessor);
+            keyPressCommandHandler = new SequencerKeyPressCommandHandler(sequencerSettings, notes, keyboardStateProcessor);
         }
 
         public NoteAction NoteAction
