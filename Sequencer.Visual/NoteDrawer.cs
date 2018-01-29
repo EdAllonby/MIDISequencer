@@ -47,7 +47,7 @@ namespace Sequencer.Visual
 
         public void DrawNote([NotNull] Pitch pitch, [NotNull] Velocity velocity, [NotNull] IPosition startPosition, [NotNull] IPosition endPosition, NoteState noteState)
         {
-            Log.InfoFormat($"Drawing note length with start position {startPosition} to end position {endPosition}");
+            Log.InfoFormat($"Drawing note Pitch [{pitch}], Velocity [{velocity}] Start Position [{startPosition}] to End Position [{endPosition}]");
 
             double noteHeight = sequencerDimensionsCalculator.NoteHeight;
 

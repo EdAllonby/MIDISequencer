@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
@@ -12,6 +13,7 @@ namespace Sequencer.Visual
         [NotNull] private readonly IDigitalAudioProtocol protocol;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         private NoteState noteState = NoteState.Selected;
+        private bool canDraw = true;
 
         public VisualNote([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
             [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone)
@@ -105,7 +107,10 @@ namespace Sequencer.Visual
         /// </summary>
         public void Draw()
         {
-            noteDrawer.DrawNote(Pitch, Velocity, StartPosition, EndPosition, noteState);
+            if (canDraw)
+            {
+                noteDrawer.DrawNote(Pitch, Velocity, StartPosition, EndPosition, noteState);
+            }
         }
 
         /// <summary>
@@ -122,8 +127,11 @@ namespace Sequencer.Visual
         /// <param name="ticksToMove">How many beats to move this visual note.</param>
         public void MovePositionRelativeTo(int ticksToMove)
         {
-            StartPosition = StartPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
-            EndPosition = EndPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            DelayedDraw(() =>
+            {
+                StartPosition = StartPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+                EndPosition = EndPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            });
         }
 
         /// <summary>
@@ -139,6 +147,14 @@ namespace Sequencer.Visual
         public override string ToString()
         {
             return $"Pitch: {Pitch}, Start IPosition: {StartPosition}, End IPosition: {EndPosition}";
+        }
+
+        private void DelayedDraw(Action action)
+        {
+            canDraw = false;
+            action();
+            canDraw = true;
+            Draw();
         }
     }
 }
