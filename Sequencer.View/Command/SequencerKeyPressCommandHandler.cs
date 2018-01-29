@@ -43,7 +43,7 @@ namespace Sequencer.View.Command
         }
 
         /// <summary>
-        /// Handle's a particular key press from the user.
+        /// Handles a particular key press from the user.
         /// </summary>
         /// <param name="keyPressed">The key the user pressed.</param>
         public void HandleSequencerKeyPressed(Key keyPressed)
