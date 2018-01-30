@@ -12,8 +12,8 @@ namespace Sequencer.Visual
         [NotNull] private readonly NoteDrawer noteDrawer;
         [NotNull] private readonly IDigitalAudioProtocol protocol;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        private NoteState noteState = NoteState.Selected;
         private bool canDraw = true;
+        private NoteState noteState = NoteState.Selected;
 
         public VisualNote([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
             [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone)
@@ -149,7 +149,7 @@ namespace Sequencer.Visual
             return $"Pitch: {Pitch}, Start IPosition: {StartPosition}, End IPosition: {EndPosition}";
         }
 
-        private void DelayedDraw(Action action)
+        private void DelayedDraw([NotNull] Action action)
         {
             canDraw = false;
             action();

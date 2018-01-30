@@ -21,16 +21,16 @@ namespace Sequencer.View.Control
 
         private void SequencerMouseDown([NotNull] object sender, [NotNull] MouseButtonEventArgs e)
         {
-            IMousePoint mouseDownPoint = SequencerMousePosition(e);
-
             switch (e.ChangedButton)
             {
                 case MouseButton.Left:
-                    Sequencer?.HandleLeftMouseDown(mouseDownPoint);
+                    IMousePoint sequencerMousePosition = SequencerMousePosition(e);
+                    Sequencer?.HandleLeftMouseDown(sequencerMousePosition);
                     break;
 
                 case MouseButton.Right:
-                    RadialContextMenu?.BuildPopup(mouseDownPoint);
+                    IMousePoint sequencerScrollWindowMousePosition = SequencerScrollerMousePosition(e);
+                    RadialContextMenu?.BuildPopup(sequencerScrollWindowMousePosition);
                     break;
             }
 
@@ -40,15 +40,16 @@ namespace Sequencer.View.Control
 
         private void SequencerMouseMoved([NotNull] object sender, [NotNull] MouseEventArgs e)
         {
-            IMousePoint currentMousePosition = SequencerMousePosition(e);
 
             if (mouseOperator.CanModifyContextMenu)
             {
-                RadialContextMenu?.SetCursorPosition(currentMousePosition);
+                IMousePoint sequencerScrollWindowMousePosition = SequencerScrollerMousePosition(e);
+                RadialContextMenu?.SetCursorPosition(sequencerScrollWindowMousePosition);
             }
             else
             {
-                Sequencer?.HandleMouseMovement(currentMousePosition);
+                IMousePoint sequencerMousePosition = SequencerMousePosition(e);
+                Sequencer?.HandleMouseMovement(sequencerMousePosition);
             }
 
             e.Handled = true;
@@ -81,6 +82,13 @@ namespace Sequencer.View.Control
         private IMousePoint SequencerMousePosition([NotNull] MouseEventArgs mouseEventArgs)
         {
             Point point = mouseEventArgs.GetPosition(Sequencer);
+            return new MousePoint(point);
+        }
+
+        [NotNull]
+        private IMousePoint SequencerScrollerMousePosition([NotNull] MouseEventArgs mouseEventArgs)
+        {
+            Point point = mouseEventArgs.GetPosition(SequencerScrollViewer);
             return new MousePoint(point);
         }
     }

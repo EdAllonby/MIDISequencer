@@ -21,11 +21,11 @@ namespace Sequencer.Domain.Settings
         public Color IndicatorColour => Colors.BurlyWood;
 
         // Musical definitions
-        public int TotalNotes => 32;
+        public int TotalNotes => 64;
 
         public int TotalMeasures => 1;
         public Velocity DefaultVelocity => new Velocity(64);
-        public Pitch LowestPitch => new Pitch(Note.A, 2);
+        public Pitch LowestPitch => new Pitch(Note.A, 1);
         public TimeSignature TimeSignature => TimeSignature.FourFour;
         public int TicksPerQuarterNote => 96;
         public NoteResolution NoteResolution => NoteResolution.Sixteenth;
