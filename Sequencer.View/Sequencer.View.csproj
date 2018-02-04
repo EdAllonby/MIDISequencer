@@ -114,6 +114,7 @@
       <DependentUpon>DragSelectionBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\DrawingUtilities.cs" />
+    <Compile Include="Control\HeaderedScrollViewer.cs" />
     <Compile Include="Control\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -123,6 +124,9 @@
     <Compile Include="Control\RadialContextMenu\RadialCursorLine.cs" />
     <Compile Include="Control\SequencerControl.xaml.cs">
       <DependentUpon>SequencerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SequencerHeaderControl.xaml.cs">
+      <DependentUpon>SequencerHeaderControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Drawing\PositionIndicatorDrawer.cs" />
     <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />
@@ -150,6 +154,7 @@
     <Compile Include="Drawing\SequencerDrawer.cs" />
     <Compile Include="Command\SequencerKeyPressCommandHandler.cs" />
     <Compile Include="Console\UnsafeNativeMethods.cs" />
+    <Compile Include="Drawing\SequencerHeaderDrawer.cs" />
     <Compile Include="WpfDispatcher.cs" />
     <Page Include="Control\DragSelectionBox.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -167,6 +172,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Control\SequencerHeaderControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

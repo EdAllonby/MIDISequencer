@@ -23,13 +23,17 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
-                <ScrollViewer Grid.Row="0" x:Name="SequencerScrollViewer">
-                    <control:SequencerControl x:Name="Sequencer" MouseMove="SequencerMouseMoved"
+                <control:HeaderedScrollViewer Grid.Row="0" x:Name="SequencerScrollViewer">
+                    <control:HeaderedScrollViewer.TopHeader>
+                        <control:SequencerHeaderControl Height="30"/>
+                    </control:HeaderedScrollViewer.TopHeader>
+
+                        <control:SequencerControl x:Name="Sequencer" MouseMove="SequencerMouseMoved" 
                                               MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
                                               NoteAction="{Binding NoteAction}"
                                               SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
                                               CurrentPosition="{Binding CurrentPosition, Mode=OneWay}" MinHeight="800" />
-                </ScrollViewer>
+                </control:HeaderedScrollViewer>
 
                 <radialContextMenu:NoteActionRadialContextMenuWrapper x:Name="RadialContextMenu"
                                                                       SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
