@@ -40,7 +40,6 @@ namespace Sequencer.View.Control
 
         private void SequencerMouseMoved([NotNull] object sender, [NotNull] MouseEventArgs e)
         {
-
             if (mouseOperator.CanModifyContextMenu)
             {
                 IMousePoint sequencerScrollWindowMousePosition = SequencerScrollerMousePosition(e);

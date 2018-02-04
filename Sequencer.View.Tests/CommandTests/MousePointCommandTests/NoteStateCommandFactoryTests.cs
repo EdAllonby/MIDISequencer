@@ -24,6 +24,16 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
         }
 
         [Test]
+        public void CreateNoteStateCommandWithUnknown_ThrowsArgumentOutOfRangeException()
+        {
+            var sequencerNotesMock = new Mock<ISequencerNotes>();
+            var keyboardStateProcessorMock = new Mock<IKeyboardStateProcessor>();
+            var commandFactory = new NoteStateCommandFactory(sequencerNotesMock.Object, keyboardStateProcessorMock.Object);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => commandFactory.CreateNoteStateCommand((NoteState) (-1)));
+        }
+
+        [Test]
         public void CreateNoteStateCommandWithUnselected_CreatesUpdateNoteStateCommand()
         {
             var sequencerNotesMock = new Mock<ISequencerNotes>();
@@ -33,16 +43,6 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             INotesCommand selectedNoteCommand = commandFactory.CreateNoteStateCommand(NoteState.Unselected);
 
             Assert.IsInstanceOf<UpdateNoteStateCommand>(selectedNoteCommand);
-        }
-
-        [Test]
-        public void CreateNoteStateCommandWithUnknown_ThrowsArgumentOutOfRangeException()
-        {
-            var sequencerNotesMock = new Mock<ISequencerNotes>();
-            var keyboardStateProcessorMock = new Mock<IKeyboardStateProcessor>();
-            var commandFactory = new NoteStateCommandFactory(sequencerNotesMock.Object, keyboardStateProcessorMock.Object);
-
-            Assert.Throws<ArgumentOutOfRangeException>(() => commandFactory.CreateNoteStateCommand((NoteState) (-1)));
         }
     }
 }

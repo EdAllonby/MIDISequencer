@@ -9,15 +9,15 @@ namespace Sequencer.View.Command.MousePointCommand
 {
     public sealed class UpdateNoteStateFromPointCommand : MousePointNoteCommand
     {
-        [NotNull] private readonly IMouseOperator mouseOperator;
         [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
+        [NotNull] private readonly IMouseOperator mouseOperator;
         [NotNull] private readonly INotesCommand noteStateSelectedCommand;
         [NotNull] private readonly INotesCommand noteStateUnselectedCommand;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
 
         public UpdateNoteStateFromPointCommand([NotNull] ISequencerNotes sequencerNotes, [NotNull] IMouseOperator mouseOperator,
-            [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, 
+            [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
             [NotNull] INoteStateCommandFactory noteStateCommandFactory)
         {
             this.sequencerNotes = sequencerNotes;
@@ -33,7 +33,7 @@ namespace Sequencer.View.Command.MousePointCommand
         protected override void DoExecute(IMousePoint mousePoint)
         {
             IVisualNote actionableNote = sequencerDimensionsCalculator.FindNoteFromPoint(sequencerNotes, mousePoint);
-            
+
             if (actionableNote != null)
             {
                 if (actionableNote.NoteState == NoteState.Selected && keyboardStateProcessor.IsKeyDown(Key.LeftCtrl))

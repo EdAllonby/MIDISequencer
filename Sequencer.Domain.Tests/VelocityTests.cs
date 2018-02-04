@@ -31,6 +31,14 @@ namespace Sequencer.Domain.Tests
         }
 
         [Test]
+        public void NullVelocity_NotEqual()
+        {
+            var velocity = new Velocity(127 / 2);
+
+            Assert.IsFalse(velocity.Equals(null));
+        }
+
+        [Test]
         public void NullVelocityObject_IsNotEqual()
         {
             var velocity = new Velocity(127 / 2);
@@ -90,14 +98,6 @@ namespace Sequencer.Domain.Tests
             var velocity = new Velocity(127 / 2);
 
             Assert.IsTrue(velocity.Equals((object) velocity));
-        }
-
-        [Test]
-        public void NullVelocity_NotEqual()
-        {
-            var velocity = new Velocity(127 / 2);
-
-            Assert.IsFalse(velocity.Equals(null));
         }
 
         [Test]

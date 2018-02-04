@@ -38,7 +38,7 @@ namespace Sequencer.Domain.Tests
             new object[] { new Position(4, 4, 4), new Position(5, 1, 1) },
             new object[] { new Position(2, 3, 4), new Position(2, 4, 1) }
         };
-        
+
         private static readonly object[] PreviousPositionCases =
         {
             new object[] { new Position(1, 1, 2), new Position(1, 1, 1) },

@@ -8,8 +8,8 @@ namespace Sequencer.View.Command.MousePointCommand
 {
     public class NoteStateCommandFactory : INoteStateCommandFactory
     {
-        [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly IKeyboardStateProcessor keyboardStateProcessor;
+        [NotNull] private readonly ISequencerNotes sequencerNotes;
 
         public NoteStateCommandFactory([NotNull] ISequencerNotes sequencerNotes, [NotNull] IKeyboardStateProcessor keyboardStateProcessor)
         {
