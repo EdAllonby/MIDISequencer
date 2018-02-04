@@ -32,15 +32,8 @@ namespace Sequencer.Domain
 
         public bool Equals(Pitch other)
         {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
 
             return Note.Equals(other.Note) && Octave == other.Octave;
         }
@@ -49,7 +42,7 @@ namespace Sequencer.Domain
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is Pitch && Equals((Pitch) obj);
+            return obj is Pitch pitch && Equals(pitch);
         }
 
         public override int GetHashCode()
