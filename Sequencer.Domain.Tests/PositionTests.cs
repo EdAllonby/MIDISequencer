@@ -38,6 +38,67 @@ namespace Sequencer.Domain.Tests
             new object[] { new Position(4, 4, 4), new Position(5, 1, 1) },
             new object[] { new Position(2, 3, 4), new Position(2, 4, 1) }
         };
+        
+        private static readonly object[] PreviousPositionCases =
+        {
+            new object[] { new Position(1, 1, 2), new Position(1, 1, 1) },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 1) },
+            new object[] { new Position(5, 1, 1), new Position(4, 4, 4) },
+            new object[] { new Position(2, 4, 1), new Position(2, 3, 4) }
+        };
+
+        private static readonly object[] CompareToCases =
+        {
+            new object[] { new Position(1, 1, 1), new Position(1, 1, 2), -1 },
+            new object[] { new Position(3, 1, 1), new Position(3, 1, 2), -1 },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 1), 1 },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 2), 0 },
+            new object[] { new Position(3, 1, 2, 1234), new Position(3, 1, 2, 1234), 0 },
+            new object[] { new Position(3, 1, 2, 1234), new Position(3, 1, 2, 1235), -1 },
+            new object[] { new Position(3, 1, 2, 1235), new Position(3, 1, 2, 1234), 1 },
+            new object[] { new Position(3, 1, 3), new Position(3, 1, 2, 12340000), 1 },
+            new object[] { new Position(3, 2, 3), new Position(3, 1, 3), 1 }
+        };
+
+        private static readonly object[] IsGreaterThanCases =
+        {
+            new object[] { new Position(1, 1, 1), new Position(1, 1, 2), false },
+            new object[] { new Position(3, 1, 1), new Position(3, 1, 2), false },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 1), true },
+            new object[] { new Position(3, 1, 2, 1), new Position(3, 1, 2, 1), false },
+            new object[] { new Position(3, 1, 2, 123), new Position(3, 1, 2, 122), true },
+            new object[] { new Position(3, 1, 2, 122), new Position(3, 1, 2, 123), false }
+        };
+
+        private static readonly object[] IsGreaterThanOrEqualCases =
+        {
+            new object[] { new Position(1, 1, 1), new Position(1, 1, 2), false },
+            new object[] { new Position(3, 1, 1), new Position(3, 1, 2), false },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 1), true },
+            new object[] { new Position(3, 1, 2, 1), new Position(3, 1, 2, 1), true },
+            new object[] { new Position(3, 1, 2, 123), new Position(3, 1, 2, 122), true },
+            new object[] { new Position(3, 1, 2, 122), new Position(3, 1, 2, 123), false }
+        };
+
+        private static readonly object[] IsLessThanCases =
+        {
+            new object[] { new Position(1, 1, 1), new Position(1, 1, 2), true },
+            new object[] { new Position(3, 1, 1), new Position(3, 1, 2), true },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 1), false },
+            new object[] { new Position(3, 1, 2, 1), new Position(3, 1, 2, 1), false },
+            new object[] { new Position(3, 1, 2, 123), new Position(3, 1, 2, 122), false },
+            new object[] { new Position(3, 1, 2, 122), new Position(3, 1, 2, 123), true }
+        };
+
+        private static readonly object[] IsLessThanOrEqualCases =
+        {
+            new object[] { new Position(1, 1, 1), new Position(1, 1, 2), true },
+            new object[] { new Position(3, 1, 1), new Position(3, 1, 2), true },
+            new object[] { new Position(3, 1, 2), new Position(3, 1, 1), false },
+            new object[] { new Position(3, 1, 2, 1), new Position(3, 1, 2, 1), true },
+            new object[] { new Position(3, 1, 2, 123), new Position(3, 1, 2, 122), false },
+            new object[] { new Position(3, 1, 2, 122), new Position(3, 1, 2, 123), true }
+        };
 
         [Test]
         [TestCaseSource(nameof(BeatPositionCases))]
@@ -51,12 +112,75 @@ namespace Sequencer.Domain.Tests
         }
 
         [Test]
+        [TestCaseSource(nameof(CompareToCases))]
+        public void CompareToPositionTests(IPosition first, IPosition second, int expected)
+        {
+            int actual = first.CompareTo(second);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(IsGreaterThanOrEqualCases))]
+        public void IsGreaterThanOrEqualPositionTests(IPosition first, IPosition second, bool expected)
+        {
+            bool actual = first.IsGreaterThanOrEqual(second);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(IsGreaterThanCases))]
+        public void IsGreaterThanPositionTests(IPosition first, IPosition second, bool expected)
+        {
+            bool actual = first.IsGreaterThan(second);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(IsLessThanOrEqualCases))]
+        public void IsLessThanOrEqualPositionTests(IPosition first, IPosition second, bool expected)
+        {
+            bool actual = first.IsLessThanOrEqual(second);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(IsLessThanCases))]
+        public void IsLessThanPositionTests(IPosition first, IPosition second, bool expected)
+        {
+            bool actual = first.IsLessThan(second);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
         [TestCaseSource(nameof(NextPositionCases))]
         public void NextPositionShouldBeCorrect(IPosition initialPosition, IPosition expectedNextPosition)
         {
             IPosition actualNextPosition = initialPosition.NextPosition(NoteResolution.Quarter, standardTimeSignature, 96);
 
             Assert.AreEqual(expectedNextPosition, actualNextPosition);
+        }
+
+        [Test]
+        public void NullSecondPosition_ReturnsNotEqual()
+        {
+            var firstPosition = new Position(9, 1, 2, 21);
+
+            Assert.IsFalse(firstPosition.Equals(null));
+            Assert.AreNotEqual(firstPosition.GetHashCode(), null);
+        }
+
+        [Test]
+        public void NullSecondPositionObject_ReturnsNotEqual()
+        {
+            var firstPosition = new Position(9, 1, 2, 21);
+
+            Assert.IsFalse(firstPosition.Equals((object) null));
+            Assert.AreNotEqual(firstPosition.GetHashCode(), null);
         }
 
         [Test]
@@ -139,6 +263,7 @@ namespace Sequencer.Domain.Tests
             var secondPosition = new Position(9, 1, 2, 21);
 
             Assert.IsTrue(firstPosition.Equals(secondPosition));
+            Assert.AreEqual(firstPosition.GetHashCode(), secondPosition.GetHashCode());
         }
 
         [Test]
@@ -147,6 +272,33 @@ namespace Sequencer.Domain.Tests
         {
             int actual = position.SummedBeat(standardTimeSignature);
             Assert.AreEqual(expectedSum, actual);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(PreviousPositionCases))]
+        public void PreviousPositionShouldBeCorrect(IPosition initialPosition, IPosition expectedPreviousPosition)
+        {
+            IPosition actualPreviousPosition = initialPosition.PreviousPosition(NoteResolution.Quarter, standardTimeSignature, 96);
+
+            Assert.AreEqual(expectedPreviousPosition, actualPreviousPosition);
+        }
+
+        [Test]
+        public void ReferenceEquals_ReturnsTrue()
+        {
+            var firstPosition = new Position(9, 1, 2, 21);
+
+            Assert.IsTrue(firstPosition.Equals(firstPosition));
+            Assert.AreEqual(firstPosition.GetHashCode(), firstPosition.GetHashCode());
+        }
+
+
+        [Test]
+        public void ReferenceEqualsObject_ReturnsTrue()
+        {
+            var firstPosition = new Position(9, 1, 2, 21);
+
+            Assert.IsTrue(firstPosition.Equals((object) firstPosition));
         }
     }
 }
