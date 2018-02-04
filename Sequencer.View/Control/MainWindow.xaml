@@ -25,7 +25,7 @@
             <Grid Grid.Row="0">
                 <control:HeaderedScrollViewer Grid.Row="0" x:Name="SequencerScrollViewer">
                     <control:HeaderedScrollViewer.TopHeader>
-                        <control:SequencerHeaderControl Height="30"/>
+                        <control:SequencerHeaderControl Height="30" CurrentPosition="{Binding CurrentPosition, Mode=OneWay}"/>
                     </control:HeaderedScrollViewer.TopHeader>
 
                         <control:SequencerControl x:Name="Sequencer" MouseMove="SequencerMouseMoved" 
