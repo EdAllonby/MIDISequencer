@@ -105,6 +105,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Command\MousePointCommand\EmptyMousePointCommand.cs" />
+    <Compile Include="Command\MousePointCommand\INoteStateCommandFactory.cs" />
+    <Compile Include="Command\MousePointCommand\NoteStateCommandFactory.cs" />
     <Compile Include="Console\ConsolePosition.cs" />
     <Compile Include="Console\DesiredAccess.cs" />
     <Compile Include="Console\StdHandle.cs" />

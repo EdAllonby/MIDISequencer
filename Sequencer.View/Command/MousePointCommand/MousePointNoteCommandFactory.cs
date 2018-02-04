@@ -14,12 +14,13 @@ namespace Sequencer.View.Command.MousePointCommand
 
         public MousePointNoteCommandFactory([NotNull] IVisualNoteFactory visualNoteFactory, [NotNull] IMouseOperator mouseOperator,
             [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] ISequencerNotes sequencerNotes,
-            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
+            [NotNull] INoteStateCommandFactory noteStateCommandFactory)
         {
             noteCommandRegistry = new Dictionary<NoteAction, IMousePointNoteCommand>
             {
                 { NoteAction.Create, new CreateNoteFromPointCommand(visualNoteFactory, sequencerNotes, sequencerSettings, mouseOperator, sequencerDimensionsCalculator) },
-                { NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, mouseOperator, keyboardStateProcessor, sequencerDimensionsCalculator) },
+                { NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, mouseOperator, keyboardStateProcessor, sequencerDimensionsCalculator, noteStateCommandFactory) },
                 { NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerDimensionsCalculator, new DeleteNotesCommand(sequencerNotes)) }
             };
         }

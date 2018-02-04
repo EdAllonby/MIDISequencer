@@ -63,8 +63,10 @@
   <ItemGroup>
     <Compile Include="CommandTests\MousePointCommandTests\CreateNoteFromPointCommandTests.cs" />
     <Compile Include="CommandTests\MousePointCommandTests\DeleteNoteFromPointCommandTests.cs" />
+    <Compile Include="CommandTests\MousePointCommandTests\NoteStateCommandFactoryTests.cs" />
     <Compile Include="CommandTests\MousePointCommandTests\MousePointNoteCommandFactoryTests.cs" />
     <Compile Include="CommandTests\MousePointCommandTests\MoveNoteFromPointCommandTests.cs" />
+    <Compile Include="CommandTests\MousePointCommandTests\UpdateNoteStateFromPointCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\MoveNotePositionCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\MoveNotePitchCommandTests.cs" />
     <Compile Include="CommandTests\NotesCommandTests\IncrementVelocityCommandTests.cs" />

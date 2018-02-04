@@ -19,8 +19,8 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             var keyboardStateStub = new Mock<IKeyboardStateProcessor>();
             var mockSequencerCalculator = new Mock<ISequencerDimensionsCalculator>();
             var mockMouseOperator = new Mock<IMouseOperator>();
-
-            factory = new MousePointNoteCommandFactory(mockVisualNoteFactory.Object, mockMouseOperator.Object, keyboardStateStub.Object, mockSequencerNotes.Object, new SequencerSettings(), mockSequencerCalculator.Object);
+            var mockNoteStateCommandFactory = new Mock<INoteStateCommandFactory>();
+            factory = new MousePointNoteCommandFactory(mockVisualNoteFactory.Object, mockMouseOperator.Object, keyboardStateStub.Object, mockSequencerNotes.Object, new SequencerSettings(), mockSequencerCalculator.Object, mockNoteStateCommandFactory.Object);
         }
 
         private MousePointNoteCommandFactory factory;

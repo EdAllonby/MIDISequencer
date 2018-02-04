@@ -76,8 +76,9 @@ namespace Sequencer.View.Control
 
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(protocol, sequencerCanvasWrapper, sequencerSettings, pitchAndPositionCalculator);
             IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, protocol, sequencerDimensionsCalculator, sequencerCanvasWrapper);
+            INoteStateCommandFactory noteStateCommandFactory = new NoteStateCommandFactory(notes, keyboardStateProcessor);
 
-            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator);
+            mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes, sequencerSettings, sequencerDimensionsCalculator, noteStateCommandFactory);
             updateNewlyCreatedNoteCommand = new UpdateNewlyCreatedNoteCommand(notes, mouseOperator, sequencerSettings, sequencerDimensionsCalculator);
             selectNoteCommand = new UpdateNoteStateCommand(notes, keyboardStateProcessor, NoteState.Selected);
             sequencerDrawer = new SequencerDrawer(protocol, sequencerCanvasWrapper, notes, sequencerDimensionsCalculator, sequencerSettings);
