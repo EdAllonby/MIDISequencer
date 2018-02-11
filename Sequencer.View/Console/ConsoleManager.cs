@@ -78,7 +78,7 @@ namespace Sequencer.View.Console
             UnsafeNativeMethods.ShowWindow(p.MainWindowHandle, 3);
         }
 
-        public static void UnredirectConsole(out IntPtr stdOut, out IntPtr stdIn, out IntPtr stdErr)
+        private static void UnredirectConsole(out IntPtr stdOut, out IntPtr stdIn, out IntPtr stdErr)
         {
             UnsafeNativeMethods.SetStdHandle(StdHandle.Output, stdOut = GetConsoleStandardOutput());
             UnsafeNativeMethods.SetStdHandle(StdHandle.Input, stdIn = GetConsoleStandardInput());

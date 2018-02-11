@@ -25,7 +25,7 @@ namespace Sequencer.View.Drawing
             this.pitchAndPositionCalculator = pitchAndPositionCalculator;
         }
 
-        public double TickWidth => BeatWidth / sequencerSettings.TicksPerQuarterNote;
+        private double TickWidth => BeatWidth / sequencerSettings.TicksPerQuarterNote;
 
         /// <summary>
         /// The note heights the sequencer should display.

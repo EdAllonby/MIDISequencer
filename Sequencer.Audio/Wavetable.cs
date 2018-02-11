@@ -16,7 +16,7 @@ namespace Sequencer.Audio
 
         public float SampleAtPosition(int position)
         {
-            int wrappedPosition = position % (samples.Count - 1);
+            int wrappedPosition = position % samples.Count;
 
             return samples[wrappedPosition];
         }

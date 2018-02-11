@@ -148,7 +148,7 @@ namespace Sequencer.Visual
         }
 
         [NotNull]
-        private Func<IVisualNote, bool> DoesPositionMatchNoteEndingPosition([NotNull] IPosition position)
+        private static Func<IVisualNote, bool> DoesPositionMatchNoteEndingPosition([NotNull] IPosition position)
         {
             return visualNote => visualNote != null && visualNote.EndPosition.Equals(position);
         }

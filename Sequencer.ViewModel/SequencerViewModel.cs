@@ -97,7 +97,7 @@ namespace Sequencer.ViewModel
         {
             [NotNull] get { return currentPosition; }
             [NotNull]
-            set
+            private set
             {
                 currentPosition = value;
                 RaisePropertyChanged(nameof(CurrentPosition));

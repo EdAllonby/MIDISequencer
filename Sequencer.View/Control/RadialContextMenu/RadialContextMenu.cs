@@ -46,7 +46,7 @@ namespace Sequencer.View.Control.RadialContextMenu
 
         public double MenuRadius
         {
-            get
+            private get
             {
                 object value = GetValue(MenuRadiusProperty);
                 if (value == null)

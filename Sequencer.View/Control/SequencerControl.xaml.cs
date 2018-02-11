@@ -89,7 +89,7 @@ namespace Sequencer.View.Control
 
         public NoteAction NoteAction
         {
-            get => (NoteAction) GetValue(NoteActionProperty);
+            private get => (NoteAction) GetValue(NoteActionProperty);
             set => SetValue(NoteActionProperty, value);
         }
 
