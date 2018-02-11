@@ -39,9 +39,17 @@ namespace Sequencer.Domain.Tests
         [Test]
         public void EnumerableTypeCountTest()
         {
-            int count = EnumerableTypeTestClass.Count;
+            int count = EnumerableTypeTestClass.Count();
 
             Assert.AreEqual(4, count);
+        }
+
+        [Test]
+        public void EnumerableTypeCountPredicateTest()
+        {
+            int count = EnumerableTypeTestClass.Count(x => x.Value % 2 == 0);
+
+            Assert.AreEqual(2, count);
         }
 
         [Test]

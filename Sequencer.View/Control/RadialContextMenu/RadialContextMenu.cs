@@ -59,7 +59,7 @@ namespace Sequencer.View.Control.RadialContextMenu
             set => SetValue(MenuRadiusProperty, value);
         }
 
-        private static double AngleSize => (double) 360 / EnumerableType<TMenuItem>.Count;
+        private static double AngleSize => (double) 360 / EnumerableType<TMenuItem>.Count(x => x.CanView);
 
         public void SetCursorPosition([NotNull] IMousePoint point)
         {
@@ -91,7 +91,7 @@ namespace Sequencer.View.Control.RadialContextMenu
             centre = point;
             radialCursorLine = new RadialCursorLine(this, point);
 
-            foreach (TMenuItem menuItem in EnumerableType<TMenuItem>.All)
+            foreach (TMenuItem menuItem in EnumerableType<TMenuItem>.All.Where(x => x.CanView))
             {
                 double angle = AngleSize / 2 + AngleSize * menuItem.Value;
 

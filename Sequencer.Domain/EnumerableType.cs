@@ -36,7 +36,12 @@ namespace Sequencer.Domain
             ElementsById.Add(value, (TElement) this);
         }
 
-        public static int Count => ElementsById.Count;
+        public static int Count() => Count(x => true);
+
+        public static int Count([NotNull] Func<TElement, bool> predicate)
+        {
+            return All.Where(predicate).Count();
+        }
 
         public int Value { get; }
 
