@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 using NUnit.Framework;
 
@@ -34,6 +35,25 @@ namespace Sequencer.Domain.Tests
             };
 
             CollectionAssert.AreEquivalent(expected, all);
+        }
+
+        [Test]
+        public void CannotCreateEnumeratedTypeWithDuplicateElements()
+        {
+            try
+            {
+                var unused = (EnumerableTypeTestClass) typeof(EnumerableTypeTestClass)
+                    .GetConstructor(BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.Instance,
+                        null,
+                        new[] { typeof(int), typeof(string) },
+                        null
+                    ).Invoke(new object[] { 3, "DuplicateEnumerableType" });
+            }
+            catch (Exception e)
+            {
+                // Because we're running the constructor via reflection, we need to get the true exception.
+                Assert.IsInstanceOf<ArgumentException>(e.InnerException);
+            }
         }
 
         [Test]
