@@ -6,6 +6,12 @@
         xmlns:radialContextMenu="clr-namespace:Sequencer.View.Control.RadialContextMenu"
         DataContext="{Binding Source={StaticResource Locator}, Path=Sequencer}"
         Title="Sequencer" Height="500" Width="1200" KeyDown="SequencerKeyPressed">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Space" Command="{Binding ToggleSequencer}" />
+        <KeyBinding Key="Enter" Command="{Binding StopSequencer}" />
+    </Window.InputBindings>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -22,13 +28,15 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
             <Grid Grid.Row="0">
                 <control:HeaderedScrollViewer Grid.Row="0" x:Name="SequencerScrollViewer">
                     <control:HeaderedScrollViewer.TopHeader>
-                        <control:SequencerHeaderControl Height="30" CurrentPosition="{Binding CurrentPosition, Mode=OneWay}"/>
+                        <control:SequencerHeaderControl Height="30"
+                                                        CurrentPosition="{Binding CurrentPosition, Mode=OneWay}" />
                     </control:HeaderedScrollViewer.TopHeader>
 
-                        <control:SequencerControl x:Name="Sequencer" MouseMove="SequencerMouseMoved" 
+                    <control:SequencerControl x:Name="Sequencer" MouseMove="SequencerMouseMoved"
                                               MouseDown="SequencerMouseDown" MouseUp="SequencerMouseUp"
                                               NoteAction="{Binding NoteAction}"
                                               SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
@@ -45,10 +53,7 @@
                 <Button Height="20" Width="20" Margin="5" Command="{Binding PauseSequencer}">P</Button>
                 <Button Height="20" Width="20" Margin="5" Command="{Binding StopSequencer}">&#x25A0;</Button>
             </StackPanel>
-
-
         </Grid>
-
 
         <Grid Grid.Row="0" Grid.Column="1" MinWidth="20">
             <xctk:PropertyGrid SelectedObject="{Binding SelectedObject}" ShowSearchBox="False" />

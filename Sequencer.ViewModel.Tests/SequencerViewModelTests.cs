@@ -22,6 +22,32 @@ namespace Sequencer.ViewModel.Tests
         }
 
         [Test]
+        public void ExecutingToggleSerquencerCommand_WhenPaused_SetsPlayStateToTrue()
+        {
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+                { SequencerPlayState = PlayState.Pause };
+
+            ICommand toggleSequencerCommand = viewModel.ToggleSequencer;
+
+            toggleSequencerCommand.Execute(null);
+
+            Assert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
+        }
+
+        [Test]
+        public void ExecutingToggleSerquencerCommand_WhenPaused_SetsPlayStateToPause()
+        {
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+                { SequencerPlayState = PlayState.Play };
+
+            ICommand toggleSequencerCommand = viewModel.ToggleSequencer;
+
+            toggleSequencerCommand.Execute(null);
+
+            Assert.AreEqual(PlayState.Pause, viewModel.SequencerPlayState);
+        }
+
+        [Test]
         public void ExecutingStopCommand_SetsPlayState_ToFalse()
         {
             var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)

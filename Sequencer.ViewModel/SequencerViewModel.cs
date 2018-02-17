@@ -123,6 +123,8 @@ namespace Sequencer.ViewModel
 
         public ICommand StopSequencer => new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
 
+        public ICommand ToggleSequencer => new RelayCommand(ExecuteToggleSequencerCommand, () => true);
+
         private void OnTick(object sender, [NotNull] TickEventArgs e)
         {
             if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
@@ -164,5 +166,18 @@ namespace Sequencer.ViewModel
         {
             return SequencerPlayState == PlayState.Play;
         }
+
+        private void ExecuteToggleSequencerCommand()
+        {
+            if (SequencerPlayState == PlayState.Play)
+            {
+                ExecutePauseCommand();
+            }
+            else
+            {
+                ExecutePlayCommand();
+            }
+        }
+
     }
 }
