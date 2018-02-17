@@ -12,8 +12,8 @@ namespace Sequencer.View.Drawing
     public class SequencerHeaderDrawer
     {
         [NotNull] [ItemNotNull] private readonly List<UIElement> elementCache = new List<UIElement>();
-        private readonly ISequencerCanvasWrapper sequencerHeaderCanvas;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
+        private readonly ISequencerCanvasWrapper sequencerHeaderCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
 
         public SequencerHeaderDrawer(ISequencerCanvasWrapper sequencerHeaderCanvas, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
@@ -79,7 +79,6 @@ namespace Sequencer.View.Drawing
 
         private void DrawBeatNumber(double currentPosition, int currentBeat)
         {
-
             var textBlock = new TextBlock { Text = currentBeat.ToString() };
 
             Canvas.SetLeft(textBlock, currentPosition + 2);
@@ -94,7 +93,7 @@ namespace Sequencer.View.Drawing
             {
                 X1 = currentPosition,
                 X2 = currentPosition,
-                Y1 = sequencerHeaderCanvas.Height - (sequencerHeaderCanvas.Height / heightModifier),
+                Y1 = sequencerHeaderCanvas.Height - sequencerHeaderCanvas.Height / heightModifier,
                 Y2 = sequencerHeaderCanvas.Height,
                 StrokeThickness = 1,
                 Stroke = new SolidColorBrush(sequencerSettings.LineColour)

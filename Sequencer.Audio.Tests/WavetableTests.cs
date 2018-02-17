@@ -7,16 +7,6 @@ namespace Sequencer.Audio.Tests
     public class WavetableTests
     {
         [Test]
-        public void Size_GivesCorrectSampleCount()
-        {
-            var samples = new List<float> { 1, 2, 3, 4 };
-
-            var wavetable = new Wavetable(samples);
-
-            Assert.AreEqual(4, wavetable.Size);
-        }
-
-        [Test]
         public void SampleAtPosition_GetsCorrectSample()
         {
             var samples = new List<float> { 1, 2, 3, 4 };
@@ -41,6 +31,16 @@ namespace Sequencer.Audio.Tests
             Assert.AreEqual(3, wavetable.SampleAtPosition(6));
             Assert.AreEqual(4, wavetable.SampleAtPosition(7));
             Assert.AreEqual(1, wavetable.SampleAtPosition(8));
+        }
+
+        [Test]
+        public void Size_GivesCorrectSampleCount()
+        {
+            var samples = new List<float> { 1, 2, 3, 4 };
+
+            var wavetable = new Wavetable(samples);
+
+            Assert.AreEqual(4, wavetable.Size);
         }
     }
 }

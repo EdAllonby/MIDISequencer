@@ -59,7 +59,7 @@ namespace Sequencer.View.Drawing
         {
             DrawPositionIndicator(CurrentPosition);
         }
-        
+
         private void SetIndicatorHeaderPosition(double position)
         {
             Canvas.SetLeft(indicatorHeader, position - IndicatorHeaderSize / 2);
