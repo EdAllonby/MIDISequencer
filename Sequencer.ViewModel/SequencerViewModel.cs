@@ -129,7 +129,7 @@ namespace Sequencer.ViewModel
         {
             if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
             {
-                IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(clock.Ticks);
+                IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(e.CurrentTick);
                 dispatcher.DispatchToWpf(() => CurrentPosition = positionAtTick);
             }
         }

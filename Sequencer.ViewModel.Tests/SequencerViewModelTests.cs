@@ -1,6 +1,8 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
+using Sequencer.Domain;
 using Sequencer.Midi;
 
 namespace Sequencer.ViewModel.Tests
@@ -22,16 +24,16 @@ namespace Sequencer.ViewModel.Tests
         }
 
         [Test]
-        public void ExecutingToggleSerquencerCommand_WhenPaused_SetsPlayStateToTrue()
+        public void ExecutingStopCommand_SetsPlayState_ToFalse()
         {
             var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
-                { SequencerPlayState = PlayState.Pause };
+                { SequencerPlayState = PlayState.Play };
 
-            ICommand toggleSequencerCommand = viewModel.ToggleSequencer;
+            ICommand stopCommand = viewModel.StopSequencer;
 
-            toggleSequencerCommand.Execute(null);
+            stopCommand.Execute(null);
 
-            Assert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
+            Assert.AreEqual(PlayState.Stop, viewModel.SequencerPlayState);
         }
 
         [Test]
@@ -48,16 +50,16 @@ namespace Sequencer.ViewModel.Tests
         }
 
         [Test]
-        public void ExecutingStopCommand_SetsPlayState_ToFalse()
+        public void ExecutingToggleSerquencerCommand_WhenPaused_SetsPlayStateToTrue()
         {
             var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
-                { SequencerPlayState = PlayState.Play };
+                { SequencerPlayState = PlayState.Pause };
 
-            ICommand stopCommand = viewModel.StopSequencer;
+            ICommand toggleSequencerCommand = viewModel.ToggleSequencer;
 
-            stopCommand.Execute(null);
+            toggleSequencerCommand.Execute(null);
 
-            Assert.AreEqual(PlayState.Stop, viewModel.SequencerPlayState);
+            Assert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
         }
 
         [Test]
@@ -74,6 +76,66 @@ namespace Sequencer.ViewModel.Tests
             const string expectedInformation = "Note Action Select, Pause";
 
             Assert.AreEqual(expectedInformation, viewModel.Information);
+        }
+
+        [Test]
+        public void Sequencer_OnTick_CallsDispatcher()
+        {
+            const int currentTick = 8;
+
+            var mockClock = new Mock<ISequencerClock>();
+            mockClock.Setup(x => x.TicksPerQuarterNote).Returns(16);
+
+            var mockTickCalculator = new Mock<ITickCalculator>();
+            mockTickCalculator.Setup(x => x.CalculatePositionFromTick(currentTick)).Returns(It.IsAny<IPosition>());
+
+            var mockDispatcher = new Mock<IWpfDispatcher>();
+
+            var unused = new SequencerViewModel(mockClock.Object, mockTickCalculator.Object, mockDispatcher.Object);
+
+            mockClock.Raise(x => x.Tick += null, new TickEventArgs(currentTick));
+
+            mockDispatcher.Verify(x => x.DispatchToWpf(It.IsAny<Action>()), Times.Once);
+        }
+
+        [Test]
+        public void Sequencer_OnTick_SetsCorrectCurrentPosition()
+        {
+            const int currentTick = 8;
+            var expectedPosition = new Position(1, 2, 3, 4);
+
+            var mockClock = new Mock<ISequencerClock>();
+            mockClock.Setup(x => x.TicksPerQuarterNote).Returns(16);
+
+            var mockTickCalculator = new Mock<ITickCalculator>();
+            mockTickCalculator.Setup(x => x.CalculatePositionFromTick(currentTick)).Returns(expectedPosition);
+
+            var dispatcher = new Mock<IWpfDispatcher>();
+            dispatcher.Setup(x => x.DispatchToWpf(It.IsAny<Action>())).Callback<Action>(wpfDispatcherCallback => wpfDispatcherCallback());
+
+            var viewModel = new SequencerViewModel(mockClock.Object, mockTickCalculator.Object, dispatcher.Object);
+
+            mockClock.Raise(x => x.Tick += null, new TickEventArgs(currentTick));
+
+            Assert.AreEqual(viewModel.CurrentPosition, expectedPosition);
+        }
+
+        [Test]
+        public void Sequencer_OnTickInBetweenResolution_DoesNotCallDispatcher()
+        {
+            const int currentTick = 7;
+
+            var mockClock = new Mock<ISequencerClock>();
+            mockClock.Setup(x => x.TicksPerQuarterNote).Returns(16);
+
+            var mockTickCalculator = new Mock<ITickCalculator>();
+            var mockDispatcher = new Mock<IWpfDispatcher>();
+
+            var unused = new SequencerViewModel(mockClock.Object, mockTickCalculator.Object, mockDispatcher.Object);
+
+            mockClock.Raise(x => x.Tick += null, new TickEventArgs(currentTick));
+
+            mockDispatcher.Verify(x => x.DispatchToWpf(It.IsAny<Action>()), Times.Never);
         }
 
         [Test]
