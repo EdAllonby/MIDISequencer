@@ -178,6 +178,5 @@ namespace Sequencer.ViewModel
                 ExecutePlayCommand();
             }
         }
-
     }
 }
