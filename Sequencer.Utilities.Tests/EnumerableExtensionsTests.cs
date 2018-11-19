@@ -15,9 +15,9 @@ namespace Sequencer.Utilities.Tests
 
         [Test]
         [TestCaseSource(nameof(YieldCases))]
-        public void YieldTests(object thing, object expected)
+        public void YieldTests<T>(T thing, IEnumerable<T> expected)
         {
-            IEnumerable<object> actual = thing.Yield();
+            IEnumerable<T> actual = thing.Yield();
 
             Assert.AreEqual(expected, actual);
         }
