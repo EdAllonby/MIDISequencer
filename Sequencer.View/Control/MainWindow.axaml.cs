@@ -86,6 +86,7 @@ namespace Sequencer.View.Control
             UpdateEmptyHint();
             BuildTunesMenu();
             BuildLoopsMenu();
+            BuildPresetsMenu(notePreviewer);
 
             DrumEditor.PreviewSound = notePreviewer.PreviewDrum;
             DrumEditor.AuditionSound = notePreviewer.PlayDrum;
@@ -484,6 +485,48 @@ namespace Sequencer.View.Control
             }
 
             TunesButton.Flyout = menu;
+        }
+
+        /// <summary>
+        /// Applies a preset to the selected synth track and plays a note so it can be heard straight away.
+        /// </summary>
+        internal void ApplyPreset([NotNull] SynthPreset preset, [CanBeNull] INotePreviewer previewer = null)
+        {
+            synthViewModel.ApplyPreset(preset);
+            Arrangement.InvalidateVisual();
+
+            if (previewer != null)
+            {
+                var start = new Position(1, 1, 1);
+                previewer.Preview(new Tone(new Pitch(Note.C, 5), settings.DefaultVelocity, start, start));
+            }
+
+            Log.Info($"Applied synth preset {preset.Name}");
+        }
+
+        private void BuildPresetsMenu([NotNull] INotePreviewer previewer)
+        {
+            var menu = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedRight };
+
+            foreach (SynthPreset preset in SynthPresets.All)
+            {
+                var item = new MenuItem
+                {
+                    Header = new StackPanel
+                    {
+                        Spacing = 1,
+                        Children =
+                        {
+                            new TextBlock { Text = preset.Name },
+                            new TextBlock { Text = preset.Description, FontSize = 11, Foreground = (IBrush) this.FindResource("TextTertiaryBrush") }
+                        }
+                    }
+                };
+                item.Click += (sender, args) => ApplyPreset(preset, previewer);
+                menu.Items.Add(item);
+            }
+
+            PresetsButton.Flyout = menu;
         }
 
         private void BuildLoopsMenu()

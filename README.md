@@ -78,6 +78,27 @@ clip instead (a new clip to change separately), reuse another of the track's cli
 **Section** mode loops the section you're editing while you work on it. **Song** mode plays the arrangement
 from the start, up to the last clip. The position readout and the ruler show bars in the whole song.
 
+### The synth
+
+Each synth track is a **subtractive synthesiser**, the classic analogue design:
+
+```
+oscillator 1 ─┐
+oscillator 2 ─┼─ mix → filter → amp → out
+noise ────────┘          ↑          ↑
+            filter envelope    amp envelope        LFO → pitch, filter or volume
+```
+
+- **Oscillators:** two of them (sawtooth, square, triangle or sine), with oscillator 2 tuned by up to two
+  octaves and detuned by cents for a thicker sound, plus noise.
+- **Filter:** low-, high- or band-pass, with resonance, an envelope that sweeps the cutoff, and key tracking.
+  It is a zero-delay-feedback state-variable filter, stable even at full resonance.
+- **LFO:** vibrato on pitch, wobbles on the filter, or tremolo on volume.
+- **Presets:** Init, Warm Pad, Acid Bass, Pluck, Brass, Lead, Wobble Bass and Bell. Each track keeps its own
+  patch, and a note keeps the patch it started with, so turning a knob never glitches a held note.
+
+<img src="docs/images/synth.png" alt="The synth panel with the Acid Bass preset" width="290">
+
 ### Drums
 
 Select a drum track's clip for a step sequencer: six synthesised sounds (kick, snare,

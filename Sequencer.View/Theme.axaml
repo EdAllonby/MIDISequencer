@@ -165,6 +165,26 @@
         <Setter Property="Stroke" Value="{StaticResource AccentBrush}" />
     </Style>
 
+    <!-- Collapsible sections in the side panel: flat, with the header as a label. -->
+    <Style Selector="Expander.synth">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Padding" Value="0,4,0,8" />
+    </Style>
+    <Style Selector="Expander.synth /template/ ToggleButton#ExpanderHeader">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0,8" />
+        <Setter Property="MinHeight" Value="32" />
+    </Style>
+    <Style Selector="Expander.synth /template/ Border#ExpanderContent">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0,4,0,8" />
+    </Style>
+
     <!-- Stroked icons: round caps and joins, consistent weight. -->
     <Style Selector="Path.stroke-icon">
         <Setter Property="StrokeThickness" Value="1.5" />

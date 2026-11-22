@@ -65,6 +65,20 @@ namespace Sequencer.View.Control
             set => SetValue(StrokeProperty, value);
         }
 
+        /// <summary>
+        /// Draws from one point to another with the given shape (0 at the start, 1 at the end).
+        /// </summary>
+        private static void Curve([NotNull] StreamGeometryContext geometry, Point from, Point to, [NotNull] Func<double, double> shape)
+        {
+            const int steps = 16;
+
+            for (var step = 1; step <= steps; step++)
+            {
+                double t = (double) step / steps;
+                geometry.LineTo(new Point(from.X + (to.X - from.X) * t, from.Y + (to.Y - from.Y) * shape(t)));
+            }
+        }
+
         public override void Render([NotNull] DrawingContext context)
         {
             double width = Bounds.Width - Padding * 2;
@@ -93,11 +107,13 @@ namespace Sequencer.View.Control
 
             using (StreamGeometryContext geometry = outline.Open())
             {
+                // Curves shaped like the real envelope: the attack rises quickly then eases into the peak;
+                // decay and release fall fast at first, then tail off.
                 geometry.BeginFigure(start, true);
-                geometry.LineTo(peak);
-                geometry.LineTo(sustainStart);
+                Curve(geometry, start, peak, t => (1 - Math.Exp(-2.5 * t)) / (1 - Math.Exp(-2.5)));
+                Curve(geometry, peak, sustainStart, t => (1 - Math.Exp(-5 * t)) / (1 - Math.Exp(-5)));
                 geometry.LineTo(sustainEnd);
-                geometry.LineTo(end);
+                Curve(geometry, sustainEnd, end, t => (1 - Math.Exp(-5 * t)) / (1 - Math.Exp(-5)));
                 geometry.EndFigure(false);
             }
 
