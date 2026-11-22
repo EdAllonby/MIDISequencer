@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using JetBrains.Annotations;
 using Sequencer.ViewModel;
 
@@ -17,11 +14,13 @@ namespace Sequencer.View.Control.RadialContextMenu
     public sealed class ContextMenuSegment<TMenuItem> : Canvas
         where TMenuItem : VisualEnumerableType<TMenuItem>
     {
-        [NotNull] private static readonly Dictionary<string, Bitmap> IconCache = new Dictionary<string, Bitmap>();
-        [NotNull] private static readonly IBrush SelectedBrush = new SolidColorBrush(Colors.CornflowerBlue);
-        [NotNull] private static readonly IBrush UnselectedBrush = new SolidColorBrush(Colors.LightSteelBlue, 0.7);
+        [NotNull] private static readonly IBrush SliceBrush = new SolidColorBrush(Color.Parse("#2A2D33"), 0.97);
+        [NotNull] private static readonly IBrush SelectedSliceBrush = new SolidColorBrush(Color.Parse("#E8A33D"));
+        [NotNull] private static readonly IBrush IconBrush = new SolidColorBrush(Color.Parse("#C9CCD1"));
+        [NotNull] private static readonly IBrush SelectedIconBrush = new SolidColorBrush(Color.Parse("#16171A"));
 
         [NotNull] private readonly Path segmentShape = new Path();
+        [CanBeNull] private readonly Path icon;
         private readonly Point centre;
         private readonly double startAngle;
         private readonly double sweepAngle;
@@ -55,22 +54,29 @@ namespace Sequencer.View.Control.RadialContextMenu
                 }
             };
 
-            var geometry = new PathGeometry { Figures = new PathFigures { figure } };
-            segmentShape.Data = geometry;
+            segmentShape.Data = new PathGeometry { Figures = new PathFigures { figure } };
             Children.Add(segmentShape);
 
-            Bitmap icon = LoadIcon(menuItem.IconName);
+            Geometry iconGeometry = Icons.ForTool(menuItem.IconName);
 
-            if (icon != null)
+            if (iconGeometry != null)
             {
-                double iconSize = Math.Min(geometry.Bounds.Width, geometry.Bounds.Height) * 0.7;
-                var image = new Image { Source = icon, Stretch = Stretch.Fill, Width = iconSize, Height = iconSize };
-                RenderOptions.SetBitmapInterpolationMode(image, Avalonia.Media.Imaging.BitmapInterpolationMode.HighQuality);
+                const double iconSize = 18;
+                icon = new Path
+                {
+                    Data = iconGeometry,
+                    Width = iconSize,
+                    Height = iconSize,
+                    Stretch = Stretch.Uniform,
+                    StrokeThickness = 1.6,
+                    StrokeLineCap = PenLineCap.Round,
+                    StrokeJoin = PenLineJoin.Round
+                };
 
-                Point iconCentre = RadialMenuGeometry.PolarToCartesian(centre, menuRadius * 0.5, endAngle - sweepAngle / 2);
-                SetLeft(image, iconCentre.X - iconSize / 2);
-                SetTop(image, iconCentre.Y - iconSize / 2);
-                Children.Add(image);
+                Point iconCentre = RadialMenuGeometry.PolarToCartesian(centre, menuRadius * 0.58, endAngle - sweepAngle / 2);
+                SetLeft(icon, iconCentre.X - iconSize / 2);
+                SetTop(icon, iconCentre.Y - iconSize / 2);
+                Children.Add(icon);
             }
 
             Unselect();
@@ -88,35 +94,26 @@ namespace Sequencer.View.Control.RadialContextMenu
 
         public void Select()
         {
-            segmentShape.Fill = SelectedBrush;
+            segmentShape.Fill = SelectedSliceBrush;
+
+            if (icon != null)
+            {
+                icon.Stroke = SelectedIconBrush;
+            }
+
             IsSelected = true;
         }
 
         public void Unselect()
         {
-            segmentShape.Fill = UnselectedBrush;
+            segmentShape.Fill = SliceBrush;
+
+            if (icon != null)
+            {
+                icon.Stroke = IconBrush;
+            }
+
             IsSelected = false;
-        }
-
-        [CanBeNull]
-        private static Bitmap LoadIcon([CanBeNull] string iconName)
-        {
-            if (iconName == null)
-            {
-                return null;
-            }
-
-            if (!IconCache.TryGetValue(iconName, out Bitmap bitmap))
-            {
-                using (var stream = AssetLoader.Open(new Uri($"avares://Sequencer/Assets/{iconName}.png")))
-                {
-                    bitmap = new Bitmap(stream);
-                }
-
-                IconCache[iconName] = bitmap;
-            }
-
-            return bitmap;
         }
     }
 }

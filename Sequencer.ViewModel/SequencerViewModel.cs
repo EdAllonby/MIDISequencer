@@ -74,6 +74,10 @@ namespace Sequencer.ViewModel
                 noteAction = value;
                 OnPropertyChanged(nameof(NoteAction));
                 OnPropertyChanged(nameof(Information));
+                OnPropertyChanged(nameof(IsSelectTool));
+                OnPropertyChanged(nameof(IsDrawTool));
+                OnPropertyChanged(nameof(IsEraseTool));
+                OnPropertyChanged(nameof(ToolHint));
 
                 Log.Info($"Note action set to {NoteAction}");
             }
@@ -115,6 +119,7 @@ namespace Sequencer.ViewModel
                 sequencerPlayState = value;
                 OnPropertyChanged(nameof(SequencerPlayState));
                 OnPropertyChanged(nameof(Information));
+                OnPropertyChanged(nameof(IsPlaying));
 
                 // Unlike WPF's CommandManager, nothing re-queries CanExecute automatically.
                 playCommand.NotifyCanExecuteChanged();
@@ -134,12 +139,64 @@ namespace Sequencer.ViewModel
             {
                 currentPosition = value;
                 OnPropertyChanged(nameof(CurrentPosition));
+                OnPropertyChanged(nameof(PositionText));
 
                 Log.Info($"Sequencer current position set to {CurrentPosition}");
             }
         }
 
         [CanBeNull]
+        public bool IsPlaying => SequencerPlayState == PlayState.Play;
+
+        /// <summary>
+        /// The playback position as "bar.beat.sixteenth".
+        /// </summary>
+        [NotNull]
+        public string PositionText => MusicalFormat.Position(CurrentPosition, TimeSignature.FourFour, 96);
+
+        // One toggle per tool, for a segmented control. Setting one to true selects that tool.
+        public bool IsSelectTool
+        {
+            get => NoteAction == NoteAction.Select;
+            set => SelectToolIf(value, NoteAction.Select);
+        }
+
+        public bool IsDrawTool
+        {
+            get => NoteAction == NoteAction.Create;
+            set => SelectToolIf(value, NoteAction.Create);
+        }
+
+        public bool IsEraseTool
+        {
+            get => NoteAction == NoteAction.Delete;
+            set => SelectToolIf(value, NoteAction.Delete);
+        }
+
+        /// <summary>
+        /// What the current tool does, for the hint bar.
+        /// </summary>
+        [NotNull]
+        public string ToolHint
+        {
+            get
+            {
+                string command = OperatingSystem.IsMacOS() ? "⌘" : "Ctrl+";
+
+                if (NoteAction == NoteAction.Select)
+                {
+                    return $"Click a note to select it · Drag to move, or drag an edge to resize · Drag across empty space to select several · {command}click to add or remove";
+                }
+
+                if (NoteAction == NoteAction.Delete)
+                {
+                    return "Click a note to erase it";
+                }
+
+                return "Click to add a note · Drag right to make it longer";
+            }
+        }
+
         public SelectedNoteViewModel SelectedNote
         {
             get => selectedNote;
@@ -225,6 +282,21 @@ namespace Sequencer.ViewModel
         private bool CanExecutePauseCommand()
         {
             return SequencerPlayState == PlayState.Play;
+        }
+
+        private void SelectToolIf(bool selected, [NotNull] NoteAction tool)
+        {
+            if (selected)
+            {
+                NoteAction = tool;
+            }
+            else
+            {
+                // A segmented control always has one tool selected: unchecking the current one re-checks it.
+                OnPropertyChanged(nameof(IsSelectTool));
+                OnPropertyChanged(nameof(IsDrawTool));
+                OnPropertyChanged(nameof(IsEraseTool));
+            }
         }
 
         private void ExecuteTapTempo()

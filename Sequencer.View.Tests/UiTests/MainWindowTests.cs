@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.NUnit;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using Avalonia.Threading;
@@ -97,6 +98,62 @@ namespace Sequencer.View.Tests.UiTests
             window.MouseUp(new Point(730, 300), MouseButton.Right);
 
             Assert.That(notes.AllNotes.Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
+        /// Renders a representative screenshot (a melody and bassline, mid-playback) for the README.
+        /// Run on demand: dotnet test --filter Screenshot_ForTheReadme
+        /// </summary>
+        [AvaloniaTest]
+        [Explicit("Writes a screenshot for the docs.")]
+        public void Screenshot_ForTheReadme()
+        {
+            var editor = window.FindControl<SequencerControl>("Editor");
+            double cell = editor.Bounds.Width / 64;
+            double lane = LaneHeight();
+
+            Point At(double sixteenth, int laneFromTop) =>
+                editor.TranslatePoint(new Point((sixteenth + 0.5) * cell, (laneFromTop + 0.5) * lane), window) ?? default;
+
+            void DrawNote(int start, int length, int laneFromTop)
+            {
+                window.MouseDown(At(start, laneFromTop), MouseButton.Left);
+                window.MouseMove(At(start + length - 1, laneFromTop));
+                window.MouseUp(At(start + length - 1, laneFromTop), MouseButton.Left);
+            }
+
+            int[,] melody =
+            {
+                { 0, 2, 24 }, { 2, 2, 22 }, { 4, 4, 20 }, { 8, 2, 22 }, { 10, 2, 24 }, { 12, 4, 27 },
+                { 16, 3, 24 }, { 19, 1, 22 }, { 20, 4, 20 }, { 24, 2, 19 }, { 26, 2, 20 }, { 28, 4, 22 },
+                { 32, 2, 24 }, { 34, 2, 27 }, { 36, 4, 29 }, { 40, 2, 27 }, { 42, 2, 24 }, { 44, 4, 22 },
+                { 48, 4, 20 }, { 52, 4, 22 }, { 56, 8, 24 }
+            };
+            int[,] bass = { { 0, 4, 44 }, { 8, 4, 44 }, { 16, 4, 41 }, { 24, 4, 41 }, { 32, 4, 39 }, { 40, 4, 39 }, { 48, 4, 46 }, { 56, 6, 44 } };
+
+            for (var i = 0; i < melody.GetLength(0); i++)
+            {
+                DrawNote(melody[i, 0], melody[i, 1], melody[i, 2]);
+            }
+
+            for (var i = 0; i < bass.GetLength(0); i++)
+            {
+                DrawNote(bass[i, 0], bass[i, 1], bass[i, 2]);
+            }
+
+            // Select one note so the inspector has something to show, then play to the middle of the loop.
+            Press(Key.V);
+            Click(At(37, 29));
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(2600);
+            Dispatcher.UIThread.RunJobs();
+
+            string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "screenshot.png");
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
+            TestContext.Out.WriteLine($"Screenshot: {path}");
+            Press(Key.Enter);
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(melody.GetLength(0) + bass.GetLength(0)));
         }
 
         [AvaloniaTest]
@@ -329,6 +386,30 @@ namespace Sequencer.View.Tests.UiTests
 
         private double EditorWidth() => window.FindControl<SequencerControl>("Editor").Bounds.Width;
 
+        private double LaneHeight() => window.FindControl<SequencerControl>("Editor").Bounds.Height / 64;
+
+        /// <summary>
+        /// The middle of a key on the piano keyboard, counting lanes from the top (the highest note).
+        /// </summary>
+        private Point KeyInWindow(int lane)
+        {
+            var keyboard = window.FindControl<PianoKeyboardControl>("Keyboard");
+            var inKeyboard = new Point(keyboard.Bounds.Width / 2, LaneHeight() * (lane + 0.5));
+            return keyboard.TranslatePoint(inKeyboard, window) ?? default;
+        }
+
+        /// <summary>
+        /// The window coordinates of the middle of a note: the centre of its first sixteenth and its lane.
+        /// </summary>
+        private Point NoteCentreInWindow(IVisualNote note)
+        {
+            var editor = window.FindControl<SequencerControl>("Editor");
+            var settings = container.Resolve<Domain.Settings.SequencerSettings>();
+            int lane = settings.TotalNotes - 1 - (NoteNumber(note.Pitch) - NoteNumber(settings.LowestPitch));
+            double x = TotalTicks(note.StartPosition) * editor.Bounds.Width / (16 * 96) + EditorWidth() / 64 / 2;
+            return editor.TranslatePoint(new Point(x, LaneHeight() * (lane + 0.5)), window) ?? default;
+        }
+
         /// <summary>
         /// The window coordinates of the note's right edge, halfway down its lane.
         /// </summary>
@@ -411,7 +492,7 @@ namespace Sequencer.View.Tests.UiTests
         {
             var settings = container.Resolve<Domain.Settings.SynthSettings>();
 
-            window.FindControl<ComboBox>("WaveformBox").SelectedItem = Domain.Settings.Waveform.Triangle;
+            window.FindControl<ToggleButton>("TriangleWaveButton").IsChecked = true;
             window.FindControl<Slider>("ReleaseMillisecondsSlider").Value = 750;
             window.FindControl<Slider>("VolumePercentSlider").Value = 30;
 
@@ -447,13 +528,14 @@ namespace Sequencer.View.Tests.UiTests
             viewModel.NoteAction = NoteAction.Select;
             previewer.Pitches.Clear();
 
-            // Lanes are 12.5 px tall: grab the middle of the note and drag up three semitones.
-            Point grab = NoteEdgeInWindow(notes.AllNotes.Single()) - new Point(EditorWidth() / 64 / 2, 0);
+            // Grab the middle of the note and drag up three lanes, one at a time.
+            Point grab = NoteCentreInWindow(notes.AllNotes.Single());
+            double lane = LaneHeight();
             window.MouseDown(grab, MouseButton.Left);
-            window.MouseMove(grab + new Point(0, -13));
-            window.MouseMove(grab + new Point(0, -26));
-            window.MouseMove(grab + new Point(0, -38));
-            window.MouseUp(grab + new Point(0, -38), MouseButton.Left);
+            window.MouseMove(grab - new Point(0, lane));
+            window.MouseMove(grab - new Point(0, lane * 2));
+            window.MouseMove(grab - new Point(0, lane * 3));
+            window.MouseUp(grab - new Point(0, lane * 3), MouseButton.Left);
 
             Assert.That(previewer.Pitches.Count, Is.EqualTo(3));
         }
@@ -480,13 +562,12 @@ namespace Sequencer.View.Tests.UiTests
             var settings = container.Resolve<Domain.Settings.SequencerSettings>();
             int highest = NoteNumber(settings.LowestPitch) + settings.TotalNotes - 1;
 
-            // The top key, halfway across the keyboard column, just below the ruler.
-            window.MouseDown(new Point(28, 36), MouseButton.Left);
+            window.MouseDown(KeyInWindow(0), MouseButton.Left);
             Assert.That(previewer.Held, Is.EqualTo(new[] { PitchName(highest) }));
             Assert.That(Keyboard.PressedNote, Is.EqualTo(highest));
             Assert.That(previewer.Released, Is.EqualTo(0));
 
-            window.MouseUp(new Point(28, 36), MouseButton.Left);
+            window.MouseUp(KeyInWindow(0), MouseButton.Left);
             Assert.That(previewer.Released, Is.EqualTo(1));
             Assert.That(Keyboard.PressedNote, Is.Null);
         }
@@ -494,10 +575,10 @@ namespace Sequencer.View.Tests.UiTests
         [AvaloniaTest]
         public void DraggingAcrossTheKeys_PlaysEachInTurn()
         {
-            window.MouseDown(new Point(28, 36), MouseButton.Left);
-            window.MouseMove(new Point(28, 49));
-            window.MouseMove(new Point(28, 62));
-            window.MouseUp(new Point(28, 62), MouseButton.Left);
+            window.MouseDown(KeyInWindow(0), MouseButton.Left);
+            window.MouseMove(KeyInWindow(1));
+            window.MouseMove(KeyInWindow(2));
+            window.MouseUp(KeyInWindow(2), MouseButton.Left);
 
             Assert.That(previewer.Held.Count, Is.EqualTo(3));
             Assert.That(previewer.Held.Distinct().Count(), Is.EqualTo(3));
@@ -533,6 +614,55 @@ namespace Sequencer.View.Tests.UiTests
 
             Assert.That(headerOrigin.X, Is.EqualTo(editorOrigin.X));
             Assert.That(header.Bounds.Width, Is.EqualTo(editor.Bounds.Width).Within(1));
+        }
+
+        [AvaloniaTest]
+        public void LetterKeys_SwitchTools()
+        {
+            Press(Key.V);
+            Assert.That(viewModel.NoteAction, Is.EqualTo(NoteAction.Select));
+
+            Press(Key.E);
+            Assert.That(viewModel.NoteAction, Is.EqualTo(NoteAction.Delete));
+
+            Press(Key.D);
+            Assert.That(viewModel.NoteAction, Is.EqualTo(NoteAction.Create));
+        }
+
+        [AvaloniaTest]
+        public void ToolButtons_ShowAndChangeTheTool()
+        {
+            Assert.That(window.FindControl<ToggleButton>("DrawToolButton").IsChecked, Is.True);
+
+            window.FindControl<ToggleButton>("EraseToolButton").IsChecked = true;
+
+            Assert.That(viewModel.NoteAction, Is.EqualTo(NoteAction.Delete));
+            Assert.That(window.FindControl<ToggleButton>("DrawToolButton").IsChecked, Is.False);
+        }
+
+        [AvaloniaTest]
+        public void EmptyHint_ShowsOnlyOnAnEmptyGridWithTheDrawTool()
+        {
+            var hint = window.FindControl<Border>("EmptyHint");
+            Assert.That(hint.IsVisible, Is.True);
+
+            Click(EditorPoint);
+            Assert.That(hint.IsVisible, Is.False, "Hidden once there is a note.");
+
+            Press(Key.Back);
+            Assert.That(hint.IsVisible, Is.True, "Back when the grid is empty again.");
+
+            Press(Key.V);
+            Assert.That(hint.IsVisible, Is.False, "Only for the Draw tool.");
+        }
+
+        [AvaloniaTest]
+        public void Inspector_ShowsPositionsAndLengthMusically()
+        {
+            Click(EditorPoint);
+
+            Assert.That(window.FindControl<TextBlock>("SelectedLength").Text, Is.EqualTo("1/16"));
+            Assert.That(window.FindControl<TextBlock>("SelectedStart").Text, Does.Match(@"^\d+\.\d\.\d$"));
         }
 
         [AvaloniaTest]

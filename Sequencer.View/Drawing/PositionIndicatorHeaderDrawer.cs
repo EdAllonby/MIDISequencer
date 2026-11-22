@@ -26,7 +26,7 @@ namespace Sequencer.View.Drawing
             this.sequencerHeaderCanvas = sequencerHeaderCanvas;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
 
-            var indicatorBrush = sequencerSettings.IndicatorColour.ToBrush();
+            var indicatorBrush = sequencerSettings.PlayheadColour.ToBrush();
 
             indicatorHeader = new Polygon
             {
@@ -61,7 +61,8 @@ namespace Sequencer.View.Drawing
 
         private void SetIndicatorHeaderPosition(double position)
         {
-            Canvas.SetLeft(indicatorHeader, position - IndicatorHeaderSize / 2);
+            // Line the marker's tip up with the 1 px playhead line in the grid.
+            Canvas.SetLeft(indicatorHeader, System.Math.Floor(position) + 0.5 - IndicatorHeaderSize / 2);
             Canvas.SetTop(indicatorHeader, sequencerHeaderCanvas.Height - IndicatorHeaderSize);
         }
     }

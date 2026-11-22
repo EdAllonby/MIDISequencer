@@ -21,10 +21,6 @@ namespace Sequencer.View.Control
     /// </summary>
     public sealed class PianoKeyboardControl : UserControl
     {
-        [NotNull] private static readonly IBrush WhiteKeyBrush = new SolidColorBrush(Color.Parse("#FAFAFA"));
-        [NotNull] private static readonly IBrush BlackKeyBrush = new SolidColorBrush(Color.Parse("#2B2B2B"));
-        [NotNull] private static readonly IBrush KeyBorderBrush = new SolidColorBrush(Color.Parse("#B0B0B0"));
-        [NotNull] private static readonly IBrush PressedBrush = new SolidColorBrush(Colors.CornflowerBlue);
 
         [NotNull] private readonly Canvas canvas = new Canvas { Background = Brushes.Transparent };
         [NotNull] private readonly Dictionary<int, Rectangle> keys = new Dictionary<int, Rectangle>();
@@ -33,6 +29,11 @@ namespace Sequencer.View.Control
         private IDigitalAudioProtocol protocol;
         private SequencerSettings settings;
         private INotePreviewer notePreviewer;
+        private IBrush whiteKeyBrush;
+        private IBrush blackKeyBrush;
+        private IBrush keyBorderBrush;
+        private IBrush labelBrush;
+        private IBrush pressedBrush;
         private IBrush playingBrush;
         private int? pressedNote;
         [CanBeNull] private IDisposable heldNote;
@@ -65,7 +66,12 @@ namespace Sequencer.View.Control
             protocol = digitalAudioProtocol;
             settings = sequencerSettings;
             notePreviewer = previewer;
-            playingBrush = settings.IndicatorColour.ToBrush();
+            whiteKeyBrush = settings.WhiteKeyColour.ToBrush();
+            blackKeyBrush = settings.BlackKeyColour.ToBrush();
+            keyBorderBrush = settings.AccidentalLaneColour.ToBrush();
+            labelBrush = settings.KeyLabelColour.ToBrush();
+            pressedBrush = settings.ActiveKeyColour.ToBrush();
+            playingBrush = new SolidColorBrush(settings.ActiveKeyColour.ToAvalonia(), 0.7);
             Redraw();
         }
 
@@ -108,18 +114,20 @@ namespace Sequencer.View.Control
                 bool isBlack = pitch.Note.IsAccidental;
                 double top = lane * LaneHeight;
 
-                var background = new Rectangle { Width = width, Height = LaneHeight, Fill = WhiteKeyBrush, Stroke = KeyBorderBrush, StrokeThickness = 0.5 };
+                var background = new Rectangle { Width = width, Height = LaneHeight, Fill = whiteKeyBrush, Stroke = keyBorderBrush, StrokeThickness = 0.5 };
                 Canvas.SetTop(background, top);
                 canvas.Children.Add(background);
 
                 // Black keys are shorter, as on a piano.
                 var key = new Rectangle
                 {
-                    Width = isBlack ? width * 0.62 : width,
+                    Width = isBlack ? width * 0.6 : width,
                     Height = LaneHeight,
-                    Fill = isBlack ? BlackKeyBrush : WhiteKeyBrush,
-                    Stroke = KeyBorderBrush,
-                    StrokeThickness = 0.5
+                    Fill = isBlack ? blackKeyBrush : whiteKeyBrush,
+                    Stroke = keyBorderBrush,
+                    StrokeThickness = 0.5,
+                    RadiusX = isBlack ? 1.5 : 0,
+                    RadiusY = isBlack ? 1.5 : 0
                 };
                 Canvas.SetTop(key, top);
                 canvas.Children.Add(key);
@@ -131,7 +139,8 @@ namespace Sequencer.View.Control
                     {
                         Text = pitch.ToString(),
                         FontSize = 9,
-                        Foreground = Brushes.Gray,
+                        Foreground = labelBrush,
+                        FontWeight = FontWeight.SemiBold,
                         Width = width - 4,
                         TextAlignment = TextAlignment.Right,
                         IsHitTestVisible = false
@@ -157,7 +166,7 @@ namespace Sequencer.View.Control
         {
             if (noteNumber == pressedNote)
             {
-                return PressedBrush;
+                return pressedBrush;
             }
 
             if (activeNotes.Contains(noteNumber))
@@ -165,7 +174,7 @@ namespace Sequencer.View.Control
                 return playingBrush;
             }
 
-            return protocol.CreatePitchFromProtocolNumber(noteNumber).Note.IsAccidental ? BlackKeyBrush : WhiteKeyBrush;
+            return protocol.CreatePitchFromProtocolNumber(noteNumber).Note.IsAccidental ? blackKeyBrush : whiteKeyBrush;
         }
 
         private int? NoteAtPoint(Point point)

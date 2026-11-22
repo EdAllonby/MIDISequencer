@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using JetBrains.Annotations;
@@ -11,7 +12,7 @@ namespace Sequencer.View.Drawing
 {
     public class PositionIndicatorDrawer
     {
-        private const double IndicatorWidth = 2;
+        private const double IndicatorWidth = 1;
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(PositionIndicatorDrawer));
         [NotNull] private readonly Rectangle indicator;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
@@ -27,7 +28,7 @@ namespace Sequencer.View.Drawing
             {
                 StrokeThickness = 0.5,
                 Width = IndicatorWidth,
-                Fill = sequencerSettings.IndicatorColour.ToBrush(),
+                Fill = sequencerSettings.PlayheadColour.ToBrush(),
                 ZIndex = int.MaxValue
             };
 
@@ -59,7 +60,7 @@ namespace Sequencer.View.Drawing
 
         private void SetIndicatorPosition(double position)
         {
-            Canvas.SetLeft(indicator, position - IndicatorWidth / 2);
+            Canvas.SetLeft(indicator, Math.Floor(position));
             Canvas.SetTop(indicator, 0);
         }
     }

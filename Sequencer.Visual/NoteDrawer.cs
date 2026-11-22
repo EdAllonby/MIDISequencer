@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -28,13 +29,13 @@ namespace Sequencer.Visual
 
             noteRectangle = new Rectangle
             {
-                Stroke = sequencerSettings.LineColour.ToBrush(),
-                StrokeThickness = 0.5,
-                RadiusX = 5,
-                RadiusY = 5
+                StrokeThickness = 1,
+                RadiusX = 2,
+                RadiusY = 2
             };
 
-            velocityRectangle = new Rectangle { Fill = sequencerSettings.LineColour.ToBrush() };
+            // A thin strip along the bottom of the note shows its velocity.
+            velocityRectangle = new Rectangle { Fill = sequencerSettings.VelocityColour.ToBrush(), RadiusX = 1, RadiusY = 1, IsHitTestVisible = false };
 
             sequencer.AddChild(noteRectangle);
             sequencer.AddChild(velocityRectangle);
@@ -53,22 +54,20 @@ namespace Sequencer.Visual
             double noteWidth = ActualWidthBetweenPositions(startPosition, endPosition);
             double noteStartHeight = sequencerDimensionsCalculator.GetPointFromPitch(pitch);
 
-            noteRectangle.Height = noteHeight;
-            noteRectangle.Width = noteWidth;
+            // Inset by half a pixel so the outline sits on whole pixels and touching notes stay distinct.
+            double noteStartLocation = sequencerDimensionsCalculator.GetPointFromPosition(startPosition);
+            noteRectangle.Width = Math.Max(0, noteWidth - 1);
+            noteRectangle.Height = Math.Max(0, noteHeight - 1);
+            SetRectanglePosition(noteRectangle, Math.Floor(noteStartLocation) + 0.5, Math.Floor(noteStartHeight) + 0.5);
 
             SetNoteColour(noteState);
 
-            double noteStartLocation = sequencerDimensionsCalculator.GetPointFromPosition(startPosition);
-
-            SetRectanglePosition(noteRectangle, noteStartLocation, noteStartHeight);
-
-            double velocityHeight = noteHeight * 0.3;
-            double velocityStartHeight = noteStartHeight + noteHeight / 2 - velocityHeight / 2;
-
+            const double velocityHeight = 2;
+            const double velocityInset = 2;
             velocityRectangle.Height = velocityHeight;
-            velocityRectangle.Width = noteWidth * velocity.Volume;
-
-            SetRectanglePosition(velocityRectangle, noteStartLocation, velocityStartHeight);
+            velocityRectangle.Width = Math.Max(0, (noteWidth - velocityInset * 2 - 1) * velocity.Volume);
+            SetRectanglePosition(velocityRectangle, Math.Floor(noteStartLocation) + velocityInset,
+                Math.Floor(noteStartHeight) + noteHeight - velocityInset - velocityHeight);
         }
 
         public void SetNoteColour(NoteState noteState)
@@ -77,9 +76,11 @@ namespace Sequencer.Visual
             {
                 case NoteState.Selected:
                     noteRectangle.Fill = sequencerSettings.SelectedNoteColour.ToBrush();
+                    noteRectangle.Stroke = sequencerSettings.SelectedNoteOutlineColour.ToBrush();
                     break;
                 case NoteState.Unselected:
-                    noteRectangle.Fill = sequencerSettings.UnselectedNoteColour.ToBrush();
+                    noteRectangle.Fill = sequencerSettings.NoteColour.ToBrush();
+                    noteRectangle.Stroke = sequencerSettings.NoteOutlineColour.ToBrush();
                     break;
             }
         }

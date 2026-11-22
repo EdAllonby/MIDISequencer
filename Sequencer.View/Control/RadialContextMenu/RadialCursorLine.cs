@@ -26,7 +26,7 @@ namespace Sequencer.View.Control.RadialContextMenu
             cursorLine = new Line
             {
                 StrokeThickness = 1,
-                Stroke = Brushes.Black,
+                Stroke = new SolidColorBrush(Colors.White, 0.5),
                 StartPoint = startingPosition.Point,
                 EndPoint = startingPosition.Point,
                 ZIndex = 99,

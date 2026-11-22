@@ -19,11 +19,8 @@ namespace Sequencer.View.Control
 
         [NotNull] private readonly Border border = new Border
         {
-            BorderBrush = Brushes.Blue,
             BorderThickness = new Thickness(1),
-            Background = Brushes.LightBlue,
-            CornerRadius = new CornerRadius(1),
-            Opacity = 0.5
+            CornerRadius = new CornerRadius(2)
         };
 
         private bool isLeftMouseButtonDown;
@@ -31,6 +28,9 @@ namespace Sequencer.View.Control
 
         public DragSelectionBox()
         {
+            System.Drawing.Color selection = new Domain.Settings.SequencerSettings().SelectionColour;
+            border.BorderBrush = new SolidColorBrush(selection.ToAvalonia(), 0.9);
+            border.Background = new SolidColorBrush(selection.ToAvalonia(), 0.12);
             Children.Add(border);
             IsVisible = false;
             IsHitTestVisible = false;

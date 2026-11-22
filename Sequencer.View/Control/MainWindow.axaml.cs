@@ -55,6 +55,8 @@ namespace Sequencer.View.Control
 
             Keyboard.Initialise(protocol, settings, notePreviewer);
             viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            notes.NotesChanged += (sender, args) => UpdateEmptyHint();
+            UpdateEmptyHint();
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -74,6 +76,19 @@ namespace Sequencer.View.Control
             {
                 UpdatePlayingKeys();
             }
+
+            if (e.PropertyName == nameof(SequencerViewModel.NoteAction))
+            {
+                UpdateEmptyHint();
+            }
+        }
+
+        /// <summary>
+        /// The "click to draw" hint shows only on an empty grid with the Draw tool.
+        /// </summary>
+        private void UpdateEmptyHint()
+        {
+            EmptyHint.IsVisible = viewModel.IsDrawTool && !notes.AllNotes.Any();
         }
 
         /// <summary>
@@ -91,6 +106,18 @@ namespace Sequencer.View.Control
             Keyboard.SetActivePitches(notes.AllNotes
                 .Where(note => note.StartPosition.IsLessThanOrEqual(position) && note.EndPosition.IsGreaterThan(position))
                 .Select(note => note.Pitch));
+        }
+
+        [CanBeNull]
+        private static NoteAction ToolForKey(Key key)
+        {
+            switch (key)
+            {
+                case Key.V: return NoteAction.Select;
+                case Key.D: return NoteAction.Create;
+                case Key.E: return NoteAction.Delete;
+                default: return null;
+            }
         }
 
         private void OnEditorPointerPressed(object sender, [NotNull] PointerPressedEventArgs e)
@@ -184,6 +211,11 @@ namespace Sequencer.View.Control
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Space)
             {
                 viewModel.ToggleSequencer.Execute(null);
+                e.Handled = true;
+            }
+            else if (e.KeyModifiers == KeyModifiers.None && ToolForKey(e.Key) is NoteAction tool)
+            {
+                viewModel.NoteAction = tool;
                 e.Handled = true;
             }
             else if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Enter)
