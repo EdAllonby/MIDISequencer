@@ -1,36 +1,45 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using NAudio.Dsp;
 using NAudio.Wave;
 using Sequencer.Audio.Calculator;
+using Sequencer.Domain.Settings;
 
 namespace Sequencer.Audio
 {
-    public sealed class SignalProvider : WaveProvider32, ISignalProvider
+    public sealed class SignalProvider : ISignalProvider
     {
         [NotNull] private readonly EnvelopeGenerator envelope = new EnvelopeGenerator();
         [NotNull] private readonly IWaveformCalculator waveformCalculator;
+        private readonly int sampleRate;
         private float amplitude;
         private float frequency;
-        private int sample;
 
-        public SignalProvider([NotNull] IWaveformCalculator waveformCalculator)
+        // Position within the current cycle, 0 to 1. Carried across buffers so there is never a phase jump.
+        private double phase;
+
+        // NoteOff can be called from any thread; the audio thread applies it at the start of its next read.
+        private volatile bool releaseRequested;
+        private bool released;
+        private volatile bool finished;
+
+        public SignalProvider([NotNull] IWaveformCalculator waveformCalculator, [NotNull] IAudioSettings audioSettings)
         {
-            envelope.AttackRate = 44100;
-            envelope.DecayRate = 44100;
-            envelope.SustainLevel = 0.5f;
-            envelope.ReleaseRate = 44100;
-
             this.waveformCalculator = waveformCalculator;
+            sampleRate = audioSettings.SampleRate;
+            WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, 1);
+
+            envelope.AttackRate = (float) (audioSettings.AttackSeconds * sampleRate);
+            envelope.DecayRate = (float) (audioSettings.DecaySeconds * sampleRate);
+            envelope.SustainLevel = (float) audioSettings.SustainLevel;
+            envelope.ReleaseRate = (float) (audioSettings.ReleaseSeconds * sampleRate);
 
             Frequency = 1000f;
             Amplitude = 0.25f;
         }
 
-        public bool NoteState
-        {
-            get => envelope.State != EnvelopeGenerator.EnvelopeState.Idle;
-            set => envelope.Gate(value);
-        }
+        public WaveFormat WaveFormat { get; }
+
+        public bool IsFinished => finished;
 
         public float Amplitude
         {
@@ -56,35 +65,51 @@ namespace Sequencer.Audio
             }
         }
 
-        public override int Read(float[] buffer, int offset, int sampleCount)
+        public void NoteOn()
         {
-            if (WaveFormat != null)
+            envelope.Gate(true);
+        }
+
+        public void NoteOff()
+        {
+            releaseRequested = true;
+        }
+
+        public int Read(System.Span<float> buffer)
+        {
+            if (finished)
             {
-                int sampleRate = WaveFormat.SampleRate;
+                // Returning fewer samples than requested tells the mixer to drop this voice.
+                return 0;
+            }
 
-                for (var n = 0; n < sampleCount; n++)
+            if (releaseRequested && !released)
+            {
+                envelope.Gate(false);
+                released = true;
+            }
+
+            double phaseStep = (double) Frequency / sampleRate;
+
+            for (var n = 0; n < buffer.Length; n++)
+            {
+                float envelopeAmplitude = envelope.Process();
+                buffer[n] = Amplitude * envelopeAmplitude * waveformCalculator.CalculateForPhase(phase);
+
+                phase += phaseStep;
+
+                if (phase >= 1.0)
                 {
-                    float envelopeAmplitude = envelope.Process();
-
-                    if (envelopeAmplitude > 0)
-                    {
-                        buffer[n + offset] = Amplitude * envelopeAmplitude * waveformCalculator.CalculateForSample(sample, Frequency, sampleRate);
-                    }
-                    else
-                    {
-                        buffer[n + offset] = 0;
-                    }
-
-                    sample++;
-
-                    if (sample >= sampleRate)
-                    {
-                        sample = 0;
-                    }
+                    phase -= 1.0;
                 }
             }
 
-            return sampleCount;
+            if (released && envelope.State == EnvelopeGenerator.EnvelopeState.Idle)
+            {
+                finished = true;
+            }
+
+            return buffer.Length;
         }
     }
 }

@@ -1,33 +1,32 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Sequencer.Audio.Calculator;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
-using Sequencer.Visual;
 
 namespace Sequencer.Audio
 {
     public class SignalProviderFactory : ISignalProviderFactory
     {
+        [NotNull] private readonly IAudioSettings audioSettings;
         [NotNull] private readonly IFrequencyCalculator frequencyCalculator;
-        private readonly int sampleRate;
+
+        // Building the sawtooth from 19 harmonics is expensive, so it is computed once into a wavetable
+        // that every voice shares.
+        [NotNull] private readonly IWaveformCalculator waveform = new WavetableCalculator(new SawtoothWaveCalculator(19));
 
         public SignalProviderFactory([NotNull] IAudioSettings audioSettings, [NotNull] IFrequencyCalculator frequencyCalculator)
         {
-            sampleRate = audioSettings.SampleRate;
+            this.audioSettings = audioSettings;
             this.frequencyCalculator = frequencyCalculator;
         }
 
-        public ISignalProvider CreateSignalProvider(IVisualNote visualNote)
+        public ISignalProvider CreateSignalProvider(ISequencedNote note)
         {
-            var signalProvider = new SignalProvider(new SawtoothWaveCalculator(19))
+            return new SignalProvider(waveform, audioSettings)
             {
-                Amplitude = (float) visualNote.Velocity.Volume,
-                Frequency = (float) frequencyCalculator.PitchFrequency(visualNote.Pitch)
+                Amplitude = (float) note.Tone.Velocity.Volume,
+                Frequency = (float) frequencyCalculator.PitchFrequency(note.Tone.Pitch)
             };
-
-            signalProvider.SetWaveFormat(sampleRate, 1);
-
-            return signalProvider;
         }
     }
 }

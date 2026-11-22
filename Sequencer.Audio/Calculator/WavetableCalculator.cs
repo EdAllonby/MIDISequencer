@@ -1,59 +1,42 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Sequencer.Audio.Calculator
 {
+    /// <summary>
+    /// Pre-computes one cycle of another waveform, then reads it back with linear interpolation.
+    /// It holds no per-voice state, so one instance can be shared by every voice.
+    /// </summary>
     public sealed class WavetableCalculator : IWaveformCalculator
     {
-        [NotNull] private readonly Wavetable wavetable;
+        private const int WavetableSize = 2048;
 
-        private float currentWavetablePosition;
+        [NotNull] private readonly Wavetable wavetable;
 
         public WavetableCalculator([NotNull] IWaveformCalculator calculator)
         {
-            var wavetableSize = 1024;
+            var samples = new List<float>(WavetableSize);
 
-            var wavetableSamples = new List<float>();
-
-            for (var position = 0; position < wavetableSize; position++)
+            for (var position = 0; position < WavetableSize; position++)
             {
-                float sample = calculator.CalculateForSample(position, wavetableSize, wavetableSize * wavetableSize);
-                wavetableSamples.Add(sample);
+                samples.Add(calculator.CalculateForPhase((double) position / WavetableSize));
             }
 
-            wavetable = new Wavetable(wavetableSamples);
+            wavetable = new Wavetable(samples);
         }
 
-        public float CalculateForSample(int sample, float frequency, int sampleRate)
+        public float CalculateForPhase(double phase)
         {
-            float interpolatedSample = InterpolateCurrentPosition();
+            double position = phase * wavetable.Size;
+            var previousIndex = (int) Math.Floor(position);
+            var fraction = (float) (position - previousIndex);
 
-            float step = wavetable.Size * frequency / sampleRate;
+            // Wavetable wraps, so the sample after the last one is the first one.
+            float previousSample = wavetable.SampleAtPosition(previousIndex);
+            float nextSample = wavetable.SampleAtPosition(previousIndex + 1);
 
-            currentWavetablePosition = (currentWavetablePosition + step) % (wavetable.Size - 1);
-
-            return interpolatedSample;
-        }
-
-        private float InterpolateCurrentPosition()
-        {
-            float previousSample = wavetable.SampleAtPosition((int) Math.Floor(currentWavetablePosition));
-            float nextSample = wavetable.SampleAtPosition((int) Math.Ceiling(currentWavetablePosition));
-
-            return LinearInterpolate(previousSample, nextSample);
-        }
-
-        private float LinearInterpolate(float previousSample, float nextSample)
-        {
-            float positionFraction = GetFraction(currentWavetablePosition);
-
-            return (nextSample - previousSample) * positionFraction + previousSample;
-        }
-
-        private static float GetFraction(float value)
-        {
-            return (float) (value - Math.Truncate(value));
+            return previousSample + (nextSample - previousSample) * fraction;
         }
     }
 }

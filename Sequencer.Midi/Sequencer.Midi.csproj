@@ -2,11 +2,14 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" />
-    <PackageReference Include="Sanford.Multimedia.Midi" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sequencer.Midi.Tests" />
   </ItemGroup>
 
 </Project>

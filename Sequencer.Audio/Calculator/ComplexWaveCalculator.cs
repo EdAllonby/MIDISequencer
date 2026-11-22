@@ -1,35 +1,32 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
+using System;
 
 namespace Sequencer.Audio.Calculator
 {
+    /// <summary>
+    /// Builds a waveform by adding sine harmonics (additive synthesis).
+    /// </summary>
     public abstract class ComplexWaveCalculator : IWaveformCalculator
     {
         private readonly int finalHarmonic;
-        [NotNull] private readonly SineWaveCalculator sineWaveCalculator = new SineWaveCalculator();
 
         protected ComplexWaveCalculator(int finalHarmonic)
         {
             this.finalHarmonic = finalHarmonic;
         }
 
-        public float CalculateForSample(int sample, float frequency, int sampleRate)
+        public float CalculateForPhase(double phase)
         {
-            IEnumerable<int> harmonicsToUse = Enumerable.Range(1, finalHarmonic).Where(IsHarmonicIncluded);
+            double signal = 0;
 
-            IEnumerable<float> harmonicSignals = harmonicsToUse.Select(harmonic => CalculateSignalForHarmonic(sample, frequency, sampleRate, harmonic));
+            for (var harmonic = 1; harmonic <= finalHarmonic; harmonic++)
+            {
+                if (IsHarmonicIncluded(harmonic))
+                {
+                    signal += AmplitudeForHarmonic(harmonic) * Math.Sin(2 * Math.PI * harmonic * phase);
+                }
+            }
 
-            return harmonicSignals.Sum();
-        }
-
-        private float CalculateSignalForHarmonic(int sample, float frequency, int sampleRate, int currentHarmonic)
-        {
-            float harmonicFrequency = frequency * currentHarmonic;
-            float harmonicSignal = sineWaveCalculator.CalculateForSample(sample, harmonicFrequency, sampleRate);
-            float harmonicAmplitude = AmplitudeForHarmonic(currentHarmonic);
-
-            return harmonicAmplitude * harmonicSignal;
+            return (float) signal;
         }
 
         protected abstract bool IsHarmonicIncluded(int harmonic);
