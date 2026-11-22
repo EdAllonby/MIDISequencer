@@ -59,7 +59,8 @@ namespace Sequencer.View.Control
             [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IDigitalAudioProtocol protocol,
             [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator,
             [NotNull] SynthViewModel synthViewModel, [NotNull] INotePreviewer notePreviewer,
-            [NotNull] DrumKitViewModel drumKitViewModel, [NotNull] Song song, [NotNull] ArrangementState arrangement)
+            [NotNull] DrumKitViewModel drumKitViewModel, [NotNull] Song song, [NotNull] ArrangementState arrangement,
+            [NotNull] MixerSettings mixerSettings, [NotNull] Sequencer.Audio.WavExporter wavExporter, [NotNull] MidiFileWriter midiFileWriter)
         {
             InitializeComponent();
 
@@ -100,11 +101,21 @@ namespace Sequencer.View.Control
             Arrangement.AddTrackRequested += (sender, kind) => AddTrack(kind);
             NewClipButton.Click += (sender, args) => CreateClipAt(arrangement.SelectedTrack, arrangement.SelectedSection);
 
-            // Redraw the arrangement's clip miniatures after edits in the piano roll.
-            Editor.PointerReleased += (sender, args) => song.NotifyClipEdited();
-            notes.NotesChanged += (sender, args) => song.NotifyClipEdited();
+            // After edits in the piano roll: redraw the clip miniatures, and note whether the song changed.
+            Editor.PointerReleased += (sender, args) =>
+            {
+                Arrangement.InvalidateVisual();
+                CheckOpenClipEdited();
+            };
+            notes.NotesChanged += (sender, args) =>
+            {
+                Arrangement.InvalidateVisual();
+                CheckOpenClipEdited();
+            };
+            AddHandler(KeyUpEvent, (sender, args) => CheckOpenClipEdited(), RoutingStrategies.Bubble);
 
             Select(song.Tracks.First(), 0);
+            InitialiseDocument(mixerSettings, wavExporter, midiFileWriter);
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -186,6 +197,23 @@ namespace Sequencer.View.Control
         /// side panel. In section mode, that section loops.
         /// </summary>
         internal void Select([NotNull] Track track, int section)
+        {
+            // Opening a clip changes what's shown, not the song.
+            suppressEdits++;
+
+            try
+            {
+                SelectCell(track, section);
+            }
+            finally
+            {
+                suppressEdits--;
+            }
+
+            openClipFingerprint = OpenClipFingerprint();
+        }
+
+        private void SelectCell([NotNull] Track track, int section)
         {
             CloseOpenClip();
 
@@ -287,6 +315,7 @@ namespace Sequencer.View.Control
         {
             track.IsMuted = !track.IsMuted;
             Arrangement.InvalidateVisual();
+            MarkEdited();
         }
 
         /// <summary>
