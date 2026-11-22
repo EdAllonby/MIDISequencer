@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NAudio.Wave;
 using NUnit.Framework;
@@ -21,6 +22,7 @@ namespace Sequencer.Audio.Tests
         private Dictionary<ISequencedNote, FakeVoice> voices;
         private SequencerPlayer player;
         private ISampleProvider playedSource;
+        private double masterVolume = 1.0;
 
         private readonly IPosition start = new Position(1, 1, 1);
         private readonly IPosition end = new Position(1, 2, 1);
@@ -52,6 +54,7 @@ namespace Sequencer.Audio.Tests
 
             var audioSettings = new Mock<IAudioSettings>();
             audioSettings.Setup(x => x.SampleRate).Returns(SampleRate);
+            audioSettings.Setup(x => x.MasterVolume).Returns(() => masterVolume);
 
             player = new SequencerPlayer(factory.Object, notes.Object, clock.Object, tickCalculator.Object, audioSettings.Object, output.Object);
         }
@@ -172,6 +175,75 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
+        public void Output_IsScaledByTheMasterVolume()
+        {
+            ISequencedNote note = AddNote();
+            RaiseStarted();
+            RaiseTick(0);
+            voices[note].Level = 0.8f;
+            masterVolume = 0.5;
+
+            var buffer = new float[16];
+            playedSource.Read(buffer);
+
+            Assert.That(buffer, Is.All.EqualTo(0.4f).Within(1e-6));
+        }
+
+        [Test]
+        public void Preview_PlaysAShortSelfReleasingNote()
+        {
+            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+
+            player.Preview(tone);
+
+            FakeVoice voice = voices.Values.Single();
+            Assert.That(voice.NoteOnCount, Is.EqualTo(1));
+            Assert.That(voice.ReleaseAfterSamples, Is.EqualTo((int) (0.15 * SampleRate)));
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Hold_PlaysUntilTheHandleIsDisposed()
+        {
+            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+
+            IDisposable held = player.Hold(tone);
+            FakeVoice voice = voices.Values.Single();
+            Assert.That(voice.NoteOnCount, Is.EqualTo(1));
+            Assert.That(voice.ReleaseAfterSamples, Is.Null, "Held notes do not release by themselves.");
+            Assert.That(voice.NoteOffCount, Is.EqualTo(0));
+
+            held.Dispose();
+
+            Assert.That(voice.NoteOffCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void NotePreviewer_HoldPlaysEvenWithPreviewsSwitchedOff()
+        {
+            var previewer = new NotePreviewer(player, new SynthSettings { PreviewOnEdit = false });
+
+            previewer.Hold(new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end));
+
+            Assert.That(voices.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void NotePreviewer_OnlyPreviewsWhenSwitchedOn()
+        {
+            var settings = new SynthSettings { PreviewOnEdit = false };
+            var previewer = new NotePreviewer(player, settings);
+            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+
+            previewer.Preview(tone);
+            Assert.That(voices, Is.Empty);
+
+            settings.PreviewOnEdit = true;
+            previewer.Preview(tone);
+            Assert.That(voices.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void Dispose_DisposesTheOutput()
         {
             player.Dispose();
@@ -187,6 +259,8 @@ namespace Sequencer.Audio.Tests
 
             public bool Finished { get; set; }
 
+            public float Level { get; set; }
+
             public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, 1);
 
             public float Amplitude { get; set; }
@@ -199,6 +273,10 @@ namespace Sequencer.Audio.Tests
 
             public void NoteOff() => NoteOffCount++;
 
+            public int? ReleaseAfterSamples { get; private set; }
+
+            public void ReleaseAfter(int sampleCount) => ReleaseAfterSamples = sampleCount;
+
             public int Read(Span<float> buffer)
             {
                 if (Finished)
@@ -206,7 +284,7 @@ namespace Sequencer.Audio.Tests
                     return 0;
                 }
 
-                buffer.Clear();
+                buffer.Fill(Level);
                 return buffer.Length;
             }
         }

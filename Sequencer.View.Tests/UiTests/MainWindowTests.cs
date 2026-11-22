@@ -5,7 +5,9 @@ using Autofac;
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.NUnit;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using Avalonia.Threading;
 using NUnit.Framework;
 using Sequencer.View.Control;
@@ -27,13 +29,16 @@ namespace Sequencer.View.Tests.UiTests
         private ISequencerNotes notes;
         private SequencerViewModel viewModel;
         private RawInputModifiers commandModifier;
+        private RecordingNotePreviewer previewer;
 
         private static readonly Point EditorPoint = new Point(120, 230);
 
         [SetUp]
         public void SetUp()
         {
-            container = App.BuildContainer();
+            // Record previews instead of opening the real audio device.
+            previewer = new RecordingNotePreviewer();
+            container = App.BuildContainer(builder => builder.RegisterInstance(previewer).As<Domain.INotePreviewer>());
             window = container.Resolve<MainWindow>();
             notes = container.Resolve<ISequencerNotes>();
             viewModel = container.Resolve<SequencerViewModel>();
@@ -282,11 +287,58 @@ namespace Sequencer.View.Tests.UiTests
             int lengthBefore = TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition);
             viewModel.NoteAction = NoteAction.Select;
 
-            window.MouseDown(EditorPoint, MouseButton.Left);
-            window.MouseMove(EditorPoint + new Point(56, 0));
-            window.MouseUp(EditorPoint + new Point(56, 0), MouseButton.Left);
+            // Grab the note's right edge.
+            Point edge = NoteEdgeInWindow(note) - new Point(1, 0);
+            window.MouseDown(edge, MouseButton.Left);
+            window.MouseMove(edge + new Point(56, 0));
+            window.MouseUp(edge + new Point(56, 0), MouseButton.Left);
 
             Assert.That(TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition), Is.GreaterThan(lengthBefore));
+        }
+
+        [AvaloniaTest]
+        public void SelectMode_DraggingAShortNotesMiddle_MovesItInsteadOfResizing()
+        {
+            Click(EditorPoint);
+            IVisualNote note = notes.AllNotes.Single();
+            int length = TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition);
+            string pitch = note.Pitch.ToString();
+            viewModel.NoteAction = NoteAction.Select;
+
+            Point middle = NoteEdgeInWindow(note) - new Point(EditorWidth() / 64 / 2, 0);
+            window.MouseDown(middle, MouseButton.Left);
+            window.MouseMove(middle + new Point(0, -30));
+            window.MouseUp(middle + new Point(0, -30), MouseButton.Left);
+
+            Assert.That(TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition), Is.EqualTo(length));
+            Assert.That(note.Pitch.ToString(), Is.Not.EqualTo(pitch));
+        }
+
+        [AvaloniaTest]
+        public void ClickingTheRightHalfOfAShortNote_SelectsIt()
+        {
+            Click(EditorPoint);
+            IVisualNote note = notes.AllNotes.Single();
+            Press(Key.Escape);
+            viewModel.NoteAction = NoteAction.Select;
+
+            Click(NoteEdgeInWindow(note) - new Point(3, 0));
+
+            Assert.That(note.NoteState, Is.EqualTo(NoteState.Selected));
+        }
+
+        private double EditorWidth() => window.FindControl<SequencerControl>("Editor").Bounds.Width;
+
+        /// <summary>
+        /// The window coordinates of the note's right edge, halfway down its lane.
+        /// </summary>
+        private Point NoteEdgeInWindow(IVisualNote note)
+        {
+            var editor = window.FindControl<SequencerControl>("Editor");
+            double ticksAcross = 16 * 96;
+            double x = TotalTicks(note.EndPosition) * editor.Bounds.Width / ticksAcross;
+            Point origin = editor.TranslatePoint(new Point(0, 0), window) ?? default;
+            return new Point(origin.X + x, EditorPoint.Y);
         }
 
         [AvaloniaTest]
@@ -329,6 +381,161 @@ namespace Sequencer.View.Tests.UiTests
         }
 
         [AvaloniaTest]
+        public void TempoBox_IsBoundToTheViewModel()
+        {
+            var tempoBox = window.FindControl<NumericUpDown>("TempoBox");
+
+            tempoBox.Value = 90;
+            Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(90));
+
+            viewModel.BeatsPerMinute = 140;
+            Assert.That(tempoBox.Value, Is.EqualTo(140));
+        }
+
+        [AvaloniaTest]
+        public void TypingInTheTempoBox_DoesNotTriggerEditorShortcuts()
+        {
+            Click(EditorPoint);
+            TextBox tempoText = window.FindControl<NumericUpDown>("TempoBox").GetVisualDescendants().OfType<TextBox>().First();
+            tempoText.Focus();
+
+            Press(Key.Back);
+            Press(Key.Space);
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1), "Backspace edits the text, not the notes.");
+            Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop), "Space types a space, not Play.");
+        }
+
+        [AvaloniaTest]
+        public void SynthPanel_IsBoundToTheSynthSettings()
+        {
+            var settings = container.Resolve<Domain.Settings.SynthSettings>();
+
+            window.FindControl<ComboBox>("WaveformBox").SelectedItem = Domain.Settings.Waveform.Triangle;
+            window.FindControl<Slider>("ReleaseMillisecondsSlider").Value = 750;
+            window.FindControl<Slider>("VolumePercentSlider").Value = 30;
+
+            Assert.That(settings.Waveform, Is.EqualTo(Domain.Settings.Waveform.Triangle));
+            Assert.That(settings.ReleaseSeconds, Is.EqualTo(0.75));
+            Assert.That(settings.MasterVolume, Is.EqualTo(0.3));
+        }
+
+        [AvaloniaTest]
+        public void CreatingANote_PreviewsIt()
+        {
+            Click(EditorPoint);
+
+            Assert.That(previewer.Pitches, Is.EqualTo(new[] { notes.AllNotes.Single().Pitch.ToString() }));
+        }
+
+        [AvaloniaTest]
+        public void ChangingANotesPitch_PreviewsTheNewPitch()
+        {
+            Click(EditorPoint);
+
+            Press(Key.Up);
+            Press(Key.Right);
+
+            Assert.That(previewer.Pitches.Count, Is.EqualTo(2), "Moving in time does not preview.");
+            Assert.That(previewer.Pitches.Last(), Is.EqualTo(notes.AllNotes.Single().Pitch.ToString()));
+        }
+
+        [AvaloniaTest]
+        public void DraggingANoteUpAndDown_PreviewsEachNewPitch()
+        {
+            Click(EditorPoint);
+            viewModel.NoteAction = NoteAction.Select;
+            previewer.Pitches.Clear();
+
+            // Lanes are 12.5 px tall: grab the middle of the note and drag up three semitones.
+            Point grab = NoteEdgeInWindow(notes.AllNotes.Single()) - new Point(EditorWidth() / 64 / 2, 0);
+            window.MouseDown(grab, MouseButton.Left);
+            window.MouseMove(grab + new Point(0, -13));
+            window.MouseMove(grab + new Point(0, -26));
+            window.MouseMove(grab + new Point(0, -38));
+            window.MouseUp(grab + new Point(0, -38), MouseButton.Left);
+
+            Assert.That(previewer.Pitches.Count, Is.EqualTo(3));
+        }
+
+        [AvaloniaTest]
+        public void PreviewCheckbox_IsBoundToTheSetting()
+        {
+            var settings = container.Resolve<Domain.Settings.SynthSettings>();
+
+            window.FindControl<CheckBox>("PreviewOnEditBox").IsChecked = false;
+
+            Assert.That(settings.PreviewOnEdit, Is.False);
+        }
+
+        private PianoKeyboardControl Keyboard => window.FindControl<PianoKeyboardControl>("Keyboard");
+
+        private string PitchName(int noteNumber) => container.Resolve<Midi.IDigitalAudioProtocol>().CreatePitchFromProtocolNumber(noteNumber).ToString();
+
+        private int NoteNumber(Domain.Pitch pitch) => container.Resolve<Midi.IDigitalAudioProtocol>().ProtocolNoteNumber(pitch);
+
+        [AvaloniaTest]
+        public void PressingAKey_HoldsItsNoteUntilReleased()
+        {
+            var settings = container.Resolve<Domain.Settings.SequencerSettings>();
+            int highest = NoteNumber(settings.LowestPitch) + settings.TotalNotes - 1;
+
+            // The top key, halfway across the keyboard column, just below the ruler.
+            window.MouseDown(new Point(28, 36), MouseButton.Left);
+            Assert.That(previewer.Held, Is.EqualTo(new[] { PitchName(highest) }));
+            Assert.That(Keyboard.PressedNote, Is.EqualTo(highest));
+            Assert.That(previewer.Released, Is.EqualTo(0));
+
+            window.MouseUp(new Point(28, 36), MouseButton.Left);
+            Assert.That(previewer.Released, Is.EqualTo(1));
+            Assert.That(Keyboard.PressedNote, Is.Null);
+        }
+
+        [AvaloniaTest]
+        public void DraggingAcrossTheKeys_PlaysEachInTurn()
+        {
+            window.MouseDown(new Point(28, 36), MouseButton.Left);
+            window.MouseMove(new Point(28, 49));
+            window.MouseMove(new Point(28, 62));
+            window.MouseUp(new Point(28, 62), MouseButton.Left);
+
+            Assert.That(previewer.Held.Count, Is.EqualTo(3));
+            Assert.That(previewer.Held.Distinct().Count(), Is.EqualTo(3));
+            Assert.That(previewer.Released, Is.EqualTo(3), "Each key is released when the next is played.");
+        }
+
+        [AvaloniaTest]
+        public void PlayingKeys_LightUpDuringPlayback()
+        {
+            // A note in the first cell of the grid, which sounds as soon as playback starts.
+            Point firstCell = (window.FindControl<SequencerControl>("Editor").TranslatePoint(new Point(4, 0), window) ?? default)
+                .WithY(EditorPoint.Y);
+            Click(firstCell);
+            int noteNumber = NoteNumber(notes.AllNotes.Single().Pitch);
+
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(60);
+            Dispatcher.UIThread.RunJobs();
+            Assert.That(Keyboard.ActiveNotes, Is.EquivalentTo(new[] { noteNumber }));
+
+            Press(Key.Enter);
+            Assert.That(Keyboard.ActiveNotes, Is.Empty);
+        }
+
+        [AvaloniaTest]
+        public void Ruler_LinesUpWithTheGrid()
+        {
+            var header = window.FindControl<SequencerHeaderControl>("Header");
+            var editor = window.FindControl<SequencerControl>("Editor");
+
+            Point headerOrigin = header.TranslatePoint(new Point(0, 0), window) ?? default;
+            Point editorOrigin = editor.TranslatePoint(new Point(0, 0), window) ?? default;
+
+            Assert.That(headerOrigin.X, Is.EqualTo(editorOrigin.X));
+            Assert.That(header.Bounds.Width, Is.EqualTo(editor.Bounds.Width).Within(1));
+        }
+
+        [AvaloniaTest]
         public void Space_TogglesPlayAndPause_AndReturnStops()
         {
             Press(Key.Space);
@@ -339,6 +546,32 @@ namespace Sequencer.View.Tests.UiTests
 
             Press(Key.Enter);
             Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop));
+        }
+
+        private sealed class RecordingNotePreviewer : Domain.INotePreviewer
+        {
+            public System.Collections.Generic.List<string> Pitches { get; } = new System.Collections.Generic.List<string>();
+
+            public System.Collections.Generic.List<string> Held { get; } = new System.Collections.Generic.List<string>();
+
+            public int Released { get; private set; }
+
+            public void Preview(Domain.Tone tone) => Pitches.Add(tone.Pitch.ToString());
+
+            public IDisposable Hold(Domain.Tone tone)
+            {
+                Held.Add(tone.Pitch.ToString());
+                return new Release(() => Released++);
+            }
+
+            private sealed class Release : IDisposable
+            {
+                private readonly Action onDispose;
+
+                public Release(Action onDispose) => this.onDispose = onDispose;
+
+                public void Dispose() => onDispose();
+            }
         }
     }
 }

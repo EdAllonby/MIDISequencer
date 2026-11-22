@@ -5,18 +5,8 @@ namespace Sequencer.Domain.Settings
     /// <summary>
     /// Holds the sequencer's currently assigned settings.
     /// </summary>
-    public sealed class SequencerSettings : IColourSettings, IMusicalSettings, IAudioSettings
+    public sealed class SequencerSettings : IColourSettings, IMusicalSettings
     {
-        // Audio definitions
-        public int SampleRate => 44100;
-
-        // A short, percussive envelope. The original Windows build used 1 s attack, decay and release
-        // with 0.5 sustain, but its release stage never ran (issue #16).
-        public double AttackSeconds => 0.005;
-        public double DecaySeconds => 0.1;
-        public double SustainLevel => 0.7;
-        public double ReleaseSeconds => 0.2;
-
         // Colour definitions
         public Color AccidentalKeyColour => Color.Gray;
 

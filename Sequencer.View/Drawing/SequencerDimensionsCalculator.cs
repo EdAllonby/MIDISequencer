@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Linq;
+using Avalonia;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
@@ -11,6 +13,8 @@ namespace Sequencer.View.Drawing
 {
     public sealed class SequencerDimensionsCalculator : ISequencerDimensionsCalculator
     {
+        private const double MaximumEdgeWidth = 6;
+
         [NotNull] private readonly IPitchAndPositionCalculator pitchAndPositionCalculator;
         [NotNull] private readonly IDigitalAudioProtocol protocol;
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
@@ -56,13 +60,13 @@ namespace Sequencer.View.Drawing
 
         public IPosition FindPositionFromPoint(IMousePoint mousePosition)
         {
-            NoteResolution currentResolution = sequencerSettings.NoteResolution;
+            // The start of the grid cell containing the point. (Rounding to the nearest grid line put notes
+            // in the next cell when clicking the right half of a cell.)
+            int resolutionTicks = NoteResolutionCalculator.GetTicksForResolution(sequencerSettings.NoteResolution, sequencerSettings.TicksPerQuarterNote);
+            var tick = (int) Math.Floor(Math.Max(0, mousePosition.X) / TickWidth);
+            int cellStartTick = tick / resolutionTicks * resolutionTicks;
 
-            var tick = (int) Math.Ceiling(mousePosition.X / TickWidth);
-
-            int closestTick = FindClosestTickUsingResolution(tick, currentResolution);
-
-            return Position.PositionFromTick(closestTick, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            return Position.PositionFromTick(cellStartTick, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
         }
 
         public double GetPointFromPosition(IPosition position)
@@ -98,32 +102,36 @@ namespace Sequencer.View.Drawing
         /// <returns>The note a mouse is over.</returns>
         public IVisualNote FindNoteFromPoint(ISequencerNotes sequencerNotes, IMousePoint point)
         {
-            IPosition mousePosition = FindPositionFromPoint(point);
-            Pitch mousePitch = FindPitchFromPoint(point);
-            return sequencerNotes.FindNoteFromPositionAndPitch(mousePosition, mousePitch);
+            // Hit-test the drawn rectangle. Snapping the point to the grid first (as this used to) misses the
+            // right half of a one-sixteenth note.
+            return sequencerNotes.AllNotes.LastOrDefault(note => NoteBounds(note).Contains(point.Point));
         }
 
-        public IVisualNote NoteAtStartingPoint(ISequencerNotes sequencerNotes, IMousePoint point)
+        public NoteEdge EdgeAtPoint(IVisualNote note, IMousePoint point)
         {
-            IPosition mousePosition = FindPositionFromPoint(point);
-            Pitch mousePitch = FindPitchFromPoint(point);
+            Rect bounds = NoteBounds(note);
 
-            return sequencerNotes.FindNoteFromStartingPositionAndPitch(mousePosition, mousePitch);
+            // Up to 6 px at each end resizes; short notes keep at least half their width for moving.
+            double edgeWidth = Math.Min(MaximumEdgeWidth, bounds.Width / 4);
+
+            if (point.X >= bounds.Right - edgeWidth)
+            {
+                return NoteEdge.End;
+            }
+
+            if (point.X <= bounds.Left + edgeWidth)
+            {
+                return NoteEdge.Start;
+            }
+
+            return NoteEdge.None;
         }
 
-        public IVisualNote NoteAtEndingPoint(ISequencerNotes sequencerNotes, IMousePoint point)
+        private Rect NoteBounds([NotNull] IVisualNote note)
         {
-            IPosition mousePosition = FindPositionFromPoint(point);
-            Pitch mousePitch = FindPitchFromPoint(point);
-
-            return sequencerNotes.FindNoteFromEndingPositionAndPitch(mousePosition, mousePitch);
-        }
-
-        private int FindClosestTickUsingResolution(int tick, NoteResolution currentResolution)
-        {
-            int resolutionMultiple = NoteResolutionCalculator.GetTicksForResolution(currentResolution, sequencerSettings.TicksPerQuarterNote);
-
-            return MathsUtilities.NearestValue(tick, resolutionMultiple);
+            double left = GetPointFromPosition(note.StartPosition);
+            double right = GetPointFromPosition(note.EndPosition);
+            return new Rect(left, GetPointFromPitch(note.Pitch), Math.Max(0, right - left), NoteHeight);
         }
     }
 }

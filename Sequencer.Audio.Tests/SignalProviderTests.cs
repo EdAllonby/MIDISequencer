@@ -72,6 +72,23 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
+        public void ReleaseAfter_ReleasesAndFinishesByItself()
+        {
+            // Release after 0.1 s (100 samples), then a 0.05 s release.
+            var voice = new SignalProvider(new SineWaveCalculator(), Settings()) { Frequency = 10, Amplitude = 1 };
+            voice.NoteOn();
+            voice.ReleaseAfter(100);
+            var buffer = new float[50];
+
+            for (var i = 0; i < 10 && !voice.IsFinished; i++)
+            {
+                voice.Read(buffer);
+            }
+
+            Assert.That(voice.IsFinished, Is.True);
+        }
+
+        [Test]
         public void WithoutNoteOff_KeepsPlaying()
         {
             var voice = new SignalProvider(new SineWaveCalculator(), Settings()) { Frequency = 10, Amplitude = 1 };

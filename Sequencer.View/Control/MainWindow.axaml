@@ -14,16 +14,22 @@
         <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*,Auto">
             <Grid Grid.Row="0">
                 <DockPanel>
-                    <control:SequencerHeaderControl x:Name="Header" DockPanel.Dock="Top" Height="30"
-                                                    CurrentPosition="{Binding CurrentPosition}" />
+                    <!-- The keyboard column and the ruler's spacer share one width so lanes and beats line up. -->
+                    <Grid DockPanel.Dock="Top" Height="30" ColumnDefinitions="56,*">
+                        <control:SequencerHeaderControl x:Name="Header" Grid.Column="1"
+                                                        CurrentPosition="{Binding CurrentPosition}" />
+                    </Grid>
                     <ScrollViewer x:Name="EditorScrollViewer"
                                   HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto"
                                   Focusable="False">
-                        <control:SequencerControl x:Name="Editor" MinHeight="800"
-                                                  NoteAction="{Binding NoteAction}"
-                                                  SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
-                                                  CurrentPosition="{Binding CurrentPosition}" />
+                        <Grid ColumnDefinitions="56,*" MinHeight="800">
+                            <control:PianoKeyboardControl x:Name="Keyboard" Grid.Column="0" />
+                            <control:SequencerControl x:Name="Editor" Grid.Column="1"
+                                                      NoteAction="{Binding NoteAction}"
+                                                      SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                                      CurrentPosition="{Binding CurrentPosition}" />
+                        </Grid>
                     </ScrollViewer>
                 </DockPanel>
 
@@ -36,14 +42,20 @@
                 <Button Content="▶" Width="36" Focusable="False" Command="{Binding PlaySequencer}" ToolTip.Tip="Play (Space)" />
                 <Button Content="❚❚" Width="36" Focusable="False" Command="{Binding PauseSequencer}" ToolTip.Tip="Pause (Space)" />
                 <Button Content="■" Width="36" Focusable="False" Command="{Binding StopSequencer}" ToolTip.Tip="Stop (Return)" />
+                <Separator Width="12" Background="Transparent" />
+                <NumericUpDown x:Name="TempoBox" Width="120" Minimum="30" Maximum="300" Increment="1" FormatString="0"
+                               Value="{Binding BeatsPerMinute}" ToolTip.Tip="Tempo (beats per minute)" />
+                <TextBlock Text="BPM" VerticalAlignment="Center" />
+                <Button Content="Tap" Focusable="False" Command="{Binding TapTempo}" ToolTip.Tip="Tap repeatedly to set the tempo" />
             </StackPanel>
         </Grid>
 
         <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" ResizeDirection="Columns" />
 
-        <!-- Note inspector -->
-        <Border Grid.Row="0" Grid.Column="2" Padding="12" Background="#F5F5F5">
-            <StackPanel Spacing="8">
+        <!-- Note inspector and synth -->
+        <Border Grid.Row="0" Grid.Column="2" Padding="12,12,12,0" Background="#F5F5F5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel Spacing="8" Margin="0,0,0,12">
                 <TextBlock Text="Selected note" FontWeight="SemiBold" />
                 <TextBlock Text="Select a single note to see its details."
                            TextWrapping="Wrap" Foreground="Gray"
@@ -59,7 +71,53 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="End" Foreground="Gray" />
                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedNote.End, FallbackValue=''}" TextWrapping="Wrap" />
                 </Grid>
+
+                <Separator Margin="0,8" />
+
+                <!-- Synth -->
+                <StackPanel x:Name="SynthPanel" x:DataType="vm:SynthViewModel" Spacing="6">
+                    <TextBlock Text="Synth" FontWeight="SemiBold" />
+                    <Grid ColumnDefinitions="64,*">
+                        <TextBlock Grid.Column="0" Text="Wave" Foreground="Gray" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" x:Name="WaveformBox" HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding Waveforms}" SelectedItem="{Binding Waveform}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="How long a note takes to reach full volume">
+                        <TextBlock Grid.Column="0" Text="Attack" Foreground="Gray" VerticalAlignment="Center" />
+                        <Slider Grid.Column="1" x:Name="AttackMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding AttackMilliseconds}" />
+                        <TextBlock Grid.Column="2" Text="{Binding AttackMilliseconds, StringFormat='{}{0} ms'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="How long it then takes to fall to the sustain level">
+                        <TextBlock Grid.Column="0" Text="Decay" Foreground="Gray" VerticalAlignment="Center" />
+                        <Slider Grid.Column="1" x:Name="DecayMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding DecayMilliseconds}" />
+                        <TextBlock Grid.Column="2" Text="{Binding DecayMilliseconds, StringFormat='{}{0} ms'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="The level a held note settles at">
+                        <TextBlock Grid.Column="0" Text="Sustain" Foreground="Gray" VerticalAlignment="Center" />
+                        <Slider Grid.Column="1" x:Name="SustainPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding SustainPercent}" />
+                        <TextBlock Grid.Column="2" Text="{Binding SustainPercent, StringFormat='{}{0} %'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="How long a note takes to fade after it ends">
+                        <TextBlock Grid.Column="0" Text="Release" Foreground="Gray" VerticalAlignment="Center" />
+                        <Slider Grid.Column="1" x:Name="ReleaseMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding ReleaseMilliseconds}" />
+                        <TextBlock Grid.Column="2" Text="{Binding ReleaseMilliseconds, StringFormat='{}{0} ms'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    </Grid>
+                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="Master volume">
+                        <TextBlock Grid.Column="0" Text="Volume" Foreground="Gray" VerticalAlignment="Center" />
+                        <Slider Grid.Column="1" x:Name="VolumePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding VolumePercent}" />
+                        <TextBlock Grid.Column="2" Text="{Binding VolumePercent, StringFormat='{}{0} %'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    </Grid>
+                    <CheckBox x:Name="PreviewOnEditBox" Content="Play notes while editing" Focusable="False"
+                              IsChecked="{Binding PreviewOnEdit}" />
+                    <TextBlock Text="Sound changes apply to the next note played." FontSize="11" Foreground="Gray" TextWrapping="Wrap" />
+                </StackPanel>
             </StackPanel>
+            </ScrollViewer>
         </Border>
 
         <!-- Status bar -->

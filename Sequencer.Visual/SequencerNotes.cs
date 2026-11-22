@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -71,24 +71,8 @@ namespace Sequencer.Visual
             Log.Info($"Visual note [{noteToDelete}] has been deleted.");
         }
 
-        public IVisualNote FindNoteFromPositionAndPitch(IPosition position, Pitch pitch)
-        {
-            return Snapshot(note => note.StartPosition.IsLessThanOrEqual(position) && note.EndPosition.IsGreaterThan(position) && note.Pitch.Equals(pitch))
-                .FirstOrDefault();
-        }
 
-        public IVisualNote FindNoteFromStartingPositionAndPitch(IPosition position, Pitch pitch)
-        {
-            return Snapshot(note => note.StartPosition.Equals(position) && note.Pitch.Equals(pitch)).FirstOrDefault();
-        }
 
-        public IVisualNote FindNoteFromEndingPositionAndPitch(IPosition position, Pitch pitch)
-        {
-            return Snapshot(note =>
-                    note.EndPosition.PreviousPosition(musicalSettings.NoteResolution, musicalSettings.TimeSignature, musicalSettings.TicksPerQuarterNote).Equals(position) &&
-                    note.Pitch.Equals(pitch))
-                .FirstOrDefault();
-        }
 
         public IEnumerable<IVisualNote> FindNotesFromStartingPosition(IPosition position)
         {

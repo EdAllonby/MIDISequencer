@@ -38,7 +38,9 @@ namespace Sequencer.View.Command.MousePointCommand
             int newTicksDelta = newEndPosition.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote) -
                                 initialEndPosition.TotalTicks(sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
 
-            if (newTicksDelta != ticksDelta)
+            // The reference point moves with each step, so any non-zero delta is new movement. (Comparing with
+            // the previous delta skipped every other step of the same size.)
+            if (newTicksDelta != 0)
             {
                 ticksDelta = newTicksDelta;
 

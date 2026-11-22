@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
 using Sequencer.Visual;
@@ -12,6 +12,7 @@ namespace Sequencer.View.Command.MousePointCommand
     public class CreateNoteFromPointCommand : MousePointNoteCommand
     {
         [NotNull] private readonly IMouseOperator mouseOperator;
+        [NotNull] private readonly INotePreviewer notePreviewer;
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         [NotNull] private readonly ISequencerNotes sequencerNotes;
         [NotNull] private readonly SequencerSettings sequencerSettings;
@@ -19,8 +20,9 @@ namespace Sequencer.View.Command.MousePointCommand
 
         public CreateNoteFromPointCommand([NotNull] IVisualNoteFactory visualNoteFactory, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] IMouseOperator mouseOperator,
-            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator)
+            [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] INotePreviewer notePreviewer)
         {
+            this.notePreviewer = notePreviewer;
             this.visualNoteFactory = visualNoteFactory;
             this.sequencerNotes = sequencerNotes;
             this.sequencerSettings = sequencerSettings;
@@ -50,6 +52,7 @@ namespace Sequencer.View.Command.MousePointCommand
 
             // The new note starts selected, and the selection display needs to know.
             sequencerNotes.NoteStateChanged();
+            notePreviewer.Preview(newNote.Tone);
         }
     }
 }

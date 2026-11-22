@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using JetBrains.Annotations;
@@ -32,6 +32,7 @@ namespace Sequencer.Midi
 
         private volatile bool disposed;
         private volatile bool running;
+        private volatile int tempo = DefaultTempo;
         private int ticks;
         private int ppqn = 24;
         private long nextTickTimestamp;
@@ -62,7 +63,22 @@ namespace Sequencer.Midi
 
         public event EventHandler Stopped;
 
-        public int Tempo => DefaultTempo;
+        /// <summary>
+        /// Microseconds per quarter note. Can change while running; the next tick uses the new length.
+        /// </summary>
+        public int Tempo
+        {
+            get => tempo;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "Tempo must be positive.");
+                }
+
+                tempo = value;
+            }
+        }
 
         public bool IsRunning => running;
 

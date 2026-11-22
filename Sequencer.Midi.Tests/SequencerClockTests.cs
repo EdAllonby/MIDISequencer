@@ -51,6 +51,18 @@ namespace Sequencer.Midi.Tests
         }
 
         [Test]
+        public void SettingBeatsPerMinute_SetsTheInternalClockTempo()
+        {
+            Mock<IMusicalSettings> mockSettings = MockMusicalSettings();
+            var mockInternalClock = new Mock<IInternalClock>();
+            var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
+
+            clock.BeatsPerMinute = 90;
+
+            mockInternalClock.VerifySet(x => x.Tempo = 666667, Times.Once);
+        }
+
+        [Test]
         public void GetTicks_GetsInternalClockTicks()
         {
             Mock<IMusicalSettings> mockSettings = MockMusicalSettings();

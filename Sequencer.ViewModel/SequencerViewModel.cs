@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -13,6 +14,14 @@ namespace Sequencer.ViewModel
 {
     public sealed class SequencerViewModel : ObservableObject
     {
+        public const int MinimumBeatsPerMinute = 30;
+        public const int MaximumBeatsPerMinute = 300;
+        private const int DefaultBeatsPerMinute = 120;
+
+        // Taps further apart than this start a new count.
+        private static readonly TimeSpan TapTimeout = TimeSpan.FromSeconds(2);
+        private const int TapsToAverage = 5;
+
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly IUiDispatcher dispatcher;
@@ -20,6 +29,10 @@ namespace Sequencer.ViewModel
         [NotNull] private readonly RelayCommand pauseCommand;
         [NotNull] private readonly RelayCommand stopCommand;
         [NotNull] private readonly RelayCommand toggleCommand;
+        [NotNull] private readonly RelayCommand tapTempoCommand;
+        [NotNull] private readonly TimeProvider timeProvider;
+        [NotNull] private readonly List<long> tapTimestamps = new List<long>();
+        private int beatsPerMinute;
         [NotNull] private readonly ITickCalculator tickCalculator;
         [NotNull] private IPosition currentPosition = new Position(1, 1, 1);
         [NotNull] private NoteAction noteAction = NoteAction.Create;
@@ -27,8 +40,10 @@ namespace Sequencer.ViewModel
         [CanBeNull] private SelectedNoteViewModel selectedNote;
         private PlayState sequencerPlayState;
 
-        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IUiDispatcher dispatcher)
+        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IUiDispatcher dispatcher,
+            [CanBeNull] TimeProvider timeProvider = null)
         {
+            this.timeProvider = timeProvider ?? TimeProvider.System;
             this.clock = clock;
             this.tickCalculator = tickCalculator;
             this.dispatcher = dispatcher;
@@ -37,6 +52,10 @@ namespace Sequencer.ViewModel
             pauseCommand = new RelayCommand(ExecutePauseCommand, CanExecutePauseCommand);
             stopCommand = new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
             toggleCommand = new RelayCommand(ExecuteToggleSequencerCommand);
+            tapTempoCommand = new RelayCommand(ExecuteTapTempo);
+
+            double clockBeatsPerMinute = clock.BeatsPerMinute;
+            beatsPerMinute = clockBeatsPerMinute > 0 ? (int) Math.Round(clockBeatsPerMinute) : DefaultBeatsPerMinute;
 
             CurrentPosition = new Position(1, 1, 1);
             SequencerPlayState = PlayState.Stop;
@@ -63,7 +82,7 @@ namespace Sequencer.ViewModel
         [NotNull]
         public string Information
         {
-            [NotNull] get { return $"Note Action {NoteAction}, {sequencerPlayState}"; }
+            [NotNull] get { return $"Note Action {NoteAction}, {sequencerPlayState}, {BeatsPerMinute} BPM"; }
         }
 
         [NotNull]
@@ -139,6 +158,33 @@ namespace Sequencer.ViewModel
 
         public ICommand ToggleSequencer => toggleCommand;
 
+        /// <summary>
+        /// Sets the tempo from the average interval between recent taps.
+        /// </summary>
+        public ICommand TapTempo => tapTempoCommand;
+
+        public int BeatsPerMinute
+        {
+            get => beatsPerMinute;
+            set
+            {
+                int clamped = Math.Clamp(value, MinimumBeatsPerMinute, MaximumBeatsPerMinute);
+
+                if (clamped == beatsPerMinute)
+                {
+                    // Still notify, so a view showing an out-of-range value snaps back to the clamped one.
+                    OnPropertyChanged(nameof(BeatsPerMinute));
+                    return;
+                }
+
+                beatsPerMinute = clamped;
+                clock.BeatsPerMinute = clamped;
+                OnPropertyChanged(nameof(BeatsPerMinute));
+                OnPropertyChanged(nameof(Information));
+                Log.Info($"Tempo set to {clamped} BPM");
+            }
+        }
+
         private void OnTick(object sender, [NotNull] TickEventArgs e)
         {
             if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
@@ -179,6 +225,30 @@ namespace Sequencer.ViewModel
         private bool CanExecutePauseCommand()
         {
             return SequencerPlayState == PlayState.Play;
+        }
+
+        private void ExecuteTapTempo()
+        {
+            long now = timeProvider.GetTimestamp();
+
+            if (tapTimestamps.Count > 0 && timeProvider.GetElapsedTime(tapTimestamps[tapTimestamps.Count - 1], now) > TapTimeout)
+            {
+                tapTimestamps.Clear();
+            }
+
+            tapTimestamps.Add(now);
+
+            if (tapTimestamps.Count > TapsToAverage)
+            {
+                tapTimestamps.RemoveAt(0);
+            }
+
+            if (tapTimestamps.Count >= 2)
+            {
+                TimeSpan span = timeProvider.GetElapsedTime(tapTimestamps[0], now);
+                double secondsPerBeat = span.TotalSeconds / (tapTimestamps.Count - 1);
+                BeatsPerMinute = (int) Math.Round(60.0 / secondsPerBeat);
+            }
         }
 
         private void ExecuteToggleSequencerCommand()

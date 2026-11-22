@@ -41,7 +41,9 @@ namespace Sequencer.View.Command.MousePointCommand
 
             int newTicksDelta = pitchAndPositionCalculator.FindTicksBetweenPositions(initialPosition, newPosition);
 
-            if (newTicksDelta != ticksDelta)
+            // The reference point moves with each step, so any non-zero delta is new movement. (Comparing with
+            // the previous delta skipped every other step of the same size.)
+            if (newTicksDelta != 0)
             {
                 ticksDelta = newTicksDelta;
 
@@ -59,7 +61,7 @@ namespace Sequencer.View.Command.MousePointCommand
 
             int halfStepDifference = pitchAndPositionCalculator.FindStepsFromPitches(initialPitch, newPitch);
 
-            if (halfStepDifference != lastHalfStepDifference)
+            if (halfStepDifference != 0)
             {
                 lastHalfStepDifference = halfStepDifference;
 

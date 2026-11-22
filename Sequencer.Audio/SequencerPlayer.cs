@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,12 +17,15 @@ namespace Sequencer.Audio
     [UsedImplicitly]
     public sealed class SequencerPlayer : IDisposable
     {
+        private const double PreviewSeconds = 0.15;
+
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly MixingSampleProvider mixer;
         [NotNull] private readonly IAudioOutput output;
         [NotNull] private readonly ISequencedNotes sequencedNotes;
         [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
         [NotNull] private readonly ITickCalculator tickCalculator;
+        private readonly int previewSamples;
 
         // Ticks arrive on the clock thread; Stopped can be raised from the UI thread.
         [NotNull] private readonly object voicesLock = new object();
@@ -38,10 +41,11 @@ namespace Sequencer.Audio
             this.clock = clock;
             this.tickCalculator = tickCalculator;
             this.output = output;
+            previewSamples = (int) (PreviewSeconds * audioSettings.SampleRate);
 
             // ReadFully keeps the stream running with silence when no notes are playing.
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(audioSettings.SampleRate, 1)) { ReadFully = true };
-            output.Play(mixer);
+            output.Play(new MasterVolumeSampleProvider(mixer, audioSettings));
 
             clock.Tick += OnTick;
             clock.Started += OnClockStarted;
@@ -52,6 +56,29 @@ namespace Sequencer.Audio
         /// The number of notes currently sounding, including ones in their release stage.
         /// </summary>
         public int ActiveVoiceCount => mixer.MixerInputs.Count();
+
+        /// <summary>
+        /// Plays a short, self-releasing note alongside whatever is playing. Safe to call from the UI thread.
+        /// </summary>
+        public void Preview([NotNull] Tone tone)
+        {
+            ISignalProvider voice = signalProviderFactory.CreateSignalProvider(new PreviewNote(tone));
+            voice.NoteOn();
+            voice.ReleaseAfter(previewSamples);
+            mixer.AddMixerInput(voice);
+        }
+
+        /// <summary>
+        /// Starts a note that plays until the returned handle is disposed. Safe to call from the UI thread.
+        /// </summary>
+        [NotNull]
+        public IDisposable Hold([NotNull] Tone tone)
+        {
+            ISignalProvider voice = signalProviderFactory.CreateSignalProvider(new PreviewNote(tone));
+            voice.NoteOn();
+            mixer.AddMixerInput(voice);
+            return new HeldNote(voice);
+        }
 
         public void Dispose()
         {
@@ -144,6 +171,31 @@ namespace Sequencer.Audio
                     voices.Remove(note);
                 }
             }
+        }
+
+        private sealed class HeldNote : IDisposable
+        {
+            [NotNull] private readonly ISignalProvider voice;
+
+            public HeldNote([NotNull] ISignalProvider voice)
+            {
+                this.voice = voice;
+            }
+
+            public void Dispose()
+            {
+                voice.NoteOff();
+            }
+        }
+
+        private sealed class PreviewNote : ISequencedNote
+        {
+            public PreviewNote([NotNull] Tone tone)
+            {
+                Tone = tone;
+            }
+
+            public Tone Tone { get; }
         }
     }
 }

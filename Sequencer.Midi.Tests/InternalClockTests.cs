@@ -163,6 +163,32 @@ namespace Sequencer.Midi.Tests
         }
 
         [Test]
+        public void ChangingTempo_ChangesTheTickLength()
+        {
+            InternalClock clock = CreateClock();
+            var tickCount = 0;
+            clock.Tick += (sender, args) => tickCount++;
+            clock.Start();
+            clock.ProcessDueTicks();
+
+            // Double the speed: 60 BPM -> 250000 µs per quarter note, so ticks are half as long.
+            clock.Tempo = 250000;
+            now = TickLength * 10;
+            clock.ProcessDueTicks();
+
+            // The tick already scheduled at the old length, then ticks every 2604 µs.
+            Assert.That(tickCount, Is.InRange(19, 21));
+        }
+
+        [Test]
+        public void Tempo_MustBePositive()
+        {
+            InternalClock clock = CreateClock();
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => clock.Tempo = 0);
+        }
+
+        [Test]
         public void Tempo_Is120BeatsPerMinute()
         {
             InternalClock clock = CreateClock();

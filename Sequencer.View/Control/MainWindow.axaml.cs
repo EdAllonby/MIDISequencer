@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -21,6 +23,7 @@ namespace Sequencer.View.Control
         private readonly KeyboardStateProcessor keyboardState;
         private readonly MouseOperator mouseOperator;
         private readonly SequencerViewModel viewModel;
+        private readonly ISequencerNotes notes;
 
         // The button that opened the radial menu: right, or left with Ctrl on macOS.
         private MouseButton? contextMenuButton;
@@ -35,17 +38,23 @@ namespace Sequencer.View.Control
 
         public MainWindow([NotNull] SequencerViewModel viewModel, [NotNull] ISequencerNotes notes,
             [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IDigitalAudioProtocol protocol,
-            [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator)
+            [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator,
+            [NotNull] SynthViewModel synthViewModel, [NotNull] INotePreviewer notePreviewer)
         {
             InitializeComponent();
 
             this.viewModel = viewModel;
+            this.notes = notes;
             this.keyboardState = keyboardState;
             this.mouseOperator = mouseOperator;
             DataContext = viewModel;
+            SynthPanel.DataContext = synthViewModel;
 
             Header.Initialise(pitchAndPositionCalculator, protocol, settings);
-            Editor.Initialise(notes, pitchAndPositionCalculator, protocol, settings, keyboardState, mouseOperator, keyboardState.CommandModifier);
+            Editor.Initialise(notes, pitchAndPositionCalculator, protocol, settings, keyboardState, mouseOperator, keyboardState.CommandModifier, notePreviewer);
+
+            Keyboard.Initialise(protocol, settings, notePreviewer);
+            viewModel.PropertyChanged += OnViewModelPropertyChanged;
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -57,6 +66,31 @@ namespace Sequencer.View.Control
             AddHandler(KeyUpEvent, (sender, args) => keyboardState.CurrentModifiers = args.KeyModifiers, RoutingStrategies.Tunnel);
 
             Log.Info("Main window loaded");
+        }
+
+        private void OnViewModelPropertyChanged(object sender, [NotNull] PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SequencerViewModel.CurrentPosition) || e.PropertyName == nameof(SequencerViewModel.SequencerPlayState))
+            {
+                UpdatePlayingKeys();
+            }
+        }
+
+        /// <summary>
+        /// Lights the keyboard keys for the notes sounding at the playback position.
+        /// </summary>
+        private void UpdatePlayingKeys()
+        {
+            if (viewModel.SequencerPlayState != PlayState.Play)
+            {
+                Keyboard.SetActivePitches(Enumerable.Empty<Pitch>());
+                return;
+            }
+
+            Domain.IPosition position = viewModel.CurrentPosition;
+            Keyboard.SetActivePitches(notes.AllNotes
+                .Where(note => note.StartPosition.IsLessThanOrEqual(position) && note.EndPosition.IsGreaterThan(position))
+                .Select(note => note.Pitch));
         }
 
         private void OnEditorPointerPressed(object sender, [NotNull] PointerPressedEventArgs e)
@@ -133,6 +167,19 @@ namespace Sequencer.View.Control
         private void OnKeyDown(object sender, [NotNull] KeyEventArgs e)
         {
             keyboardState.CurrentModifiers = e.KeyModifiers;
+
+            if (e.Source is TextBox)
+            {
+                // Typing in a text field (such as the tempo box): leave the keys to it.
+                if (e.Key == Key.Enter || e.Key == Key.Escape)
+                {
+                    // Commit or abandon the edit and hand the keyboard back to the editor.
+                    Focus();
+                    e.Handled = true;
+                }
+
+                return;
+            }
 
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Space)
             {

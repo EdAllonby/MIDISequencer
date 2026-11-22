@@ -21,7 +21,19 @@ namespace Sequencer.Midi
             clock.Tick += OnTick;
         }
 
-        public double BeatsPerMinute => 60000000.0 / MicrosecondsPerQuarterNote;
+        public double BeatsPerMinute
+        {
+            get => 60000000.0 / MicrosecondsPerQuarterNote;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "Beats per minute must be positive.");
+                }
+
+                clock.Tempo = (int) Math.Round(60000000.0 / value);
+            }
+        }
 
         private int MicrosecondsPerQuarterNote => clock.Tempo;
 

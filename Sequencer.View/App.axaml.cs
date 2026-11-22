@@ -46,12 +46,14 @@ namespace Sequencer.View
             base.OnFrameworkInitializationCompleted();
         }
 
-        internal static IContainer BuildContainer()
+        /// <param name="overrides">Registrations that replace the defaults, for tests.</param>
+        internal static IContainer BuildContainer(Action<ContainerBuilder> overrides = null)
         {
             var builder = new ContainerBuilder();
 
             builder.RegisterType<AvaloniaDispatcher>().As<IUiDispatcher>().SingleInstance();
-            builder.RegisterType<SequencerSettings>().AsSelf().As<IColourSettings, IMusicalSettings, IAudioSettings>().SingleInstance();
+            builder.RegisterType<SequencerSettings>().AsSelf().As<IColourSettings, IMusicalSettings>().SingleInstance();
+            builder.RegisterType<SynthSettings>().AsSelf().As<IAudioSettings>().SingleInstance();
             builder.RegisterType<TickCalculator>().As<ITickCalculator>().SingleInstance();
             builder.RegisterType<InternalClock>().As<IInternalClock>().SingleInstance();
             builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
@@ -62,10 +64,14 @@ namespace Sequencer.View
             builder.RegisterType<PortAudioOutput>().As<IAudioOutput>().SingleInstance();
             builder.RegisterType<SequencerNotes>().As<ISequencerNotes, ISequencedNotes>().SingleInstance();
             builder.RegisterType<SequencerPlayer>().SingleInstance();
+            builder.RegisterType<NotePreviewer>().As<INotePreviewer>().SingleInstance();
             builder.RegisterType<KeyboardStateProcessor>().AsSelf().As<IKeyboardStateProcessor>().SingleInstance();
             builder.RegisterType<MouseOperator>().AsSelf().As<IMouseOperator>().SingleInstance();
             builder.RegisterType<SequencerViewModel>().SingleInstance();
+            builder.RegisterType<SynthViewModel>().SingleInstance();
             builder.RegisterType<MainWindow>().SingleInstance();
+
+            overrides?.Invoke(builder);
 
             return builder.Build();
         }

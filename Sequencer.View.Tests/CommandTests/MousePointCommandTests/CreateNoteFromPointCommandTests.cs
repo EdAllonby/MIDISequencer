@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
@@ -30,7 +30,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             mockSequencerCalculator.Setup(x => x.FindPositionFromPoint(mockMousePoint.Object)).Returns(mockNotePosition.Object);
             mockVisualNoteFactory.Setup(x => x.CreateNote(It.IsAny<Pitch>(), mockNotePosition.Object, mockNextPosition.Object)).Returns(mockCreatedNote.Object);
 
-            var command = new CreateNoteFromPointCommand(mockVisualNoteFactory.Object, mockSequencerNotes.Object, new SequencerSettings(), mockMouseOperator.Object, mockSequencerCalculator.Object);
+            var command = new CreateNoteFromPointCommand(mockVisualNoteFactory.Object, mockSequencerNotes.Object, new SequencerSettings(), mockMouseOperator.Object, mockSequencerCalculator.Object, new Mock<Domain.INotePreviewer>().Object);
             command.Execute(mockMousePoint.Object);
 
             mockSequencerNotes.Verify(x => x.MakeAllUnselected(), Times.Once);

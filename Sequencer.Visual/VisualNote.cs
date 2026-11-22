@@ -11,12 +11,15 @@ namespace Sequencer.Visual
     {
         [NotNull] private readonly NoteDrawer noteDrawer;
         [NotNull] private readonly IDigitalAudioProtocol protocol;
+        [NotNull] private readonly INotePreviewer notePreviewer;
         [NotNull] private readonly SequencerSettings sequencerSettings;
         private NoteState noteState = NoteState.Selected;
 
         public VisualNote([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
-            [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone)
+            [NotNull] ISequencerCanvasWrapper sequencer, [NotNull] SequencerSettings sequencerSettings, [NotNull] Tone tone,
+            [NotNull] INotePreviewer notePreviewer)
         {
+            this.notePreviewer = notePreviewer;
             this.protocol = protocol;
             this.sequencerSettings = sequencerSettings;
             Tone = tone;
@@ -138,8 +141,14 @@ namespace Sequencer.Visual
         /// <param name="halfStepsToMove">How many half steps to move this visual note.</param>
         public void MovePitchRelativeTo(int halfStepsToMove)
         {
+            if (halfStepsToMove == 0)
+            {
+                return;
+            }
+
             int midiNoteNumber = protocol.ProtocolNoteNumber(Tone.Pitch);
             Pitch = protocol.CreatePitchFromProtocolNumber(midiNoteNumber + halfStepsToMove);
+            notePreviewer.Preview(Tone);
         }
 
         public override string ToString()
