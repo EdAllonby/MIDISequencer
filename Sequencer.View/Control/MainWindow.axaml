@@ -217,39 +217,208 @@
 
                     <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,6" />
 
-                    <StackPanel x:Name="SynthPanel" x:DataType="vm:SynthViewModel" Spacing="12">
-                        <TextBlock Classes="section" Text="SYNTH" />
-
-                        <Border Classes="segmented">
-                            <UniformGrid Columns="4">
-                                    <ToggleButton Classes="segment" x:Name="SawtoothWaveButton" Focusable="False" ToolTip.Tip="Sawtooth: bright and buzzy"
+                    <StackPanel x:Name="SynthPanel" x:DataType="vm:SynthViewModel" Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="section" Text="SYNTH" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" x:Name="PresetsButton" Classes="quiet" Focusable="False" ToolTip.Tip="Start from a classic sound">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="Presets" VerticalAlignment="Center" />
+                                    <Path Classes="stroke-icon" Data="{x:Static view:Icons.ChevronDown}" Stroke="{StaticResource TextTertiaryBrush}" Width="10" Height="10" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                        <StackPanel Spacing="2" ToolTip.Tip="This track's volume">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="label" Text="Volume" />
+                                <TextBlock Grid.Column="1" Classes="value" Text="{Binding VolumePercent, StringFormat='{}{0} %'}" />
+                            </Grid>
+                            <Slider x:Name="VolumePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                    Focusable="False" Margin="0,-6,0,-4" Value="{Binding VolumePercent}" />
+                        </StackPanel>
+                        <Expander x:Name="OscillatorsSection" Classes="synth" IsExpanded="True" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <TextBlock Classes="section" Text="OSCILLATORS" />
+                            </Expander.Header>
+                            <StackPanel Spacing="10">
+                            <TextBlock Classes="label" Text="Oscillator 1" />
+                            <Border Classes="segmented">
+                                <UniformGrid Columns="4">
+                                    <ToggleButton Classes="segment" x:Name="SawtoothWaveButton" Focusable="False" ToolTip.Tip="Sawtooth (oscillator 1)"
                                                   IsChecked="{Binding IsSawtooth}">
                                         <Path Classes="stroke-icon" Data="{x:Static view:Icons.Sawtooth}" Width="20" Height="14" />
                                     </ToggleButton>
-                                    <ToggleButton Classes="segment" x:Name="SquareWaveButton" Focusable="False" ToolTip.Tip="Square: hollow, like a clarinet"
+                                    <ToggleButton Classes="segment" x:Name="SquareWaveButton" Focusable="False" ToolTip.Tip="Square (oscillator 1)"
                                                   IsChecked="{Binding IsSquare}">
                                         <Path Classes="stroke-icon" Data="{x:Static view:Icons.Square}" Width="20" Height="14" />
                                     </ToggleButton>
-                                    <ToggleButton Classes="segment" x:Name="TriangleWaveButton" Focusable="False" ToolTip.Tip="Triangle: soft, like a flute"
+                                    <ToggleButton Classes="segment" x:Name="TriangleWaveButton" Focusable="False" ToolTip.Tip="Triangle (oscillator 1)"
                                                   IsChecked="{Binding IsTriangle}">
                                         <Path Classes="stroke-icon" Data="{x:Static view:Icons.Triangle}" Width="20" Height="14" />
                                     </ToggleButton>
-                                    <ToggleButton Classes="segment" x:Name="SineWaveButton" Focusable="False" ToolTip.Tip="Sine: pure tone"
+                                    <ToggleButton Classes="segment" x:Name="SineWaveButton" Focusable="False" ToolTip.Tip="Sine (oscillator 1)"
                                                   IsChecked="{Binding IsSine}">
                                         <Path Classes="stroke-icon" Data="{x:Static view:Icons.Sine}" Width="20" Height="14" />
                                     </ToggleButton>
-                            </UniformGrid>
-                        </Border>
-
-                        <Border Background="{StaticResource FieldBrush}" CornerRadius="7" Height="64" Padding="6"
-                                ToolTip.Tip="How each note's volume changes over time">
-                            <control:EnvelopeGraph x:Name="Envelope" Stroke="{StaticResource AccentBrush}"
-                                                   AttackMilliseconds="{Binding AttackMilliseconds}"
-                                                   DecayMilliseconds="{Binding DecayMilliseconds}"
-                                                   SustainPercent="{Binding SustainPercent}"
-                                                   ReleaseMilliseconds="{Binding ReleaseMilliseconds}" />
-                        </Border>
-
+                                </UniformGrid>
+                            </Border>
+                            <TextBlock Classes="label" Text="Oscillator 2" Margin="0,4,0,0" />
+                            <Border Classes="segmented">
+                                <UniformGrid Columns="4">
+                                    <ToggleButton Classes="segment" x:Name="Osc2SawtoothWaveButton" Focusable="False" ToolTip.Tip="Sawtooth (oscillator 2)"
+                                                  IsChecked="{Binding IsOscillator2Sawtooth}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Sawtooth}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                    <ToggleButton Classes="segment" x:Name="Osc2SquareWaveButton" Focusable="False" ToolTip.Tip="Square (oscillator 2)"
+                                                  IsChecked="{Binding IsOscillator2Square}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Square}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                    <ToggleButton Classes="segment" x:Name="Osc2TriangleWaveButton" Focusable="False" ToolTip.Tip="Triangle (oscillator 2)"
+                                                  IsChecked="{Binding IsOscillator2Triangle}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Triangle}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                    <ToggleButton Classes="segment" x:Name="Osc2SineWaveButton" Focusable="False" ToolTip.Tip="Sine (oscillator 2)"
+                                                  IsChecked="{Binding IsOscillator2Sine}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Sine}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                </UniformGrid>
+                            </Border>
+                            <StackPanel Spacing="2" ToolTip.Tip="Oscillator 2's tuning: 12 is an octave up, 7 a fifth">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Pitch" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding Oscillator2Semitones, StringFormat='{}{0:+0;-0;0} st'}" />
+                                </Grid>
+                                <Slider x:Name="Oscillator2SemitonesSlider" Minimum="-24" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding Oscillator2Semitones}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="A few cents makes the oscillators beat, for a thicker sound">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Detune" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding Oscillator2DetuneCents, StringFormat='{}{0:+0;-0;0} ct'}" />
+                                </Grid>
+                                <Slider x:Name="Oscillator2DetuneCentsSlider" Minimum="-50" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding Oscillator2DetuneCents}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How much of oscillator 2 to hear against oscillator 1">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Mix" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding OscillatorMixText}" />
+                                </Grid>
+                                <Slider x:Name="OscillatorMixPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding OscillatorMixPercent}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="White noise, for breath or grit">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Noise" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding NoisePercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="NoisePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding NoisePercent}" />
+                            </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                        <Expander x:Name="FilterSection" Classes="synth" IsExpanded="True" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <TextBlock Classes="section" Text="FILTER" />
+                            </Expander.Header>
+                            <StackPanel Spacing="10">
+                            <Border Classes="segmented">
+                                <UniformGrid Columns="3">
+                                    <ToggleButton Classes="segment" x:Name="LowPassButton" Focusable="False" Content="Low" ToolTip.Tip="Low-pass: keeps the lows, darker as the cutoff falls"
+                                                  IsChecked="{Binding IsLowPass}" />
+                                    <ToggleButton Classes="segment" x:Name="HighPassButton" Focusable="False" Content="High" ToolTip.Tip="High-pass: keeps the highs, thinner as the cutoff rises"
+                                                  IsChecked="{Binding IsHighPass}" />
+                                    <ToggleButton Classes="segment" x:Name="BandPassButton" Focusable="False" Content="Band" ToolTip.Tip="Band-pass: keeps a band around the cutoff"
+                                                  IsChecked="{Binding IsBandPass}" />
+                                </UniformGrid>
+                            </Border>
+                            <StackPanel Spacing="2" ToolTip.Tip="Where the filter starts to cut">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Cutoff" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding CutoffText}" />
+                                </Grid>
+                                <Slider x:Name="CutoffPositionSlider" Minimum="0" Maximum="1000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding CutoffPosition}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="Emphasises frequencies at the cutoff; high values whistle">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Resonance" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding ResonancePercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="ResonancePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding ResonancePercent}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How far the filter envelope moves the cutoff">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Envelope amount" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding FilterEnvelopeAmountText}" />
+                                </Grid>
+                                <Slider x:Name="FilterEnvelopeAmountTenthsSlider" Minimum="-50" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding FilterEnvelopeAmountTenths}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="Higher notes open the filter more">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Key tracking" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding KeyTrackingPercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="KeyTrackingPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding KeyTrackingPercent}" />
+                            </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                        <Expander x:Name="FilterEnvelopeSection" Classes="synth" IsExpanded="False" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <TextBlock Classes="section" Text="FILTER ENVELOPE" />
+                            </Expander.Header>
+                            <StackPanel Spacing="10">
+                            <Border Background="{StaticResource FieldBrush}" CornerRadius="7" Height="56" Padding="6" ToolTip.Tip="How the filter's cutoff moves over each note">
+                                <control:EnvelopeGraph x:Name="FilterEnvelopeGraph" Stroke="{StaticResource AccentBrush}"
+                                                       AttackMilliseconds="{Binding FilterAttackMilliseconds}" DecayMilliseconds="{Binding FilterDecayMilliseconds}"
+                                                       SustainPercent="{Binding FilterSustainPercent}" ReleaseMilliseconds="{Binding FilterReleaseMilliseconds}" />
+                            </Border>
+                            <StackPanel Spacing="2" ToolTip.Tip="How long the filter takes to open">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Attack" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding FilterAttackMilliseconds, StringFormat='{}{0} ms'}" />
+                                </Grid>
+                                <Slider x:Name="FilterAttackMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding FilterAttackMilliseconds}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How long it then takes to fall to the sustain level">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Decay" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding FilterDecayMilliseconds, StringFormat='{}{0} ms'}" />
+                                </Grid>
+                                <Slider x:Name="FilterDecayMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding FilterDecayMilliseconds}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="Where it settles while the note is held">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Sustain" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding FilterSustainPercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="FilterSustainPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding FilterSustainPercent}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How long it takes to close after the note ends">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Release" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding FilterReleaseMilliseconds, StringFormat='{}{0} ms'}" />
+                                </Grid>
+                                <Slider x:Name="FilterReleaseMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding FilterReleaseMilliseconds}" />
+                            </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                        <Expander x:Name="AmpEnvelopeSection" Classes="synth" IsExpanded="True" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <TextBlock Classes="section" Text="AMP ENVELOPE" />
+                            </Expander.Header>
+                            <StackPanel Spacing="10">
+                            <Border Background="{StaticResource FieldBrush}" CornerRadius="7" Height="56" Padding="6" ToolTip.Tip="How each note's volume changes over time">
+                                <control:EnvelopeGraph x:Name="Envelope" Stroke="{StaticResource AccentBrush}"
+                                                       AttackMilliseconds="{Binding AttackMilliseconds}" DecayMilliseconds="{Binding DecayMilliseconds}"
+                                                       SustainPercent="{Binding SustainPercent}" ReleaseMilliseconds="{Binding ReleaseMilliseconds}" />
+                            </Border>
                             <StackPanel Spacing="2" ToolTip.Tip="How long a note takes to reach full volume">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Classes="label" Text="Attack" />
@@ -282,18 +451,41 @@
                                 <Slider x:Name="ReleaseMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
                                         Focusable="False" Margin="0,-6,0,-4" Value="{Binding ReleaseMilliseconds}" />
                             </StackPanel>
-
-                        <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,2" />
-
-                            <StackPanel Spacing="2" ToolTip.Tip="Master volume">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Classes="label" Text="Volume" />
-                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding VolumePercent, StringFormat='{}{0} %'}" />
-                                </Grid>
-                                <Slider x:Name="VolumePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
-                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding VolumePercent}" />
                             </StackPanel>
-
+                        </Expander>
+                        <Expander x:Name="LfoSection" Classes="synth" IsExpanded="False" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <TextBlock Classes="section" Text="LFO" />
+                            </Expander.Header>
+                            <StackPanel Spacing="10">
+                            <Border Classes="segmented">
+                                <UniformGrid Columns="3">
+                                    <ToggleButton Classes="segment" x:Name="LfoPitchButton" Focusable="False" Content="Pitch" ToolTip.Tip="Vibrato"
+                                                  IsChecked="{Binding IsLfoOnPitch}" />
+                                    <ToggleButton Classes="segment" x:Name="LfoFilterButton" Focusable="False" Content="Filter" ToolTip.Tip="Sweeps the cutoff: wobbles"
+                                                  IsChecked="{Binding IsLfoOnFilter}" />
+                                    <ToggleButton Classes="segment" x:Name="LfoVolumeButton" Focusable="False" Content="Volume" ToolTip.Tip="Tremolo"
+                                                  IsChecked="{Binding IsLfoOnVolume}" />
+                                </UniformGrid>
+                            </Border>
+                            <StackPanel Spacing="2" ToolTip.Tip="How fast the LFO cycles">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Rate" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding LfoRateText}" />
+                                </Grid>
+                                <Slider x:Name="LfoRateTenthsSlider" Minimum="1" Maximum="200" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding LfoRateTenths}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How much it moves its target; 0 is off">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Depth" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding LfoDepthPercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="LfoDepthPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding LfoDepthPercent}" />
+                            </StackPanel>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                 </StackPanel>
 

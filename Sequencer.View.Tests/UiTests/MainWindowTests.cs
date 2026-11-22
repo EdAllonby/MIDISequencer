@@ -177,6 +177,21 @@ namespace Sequencer.View.Tests.UiTests
         }
 
         [AvaloniaTest]
+        [Explicit("Writes a screenshot for the docs.")]
+        public void Screenshot_Synth()
+        {
+            window.Height = 1400;
+            window.ApplyPreset(Domain.Settings.SynthPresets.All.Single(p => p.Name == "Acid Bass"));
+            window.FindControl<Expander>("FilterEnvelopeSection").IsExpanded = true;
+            window.FindControl<Expander>("LfoSection").IsExpanded = true;
+            Dispatcher.UIThread.RunJobs();
+
+            string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "synth.png");
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
+            TestContext.Out.WriteLine($"Screenshot: {path}");
+        }
+
+        [AvaloniaTest]
         public void Click_InCreateMode_CreatesASelectedNote()
         {
             Click(EditorPoint);
@@ -1050,6 +1065,45 @@ namespace Sequencer.View.Tests.UiTests
 
             Press(Key.Enter);
             Assert.That(ArrangementView.PlayheadTick, Is.EqualTo(-1));
+        }
+
+        [AvaloniaTest]
+        public void PresetsMenu_ListsEveryPreset()
+        {
+            var menu = (MenuFlyout) window.FindControl<Button>("PresetsButton").Flyout;
+
+            Assert.That(menu.Items.Count, Is.EqualTo(Domain.Settings.SynthPresets.All.Count));
+        }
+
+        [AvaloniaTest]
+        public void ApplyingAPreset_ChangesTheTracksPatch_AndThePanel()
+        {
+            window.ApplyPreset(Domain.Settings.SynthPresets.All.Single(p => p.Name == "Acid Bass"), previewer);
+
+            Assert.That(SynthTrack.Synth.Resonance, Is.EqualTo(0.8));
+            Assert.That(window.FindControl<Slider>("ResonancePercentSlider").Value, Is.EqualTo(80));
+            Assert.That(previewer.Pitches.Count, Is.EqualTo(1), "Plays a note so the preset can be heard.");
+        }
+
+        [AvaloniaTest]
+        public void FilterTypeButtons_SetTheFilter()
+        {
+            window.FindControl<ToggleButton>("BandPassButton").IsChecked = true;
+
+            Assert.That(SynthTrack.Synth.FilterType, Is.EqualTo(Domain.Settings.FilterType.BandPass));
+            Assert.That(window.FindControl<ToggleButton>("LowPassButton").IsChecked, Is.False);
+        }
+
+        [AvaloniaTest]
+        public void EachSynthTrack_HasItsOwnPatch()
+        {
+            window.ApplyPreset(Domain.Settings.SynthPresets.All.Single(p => p.Name == "Lead"));
+            window.AddTrack(Domain.Arrangement.TrackKind.Synth);
+
+            Assert.That(window.FindControl<Slider>("ResonancePercentSlider").Value, Is.EqualTo(0), "The new track starts from Init.");
+
+            window.Select(SynthTrack, 0);
+            Assert.That(window.FindControl<Slider>("ResonancePercentSlider").Value, Is.EqualTo(25), "The first track kept its Lead patch.");
         }
 
         [AvaloniaTest]
