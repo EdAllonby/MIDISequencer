@@ -47,7 +47,9 @@ namespace Sequencer.View
                     if (container.Resolve<IAudioOutput>() is PortAudioOutput output)
                     {
                         // Underflows are dropouts. Clipped counts samples beyond ±1 after the limiter, so it should stay 0.
-                        LogManager.GetLogger(typeof(App)).Info($"Audio: {output.Statistics}");
+                        SequencerPlayer player = container.Resolve<SequencerPlayer>();
+                        LogManager.GetLogger(typeof(App)).Info(
+                            $"Audio: {output.Statistics}; mix peak before limiter {player.PeakBeforeLimiter:F2}, over threshold {player.LimiterActivity:P2}");
                     }
 
                     container.Dispose();
