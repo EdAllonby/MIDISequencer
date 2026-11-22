@@ -7,7 +7,7 @@ namespace Sequencer.Midi
     public class SequencerClock : ISequencerClock, IDisposable
     {
         [NotNull] private readonly IInternalClock clock;
-        private readonly int totalTicks;
+        private volatile int totalTicks;
 
         public SequencerClock([NotNull] IMusicalSettings musicalSettings, [NotNull] IInternalClock internalClock)
         {
@@ -44,6 +44,20 @@ namespace Sequencer.Midi
         }
 
         public int Ticks => clock.Ticks;
+
+        public int LoopLengthTicks
+        {
+            get => totalTicks;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "The loop must be at least one tick long.");
+                }
+
+                totalTicks = value;
+            }
+        }
 
         public void Start()
         {
@@ -91,7 +105,8 @@ namespace Sequencer.Midi
 
         private void OnTick(object sender, EventArgs e)
         {
-            if (Ticks == totalTicks)
+            // At or past the end (the loop can shrink while playing), go back to the start.
+            if (Ticks >= totalTicks)
             {
                 clock.Ticks = 0;
                 clock.Start();

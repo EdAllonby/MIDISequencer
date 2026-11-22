@@ -24,7 +24,7 @@ namespace Sequencer.Audio.Tests
         {
             var settings = new SynthSettings { Waveform = waveform, AttackSeconds = 0.001, DecaySeconds = 0.001, SustainLevel = 1 };
             var frequency = Mock.Of<IFrequencyCalculator>(f => f.PitchFrequency(It.IsAny<Pitch>()) == 441.0);
-            ISignalProvider voice = new SignalProviderFactory(settings, frequency).CreateSignalProvider(ConcertA());
+            ISignalProvider voice = new SignalProviderFactory(frequency).CreateSignalProvider(ConcertA(), settings);
             voice.NoteOn();
 
             var samples = new float[settings.SampleRate / 10];

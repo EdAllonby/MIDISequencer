@@ -6,6 +6,11 @@ namespace Sequencer.Midi
     {
         int Ticks { get; }
 
+        /// <summary>
+        /// How many ticks play before the clock loops back to 0: one section, or the whole song.
+        /// </summary>
+        int LoopLengthTicks { get; set; }
+
         double BeatsPerMinute { get; set; }
 
         int TicksPerQuarterNote { get; }

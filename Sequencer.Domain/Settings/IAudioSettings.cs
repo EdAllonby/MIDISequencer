@@ -18,8 +18,8 @@ namespace Sequencer.Domain.Settings
         double ReleaseSeconds { get; }
 
         /// <summary>
-        /// Output volume, from 0 to 1.
+        /// This instrument's volume, from 0 to 1.
         /// </summary>
-        double MasterVolume { get; }
+        double Volume { get; }
     }
 }

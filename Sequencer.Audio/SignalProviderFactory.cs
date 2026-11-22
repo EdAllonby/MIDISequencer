@@ -10,7 +10,6 @@ namespace Sequencer.Audio
     {
         private const int Harmonics = 19;
 
-        [NotNull] private readonly IAudioSettings audioSettings;
         [NotNull] private readonly IFrequencyCalculator frequencyCalculator;
 
         // Adding up harmonics per sample is expensive, so each waveform is computed once into a wavetable
@@ -23,22 +22,21 @@ namespace Sequencer.Audio
             { Waveform.Sine, new SineWaveCalculator() }
         };
 
-        public SignalProviderFactory([NotNull] IAudioSettings audioSettings, [NotNull] IFrequencyCalculator frequencyCalculator)
+        public SignalProviderFactory([NotNull] IFrequencyCalculator frequencyCalculator)
         {
-            this.audioSettings = audioSettings;
             this.frequencyCalculator = frequencyCalculator;
         }
 
-        public ISignalProvider CreateSignalProvider(ISequencedNote note)
+        public ISignalProvider CreateSignalProvider(ISequencedNote note, IAudioSettings instrument)
         {
-            if (!waveforms.TryGetValue(audioSettings.Waveform, out IWaveformCalculator waveform))
+            if (!waveforms.TryGetValue(instrument.Waveform, out IWaveformCalculator waveform))
             {
                 waveform = waveforms[Waveform.Sawtooth];
             }
 
-            return new SignalProvider(waveform, audioSettings)
+            return new SignalProvider(waveform, instrument)
             {
-                Amplitude = (float) note.Tone.Velocity.Volume,
+                Amplitude = (float) (note.Tone.Velocity.Volume * instrument.Volume),
                 Frequency = (float) frequencyCalculator.PitchFrequency(note.Tone.Pitch)
             };
         }

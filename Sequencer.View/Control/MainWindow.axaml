@@ -7,9 +7,9 @@
         x:Class="Sequencer.View.Control.MainWindow"
         x:DataType="vm:SequencerViewModel"
         Icon="/Assets/AppIcon.png"
-        Title="Sequencer" Width="1280" Height="760" MinWidth="960" MinHeight="560">
+        Title="Sequencer" Width="1280" Height="860" MinWidth="960" MinHeight="640">
 
-    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto,280">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" ColumnDefinitions="*,Auto,280">
 
         <!-- Toolbar: transport and position on the left, tools on the right. -->
         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
@@ -43,6 +43,14 @@
                     <TextBlock Classes="label" Text="BPM" VerticalAlignment="Center" />
                     <Button x:Name="TapButton" Classes="quiet" Content="Tap" Focusable="False" Command="{Binding TapTempo}"
                             ToolTip.Tip="Tap in time to set the tempo" />
+                    <Border Classes="segmented" Margin="12,0,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <ToggleButton Classes="segment" x:Name="SectionModeButton" Focusable="False" IsChecked="{Binding IsSectionMode}"
+                                          Content="Section" ToolTip.Tip="Loop the selected section while you work on it" />
+                            <ToggleButton Classes="segment" x:Name="SongModeButton" Focusable="False" IsChecked="{Binding IsSongMode}"
+                                          Content="Song" ToolTip.Tip="Play the whole arrangement from the start" />
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
 
                 <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
@@ -76,31 +84,26 @@
             </Grid>
         </Border>
 
-        <!-- Editor: the track bar, the ruler, then the piano roll or the drum grid. -->
-        <Grid Grid.Row="1" Grid.Column="0">
+        <!-- Arrangement: tracks of clips across four-bar sections. -->
+        <Border Grid.Row="1" Grid.ColumnSpan="3" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,0,1">
+            <ScrollViewer x:Name="ArrangementScrollViewer" MaxHeight="290" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                <control:ArrangementControl x:Name="Arrangement" />
+            </ScrollViewer>
+        </Border>
+
+        <!-- Editor: the clip's title, the ruler, then the piano roll or the drum grid. -->
+        <Grid Grid.Row="2" Grid.Column="0">
             <DockPanel>
                 <!-- Which track is being edited, and its presets. -->
                 <Border DockPanel.Dock="Top" Background="{StaticResource ToolbarBrush}" BorderBrush="{StaticResource HairlineBrush}"
                         BorderThickness="0,0,0,1" Padding="12,6">
                     <Grid ColumnDefinitions="Auto,*,Auto">
-                        <Border Classes="segmented">
-                            <StackPanel Orientation="Horizontal" Spacing="2">
-                                <ToggleButton Classes="segment" x:Name="SynthTrackButton" Focusable="False" IsChecked="{Binding IsSynthTrack}"
-                                              ToolTip.Tip="Edit the synth's notes">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.SynthTrack}" Width="14" Height="14" />
-                                        <TextBlock Text="Synth" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </ToggleButton>
-                                <ToggleButton Classes="segment" x:Name="DrumTrackButton" Focusable="False" IsChecked="{Binding IsDrumTrack}"
-                                              ToolTip.Tip="Edit the drum pattern">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.DrumTrack}" Width="14" Height="14" />
-                                        <TextBlock Text="Drums" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </ToggleButton>
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Ellipse x:Name="ClipColour" Width="9" Height="9" Fill="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ClipTitle" Text="Synth" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ClipDetail" Classes="label" Text="" VerticalAlignment="Center" />
+                        </StackPanel>
                         <Panel Grid.Column="2">
                             <Button x:Name="TunesButton" IsVisible="{Binding IsSynthTrack}" Classes="quiet" Focusable="False" ToolTip.Tip="Load a well-known tune to play or edit">
                                 <StackPanel Orientation="Horizontal" Spacing="7">
@@ -144,6 +147,16 @@
                         <TextBlock x:Name="DrumEmptyHint" Classes="label" Margin="84,16,16,0" Foreground="{StaticResource TextTertiaryBrush}"
                                    Text="Click the steps to build a beat, or load one from Loops." />
                     </StackPanel>
+
+                    <!-- An empty section: nothing to edit until there's a clip, so nothing is drawn into thin air. -->
+                    <Border x:Name="NoClipPanel" IsVisible="False" Background="{StaticResource WindowBrush}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                            <TextBlock x:Name="NoClipTitle" Text="No clip in this section" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                            <TextBlock Classes="label" HorizontalAlignment="Center"
+                                       Text="Make a new one, or double-click the cell in the arrangement." />
+                            <Button x:Name="NewClipButton" Classes="quiet accent" Content="New clip" Focusable="False" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
                 </Panel>
             </DockPanel>
 
@@ -162,10 +175,10 @@
                                                        MenuRadius="52" />
         </Grid>
 
-        <GridSplitter Grid.Row="1" Grid.Column="1" Width="4" ResizeDirection="Columns" Background="Transparent" />
+        <GridSplitter Grid.Row="2" Grid.Column="1" Width="4" ResizeDirection="Columns" Background="Transparent" />
 
         <!-- Side panel: the selected note, then the synth. -->
-        <Border Grid.Row="1" Grid.Column="2" Background="{StaticResource PanelBrush}"
+        <Border Grid.Row="2" Grid.Column="2" Background="{StaticResource PanelBrush}"
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1,0,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
                 <StackPanel Margin="16,14,16,16" Spacing="12">
@@ -300,19 +313,19 @@
                     </StackPanel>
 
                     <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,2" />
-                    <CheckBox x:Name="PreviewOnEditBox" x:DataType="vm:SynthViewModel" Content="Play sounds while editing" Focusable="False" FontSize="12"
+                    <CheckBox x:Name="PreviewOnEditBox" Content="Play sounds while editing" Focusable="False" FontSize="12"
                               IsChecked="{Binding PreviewOnEdit}" ToolTip.Tip="Hear notes and drum hits as you add or change them" />
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
         <!-- Hint bar: what the current tool does, and the main shortcuts. -->
-        <Border Grid.Row="2" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
+        <Border Grid.Row="3" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,1,0,0" Padding="12,5">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock x:Name="ToolHintText" Classes="label" Text="{Binding ToolHint}" TextTrimming="CharacterEllipsis" />
                 <TextBlock Grid.Column="1" Classes="label" Foreground="{StaticResource TextTertiaryBrush}" Margin="16,0,0,0"
-                           Text="Space play / pause  ·  Return stop  ·  V D E tools  ·  Right-drag for the tool wheel" />
+                           Text="Space play / pause  ·  Return stop  ·  ⌘D repeat clip  ·  V D E tools" />
             </Grid>
         </Border>
     </Grid>

@@ -7,6 +7,8 @@ using CommunityToolkit.Mvvm.Input;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
+using Sequencer.Domain.Arrangement;
+using Sequencer.Domain.Settings;
 using Sequencer.Midi;
 using Sequencer.Utilities;
 
@@ -33,6 +35,10 @@ namespace Sequencer.ViewModel
         [NotNull] private readonly TimeProvider timeProvider;
         [NotNull] private readonly List<long> tapTimestamps = new List<long>();
         private int beatsPerMinute;
+        [CanBeNull] private readonly Song song;
+        [NotNull] private readonly ArrangementState arrangement;
+        [NotNull] private readonly EditingSettings editing;
+        private int songTick;
         [NotNull] private readonly ITickCalculator tickCalculator;
         [NotNull] private IPosition currentPosition = new Position(1, 1, 1);
         [NotNull] private NoteAction noteAction = NoteAction.Create;
@@ -41,8 +47,12 @@ namespace Sequencer.ViewModel
         private PlayState sequencerPlayState;
 
         public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IUiDispatcher dispatcher,
-            [CanBeNull] TimeProvider timeProvider = null)
+            [CanBeNull] TimeProvider timeProvider = null, [CanBeNull] Song song = null, [CanBeNull] ArrangementState arrangement = null,
+            [CanBeNull] EditingSettings editing = null)
         {
+            this.song = song;
+            this.arrangement = arrangement ?? new ArrangementState();
+            this.editing = editing ?? new EditingSettings();
             this.timeProvider = timeProvider ?? TimeProvider.System;
             this.clock = clock;
             this.tickCalculator = tickCalculator;
@@ -61,6 +71,78 @@ namespace Sequencer.ViewModel
             SequencerPlayState = PlayState.Stop;
 
             clock.Tick += OnTick;
+
+            if (song != null)
+            {
+                song.Changed += (sender, args) => UpdateLoopLength();
+            }
+
+            this.arrangement.Changed += (sender, args) =>
+            {
+                UpdateLoopLength();
+                OnPropertyChanged(nameof(IsSongMode));
+                OnPropertyChanged(nameof(PositionText));
+            };
+            UpdateLoopLength();
+        }
+
+        /// <summary>
+        /// Loop one section while working on it, or play the whole song.
+        /// </summary>
+        public bool IsSongMode
+        {
+            get => arrangement.Mode == PlaybackMode.Song;
+            set => arrangement.Mode = value ? PlaybackMode.Song : PlaybackMode.Section;
+        }
+
+        public bool IsSectionMode
+        {
+            get => !IsSongMode;
+            set => IsSongMode = !value;
+        }
+
+        /// <summary>
+        /// The playback position in the whole song, in ticks (in section mode, within the looping section).
+        /// </summary>
+        public int SongTick
+        {
+            get => songTick;
+            private set
+            {
+                songTick = value;
+                OnPropertyChanged(nameof(SongTick));
+                OnPropertyChanged(nameof(PositionText));
+            }
+        }
+
+        /// <summary>
+        /// Play notes and drum hits as they are added or changed.
+        /// </summary>
+        public bool PreviewOnEdit
+        {
+            get => editing.PreviewOnEdit;
+            set
+            {
+                editing.PreviewOnEdit = value;
+                OnPropertyChanged(nameof(PreviewOnEdit));
+            }
+        }
+
+        private int TicksPerSection => clock.TicksPerQuarterNote * 16;
+
+        /// <summary>
+        /// The clock loops one section in section mode, and up to the last clip in song mode.
+        /// </summary>
+        private void UpdateLoopLength()
+        {
+            if (TicksPerSection <= 0)
+            {
+                return;
+            }
+
+            int sections = IsSongMode && song != null ? song.LengthInSections : 1;
+            clock.LoopLengthTicks = sections * TicksPerSection;
+            OnPropertyChanged(nameof(IsSectionMode));
         }
 
         [NotNull]
@@ -182,7 +264,18 @@ namespace Sequencer.ViewModel
         /// The playback position as "bar.beat.sixteenth".
         /// </summary>
         [NotNull]
-        public string PositionText => MusicalFormat.Position(CurrentPosition, TimeSignature.FourFour, 96);
+        public string PositionText
+        {
+            get
+            {
+                // The bar within the whole song: section 2 starts at bar 5.
+                int ticksPerBar = Math.Max(1, clock.TicksPerQuarterNote * 4);
+                int barsBefore = TicksPerSection > 0 ? (IsSongMode ? SongTick / TicksPerSection : arrangement.LoopSection) * 4 : 0;
+                string local = MusicalFormat.Position(CurrentPosition, TimeSignature.FourFour, 96);
+                int separator = local.IndexOf('.');
+                return $"{int.Parse(local.Substring(0, separator)) + barsBefore}{local.Substring(separator)}";
+            }
+        }
 
         // One toggle per tool, for a segmented control. Setting one to true selects that tool.
         public bool IsSelectTool
@@ -282,8 +375,16 @@ namespace Sequencer.ViewModel
         {
             if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
             {
-                IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(e.CurrentTick);
-                dispatcher.Dispatch(() => CurrentPosition = positionAtTick);
+                // Editors show the position within the section; the readout and arrangement use the song position.
+                int ticksPerSection = TicksPerSection > 0 ? TicksPerSection : int.MaxValue;
+                int tickInSection = e.CurrentTick % ticksPerSection;
+                IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(tickInSection);
+                int tickInSong = IsSongMode ? e.CurrentTick : arrangement.LoopSection * TicksPerSection + tickInSection;
+                dispatcher.Dispatch(() =>
+                {
+                    CurrentPosition = positionAtTick;
+                    SongTick = tickInSong;
+                });
             }
         }
 

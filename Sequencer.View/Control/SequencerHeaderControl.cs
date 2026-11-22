@@ -53,6 +53,22 @@ namespace Sequencer.View.Control
             }
         }
 
+        /// <summary>
+        /// The bar number at the left edge (1 for the first section, 5 for the second, and so on).
+        /// </summary>
+        public int FirstBarNumber
+        {
+            get => sequencerHeaderDrawer?.FirstBarNumber ?? 1;
+            set
+            {
+                if (sequencerHeaderDrawer != null)
+                {
+                    sequencerHeaderDrawer.FirstBarNumber = value;
+                    Redraw();
+                }
+            }
+        }
+
         private void Redraw()
         {
             sequencerHeaderDrawer?.RedrawHeader();

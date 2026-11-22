@@ -15,16 +15,12 @@ namespace Sequencer.Domain.Settings
         private double decaySeconds = 0.1;
         private double sustainLevel = 0.7;
         private double releaseSeconds = 0.2;
-        private double masterVolume = 1.0;
+        private double volume = 0.8;
 
         public int SampleRate => 44100;
 
         public Waveform Waveform { get; set; } = Waveform.Sawtooth;
 
-        /// <summary>
-        /// Play a short preview when a note is created or its pitch changes.
-        /// </summary>
-        public bool PreviewOnEdit { get; set; } = true;
 
         public double AttackSeconds
         {
@@ -50,10 +46,10 @@ namespace Sequencer.Domain.Settings
             set => releaseSeconds = ClampEnvelopeTime(value);
         }
 
-        public double MasterVolume
+        public double Volume
         {
-            get => masterVolume;
-            set => masterVolume = Math.Clamp(value, 0, 1);
+            get => volume;
+            set => volume = Math.Clamp(value, 0, 1);
         }
 
         private static double ClampEnvelopeTime(double seconds)
