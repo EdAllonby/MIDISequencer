@@ -126,6 +126,21 @@ namespace Sequencer.View.Tests.UiTests
         }
 
         [AvaloniaTest]
+        [Explicit("Writes a screenshot for the docs.")]
+        public void Screenshot_Drums()
+        {
+            ShowDrums();
+            window.RequestLoop(Domain.Drums.DrumLoopLibrary.All.Single(l => l.Name == "Boom Bap"));
+            System.Threading.Thread.Sleep(1500);
+            Dispatcher.UIThread.RunJobs();
+
+            string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "drums.png");
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
+            TestContext.Out.WriteLine($"Screenshot: {path}");
+            Press(Key.Enter);
+        }
+
+        [AvaloniaTest]
         public void Click_InCreateMode_CreatesASelectedNote()
         {
             Click(EditorPoint);
@@ -691,6 +706,153 @@ namespace Sequencer.View.Tests.UiTests
             Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop));
         }
 
+        private Domain.Drums.DrumPattern DrumPattern => container.Resolve<Domain.Drums.DrumPattern>();
+
+        private void ShowDrums()
+        {
+            window.FindControl<ToggleButton>("DrumTrackButton").IsChecked = true;
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// The middle of a step in the drum grid, in window coordinates.
+        /// </summary>
+        private Point DrumStepInWindow(Domain.Drums.DrumSound sound, int step)
+        {
+            var editor = window.FindControl<DrumEditorControl>("DrumEditor");
+            double cell = (editor.Bounds.Width - DrumEditorControl.LabelWidth) / Domain.Drums.DrumPattern.StepCount;
+            int row = System.Array.IndexOf(Domain.Drums.DrumPattern.AllSounds, sound);
+            var point = new Point(DrumEditorControl.LabelWidth + (step + 0.5) * cell, (row + 0.5) * DrumEditorControl.RowHeight);
+            return editor.TranslatePoint(point, window) ?? default;
+        }
+
+        [AvaloniaTest]
+        public void DrumTrack_ShowsTheDrumGridInsteadOfThePianoRoll()
+        {
+            ShowDrums();
+
+            Assert.That(window.FindControl<DrumEditorControl>("DrumEditor").IsEffectivelyVisible, Is.True);
+            Assert.That(window.FindControl<ScrollViewer>("EditorScrollViewer").IsVisible, Is.False);
+            Assert.That(window.FindControl<Button>("LoopsButton").IsVisible, Is.True);
+            Assert.That(window.FindControl<Button>("TunesButton").IsVisible, Is.False);
+            Assert.That(window.FindControl<StackPanel>("DrumKitPanel").IsVisible, Is.True);
+        }
+
+        [AvaloniaTest]
+        public void ClickingAStep_TogglesItAndPreviewsIt()
+        {
+            ShowDrums();
+
+            Click(DrumStepInWindow(Domain.Drums.DrumSound.Snare, 4));
+            Assert.That(DrumPattern.VelocityAt(Domain.Drums.DrumSound.Snare, 4), Is.EqualTo(Domain.Drums.DrumPattern.NormalVelocity));
+            Assert.That(previewer.DrumPreviews, Is.EqualTo(new[] { Domain.Drums.DrumSound.Snare }));
+
+            Click(DrumStepInWindow(Domain.Drums.DrumSound.Snare, 4));
+            Assert.That(DrumPattern.IsHit(Domain.Drums.DrumSound.Snare, 4), Is.False);
+        }
+
+        [AvaloniaTest]
+        public void AltClickingAStep_AddsAnAccent()
+        {
+            ShowDrums();
+
+            Click(DrumStepInWindow(Domain.Drums.DrumSound.Kick, 0), modifiers: RawInputModifiers.Alt);
+
+            Assert.That(DrumPattern.VelocityAt(Domain.Drums.DrumSound.Kick, 0), Is.EqualTo(Domain.Drums.DrumPattern.AccentVelocity));
+        }
+
+        [AvaloniaTest]
+        public void DraggingAcrossSteps_PaintsHits()
+        {
+            ShowDrums();
+
+            window.MouseDown(DrumStepInWindow(Domain.Drums.DrumSound.ClosedHat, 0), MouseButton.Left);
+            for (var step = 1; step < 8; step++)
+            {
+                window.MouseMove(DrumStepInWindow(Domain.Drums.DrumSound.ClosedHat, step));
+            }
+
+            window.MouseUp(DrumStepInWindow(Domain.Drums.DrumSound.ClosedHat, 7), MouseButton.Left);
+
+            Assert.That(Enumerable.Range(0, 8).All(step => DrumPattern.IsHit(Domain.Drums.DrumSound.ClosedHat, step)), Is.True);
+            Assert.That(previewer.DrumPreviews.Count, Is.EqualTo(1), "Only the first hit of a drag is previewed.");
+        }
+
+        [AvaloniaTest]
+        public void ClickingASoundsName_PlaysIt()
+        {
+            ShowDrums();
+            var editor = window.FindControl<DrumEditorControl>("DrumEditor");
+            int row = System.Array.IndexOf(Domain.Drums.DrumPattern.AllSounds, Domain.Drums.DrumSound.Clap);
+
+            Click(editor.TranslatePoint(new Point(20, (row + 0.5) * DrumEditorControl.RowHeight), window) ?? default);
+
+            Assert.That(previewer.DrumsPlayed, Is.EqualTo(new[] { Domain.Drums.DrumSound.Clap }));
+            Assert.That(DrumPattern.IsEmpty, Is.True);
+        }
+
+        [AvaloniaTest]
+        public void LoadingALoop_FillsThePatternAndPlays()
+        {
+            Domain.Drums.DrumLoop loop = Domain.Drums.DrumLoopLibrary.All.First();
+            ShowDrums();
+
+            window.RequestLoop(loop);
+
+            Assert.That(DrumPattern.HitCount, Is.EqualTo(loop.ToPattern().HitCount));
+            Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(loop.BeatsPerMinute));
+            Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Play));
+            Assert.That(window.FindControl<TextBlock>("DrumEmptyHint").IsVisible, Is.False);
+            Press(Key.Enter);
+        }
+
+        [AvaloniaTest]
+        public void LoadingALoop_OverAPattern_AsksFirst()
+        {
+            ShowDrums();
+            Click(DrumStepInWindow(Domain.Drums.DrumSound.Tom, 3));
+
+            window.RequestLoop(Domain.Drums.DrumLoopLibrary.All.Last());
+
+            Assert.That(window.ReplaceConfirmButton, Is.Not.Null);
+            Assert.That(DrumPattern.HitCount, Is.EqualTo(1));
+        }
+
+        [AvaloniaTest]
+        public void LoopsMenu_ListsEveryLoop()
+        {
+            var menu = (MenuFlyout) window.FindControl<Button>("LoopsButton").Flyout;
+
+            Assert.That(menu.Items.Count, Is.EqualTo(Domain.Drums.DrumLoopLibrary.All.Count));
+        }
+
+        [AvaloniaTest]
+        public void NoteShortcuts_DoNothingOnTheDrumTrack()
+        {
+            Click(EditorPoint);
+            ShowDrums();
+
+            Press(Key.Back);
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1), "The selected synth note isn't on screen, so it isn't deleted.");
+        }
+
+        [AvaloniaTest]
+        public void Playback_HighlightsTheCurrentStep()
+        {
+            ShowDrums();
+            var editor = window.FindControl<DrumEditorControl>("DrumEditor");
+            Assert.That(editor.CurrentStep, Is.EqualTo(-1));
+
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(300);
+            Dispatcher.UIThread.RunJobs();
+            Assert.That(editor.CurrentStep, Is.GreaterThanOrEqualTo(0));
+
+            Press(Key.Enter);
+            Assert.That(editor.CurrentStep, Is.EqualTo(-1));
+        }
+
         [AvaloniaTest]
         public void Space_TogglesPlayAndPause_AndReturnStops()
         {
@@ -713,6 +875,14 @@ namespace Sequencer.View.Tests.UiTests
             public int Released { get; private set; }
 
             public void Preview(Domain.Tone tone) => Pitches.Add(tone.Pitch.ToString());
+
+            public System.Collections.Generic.List<Domain.Drums.DrumSound> DrumPreviews { get; } = new System.Collections.Generic.List<Domain.Drums.DrumSound>();
+
+            public System.Collections.Generic.List<Domain.Drums.DrumSound> DrumsPlayed { get; } = new System.Collections.Generic.List<Domain.Drums.DrumSound>();
+
+            public void PreviewDrum(Domain.Drums.DrumSound sound, byte velocity) => DrumPreviews.Add(sound);
+
+            public void PlayDrum(Domain.Drums.DrumSound sound, byte velocity) => DrumsPlayed.Add(sound);
 
             public IDisposable Hold(Domain.Tone tone)
             {

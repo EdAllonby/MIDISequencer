@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Sequencer.Domain.Drums;
 using Sequencer.Domain.Tunes;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -33,6 +34,7 @@ namespace Sequencer.View.Control
         private readonly SynthViewModel synthViewModel;
         private readonly IDigitalAudioProtocol protocol;
         private readonly SequencerSettings settings;
+        private readonly DrumPattern drumPattern;
 
         // The button that opened the radial menu: right, or left with Ctrl on macOS.
         private MouseButton? contextMenuButton;
@@ -48,7 +50,8 @@ namespace Sequencer.View.Control
         public MainWindow([NotNull] SequencerViewModel viewModel, [NotNull] ISequencerNotes notes,
             [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IDigitalAudioProtocol protocol,
             [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator,
-            [NotNull] SynthViewModel synthViewModel, [NotNull] INotePreviewer notePreviewer)
+            [NotNull] SynthViewModel synthViewModel, [NotNull] INotePreviewer notePreviewer,
+            [NotNull] DrumPattern drumPattern, [NotNull] DrumKitViewModel drumKitViewModel)
         {
             InitializeComponent();
 
@@ -57,10 +60,13 @@ namespace Sequencer.View.Control
             this.synthViewModel = synthViewModel;
             this.protocol = protocol;
             this.settings = settings;
+            this.drumPattern = drumPattern;
             this.keyboardState = keyboardState;
             this.mouseOperator = mouseOperator;
             DataContext = viewModel;
             SynthPanel.DataContext = synthViewModel;
+            PreviewOnEditBox.DataContext = synthViewModel;
+            DrumVolumeRow.DataContext = drumKitViewModel;
 
             Header.Initialise(pitchAndPositionCalculator, protocol, settings);
             Editor.Initialise(notes, pitchAndPositionCalculator, protocol, settings, keyboardState, mouseOperator, keyboardState.CommandModifier, notePreviewer);
@@ -70,6 +76,12 @@ namespace Sequencer.View.Control
             notes.NotesChanged += (sender, args) => UpdateEmptyHint();
             UpdateEmptyHint();
             BuildTunesMenu();
+            BuildLoopsMenu();
+
+            DrumEditor.Pattern = drumPattern;
+            DrumEditor.PreviewSound = notePreviewer.PreviewDrum;
+            DrumEditor.AuditionSound = notePreviewer.PlayDrum;
+            drumPattern.Changed += (sender, args) => DrumEmptyHint.IsVisible = drumPattern.IsEmpty;
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -102,6 +114,44 @@ namespace Sequencer.View.Control
                 return;
             }
 
+            ConfirmReplace($"Replace your {existing} note{(existing == 1 ? "" : "s")} with {tune.Name}?", TunesButton, () => LoadTune(tune));
+        }
+
+        /// <summary>
+        /// Loads a drum loop, first asking before it replaces a pattern (there is no undo).
+        /// </summary>
+        internal void RequestLoop([NotNull] DrumLoop loop)
+        {
+            if (drumPattern.IsEmpty)
+            {
+                LoadLoop(loop);
+                return;
+            }
+
+            ConfirmReplace($"Replace your {drumPattern.HitCount}-hit pattern with {loop.Name}?", LoopsButton, () => LoadLoop(loop));
+        }
+
+        /// <summary>
+        /// Replaces the drum pattern with the loop, sets its tempo, and plays it.
+        /// </summary>
+        internal void LoadLoop([NotNull] DrumLoop loop)
+        {
+            if (viewModel.StopSequencer.CanExecute(null))
+            {
+                viewModel.StopSequencer.Execute(null);
+            }
+
+            drumPattern.CopyFrom(loop.ToPattern());
+            viewModel.BeatsPerMinute = loop.BeatsPerMinute;
+            viewModel.PlaySequencer.Execute(null);
+            Log.Info($"Loaded drum loop {loop.Name}");
+        }
+
+        /// <summary>
+        /// Asks before replacing work, in a small prompt under the button that asked for it.
+        /// </summary>
+        private void ConfirmReplace([NotNull] string question, [NotNull] Avalonia.Controls.Control anchor, [NotNull] Action onReplace)
+        {
             var cancel = new Button { Content = "Cancel", Focusable = false };
             var replace = new Button { Content = "Replace", Focusable = false };
             cancel.Classes.Add("quiet");
@@ -117,7 +167,7 @@ namespace Sequencer.View.Control
                     MaxWidth = 260,
                     Children =
                     {
-                        new TextBlock { Text = $"Replace your {existing} note{(existing == 1 ? "" : "s")} with {tune.Name}?", TextWrapping = TextWrapping.Wrap, FontWeight = FontWeight.SemiBold },
+                        new TextBlock { Text = question, TextWrapping = TextWrapping.Wrap, FontWeight = FontWeight.SemiBold },
                         new TextBlock { Text = "This can't be undone.", Classes = { "label" } },
                         new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right, Children = { cancel, replace } }
                     }
@@ -128,12 +178,13 @@ namespace Sequencer.View.Control
             replace.Click += (sender, args) =>
             {
                 flyout.Hide();
-                LoadTune(tune);
+                replace.IsEnabled = false;
+                onReplace();
             };
             flyout.Closed += (sender, args) => ReplaceConfirmButton = null;
 
             ReplaceConfirmButton = replace;
-            flyout.ShowAt(TunesButton);
+            flyout.ShowAt(anchor);
         }
 
         /// <summary>
@@ -179,6 +230,31 @@ namespace Sequencer.View.Control
             TunesButton.Flyout = menu;
         }
 
+        private void BuildLoopsMenu()
+        {
+            var menu = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedRight };
+
+            foreach (DrumLoop loop in DrumLoopLibrary.All)
+            {
+                var item = new MenuItem
+                {
+                    Header = new StackPanel
+                    {
+                        Spacing = 1,
+                        Children =
+                        {
+                            new TextBlock { Text = loop.Name },
+                            new TextBlock { Text = $"{loop.Style} · {loop.BeatsPerMinute} BPM", FontSize = 11, Foreground = (IBrush) this.FindResource("TextTertiaryBrush") }
+                        }
+                    }
+                };
+                item.Click += (sender, args) => RequestLoop(loop);
+                menu.Items.Add(item);
+            }
+
+            LoopsButton.Flyout = menu;
+        }
+
         /// <summary>
         /// Scrolls the grid so the notes are in view, if any are off screen.
         /// </summary>
@@ -215,7 +291,7 @@ namespace Sequencer.View.Control
                 UpdatePlayingKeys();
             }
 
-            if (e.PropertyName == nameof(SequencerViewModel.NoteAction))
+            if (e.PropertyName == nameof(SequencerViewModel.NoteAction) || e.PropertyName == nameof(SequencerViewModel.IsDrumTrack))
             {
                 UpdateEmptyHint();
             }
@@ -226,7 +302,7 @@ namespace Sequencer.View.Control
         /// </summary>
         private void UpdateEmptyHint()
         {
-            EmptyHint.IsVisible = viewModel.IsDrawTool && !notes.AllNotes.Any();
+            EmptyHint.IsVisible = viewModel.IsSynthTrack && viewModel.IsDrawTool && !notes.AllNotes.Any();
         }
 
         /// <summary>
@@ -237,10 +313,12 @@ namespace Sequencer.View.Control
             if (viewModel.SequencerPlayState != PlayState.Play)
             {
                 Keyboard.SetActivePitches(Enumerable.Empty<Pitch>());
+                DrumEditor.CurrentStep = -1;
                 return;
             }
 
             Domain.IPosition position = viewModel.CurrentPosition;
+            DrumEditor.CurrentStep = position.TotalTicks(settings.TimeSignature, settings.TicksPerQuarterNote) / (settings.TicksPerQuarterNote / 4);
             Keyboard.SetActivePitches(notes.AllNotes
                 .Where(note => note.StartPosition.IsLessThanOrEqual(position) && note.EndPosition.IsGreaterThan(position))
                 .Select(note => note.Pitch));
@@ -351,7 +429,7 @@ namespace Sequencer.View.Control
                 viewModel.ToggleSequencer.Execute(null);
                 e.Handled = true;
             }
-            else if (e.KeyModifiers == KeyModifiers.None && ToolForKey(e.Key) is NoteAction tool)
+            else if (e.KeyModifiers == KeyModifiers.None && viewModel.IsSynthTrack && ToolForKey(e.Key) is NoteAction tool)
             {
                 viewModel.NoteAction = tool;
                 e.Handled = true;
@@ -365,8 +443,9 @@ namespace Sequencer.View.Control
 
                 e.Handled = true;
             }
-            else
+            else if (viewModel.IsSynthTrack)
             {
+                // Note shortcuts only on the synth track: on the drum track the notes aren't on screen.
                 e.Handled = Editor.HandleKeyPress(e.Key, e.KeyModifiers);
             }
         }

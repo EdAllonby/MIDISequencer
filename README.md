@@ -65,6 +65,19 @@ On macOS, ⌘ is the command key; on Windows and Linux it is Ctrl.
 | Tempo | Type in the BPM box (30-300), or click **Tap** in time |
 | Play a note | Press a key on the piano keyboard; drag across keys to play each in turn |
 
+### Drums
+
+Switch the editor to **Drums** (above the grid) for a step sequencer: six synthesised sounds (kick, snare,
+clap, tom, closed and open hi-hat) across 64 sixteenth steps. Click a step to add or remove a hit, drag to
+paint, ⌥/Alt-click for an accent, and click a sound's name to hear it. A closed hi-hat cuts off an open one,
+as on a drum machine. The drums play along with the synth.
+
+**Loops** loads a classic pattern: four on the floor, rock, boom bap, breakbeat, disco, dembow, bossa nova
+or trap. Patterns are written as grids in `Sequencer.Domain/Drums/DrumLoopLibrary.cs` (`x` a hit, `X` an
+accent, `.` a rest).
+
+![The drum grid playing the boom bap loop](docs/images/drums.png)
+
 ### Tunes
 
 **Tunes** in the toolbar loads a well-known tune to play or edit: Ode to Joy, Twinkle, Twinkle, Little Star,

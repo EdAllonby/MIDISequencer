@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using Sequencer.Domain;
+using Sequencer.Domain.Drums;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
 
@@ -25,6 +26,12 @@ namespace Sequencer.Audio
         [NotNull] private readonly ISequencedNotes sequencedNotes;
         [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
         [NotNull] private readonly ITickCalculator tickCalculator;
+        [NotNull] private readonly DrumPattern drumPattern;
+        [NotNull] private readonly DrumKitSettings drumKit;
+        private readonly int sampleRate;
+
+        // The open hi-hat still ringing, so the next closed or open hat can cut it off.
+        [CanBeNull] private DrumVoice ringingOpenHat;
         private readonly int previewSamples;
 
         // Ticks arrive on the clock thread; Stopped can be raised from the UI thread.
@@ -34,8 +41,11 @@ namespace Sequencer.Audio
 
         public SequencerPlayer([NotNull] ISignalProviderFactory signalProviderFactory, [NotNull] ISequencedNotes sequencedNotes,
             [NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IAudioSettings audioSettings,
-            [NotNull] IAudioOutput output)
+            [NotNull] IAudioOutput output, [NotNull] DrumPattern drumPattern, [NotNull] DrumKitSettings drumKit)
         {
+            this.drumPattern = drumPattern;
+            this.drumKit = drumKit;
+            sampleRate = audioSettings.SampleRate;
             this.signalProviderFactory = signalProviderFactory;
             this.sequencedNotes = sequencedNotes;
             this.clock = clock;
@@ -119,6 +129,51 @@ namespace Sequencer.Audio
 
             StartNotes(currentPosition);
             ReleaseNotes(currentPosition);
+
+            int ticksPerSixteenth = Math.Max(1, clock.TicksPerQuarterNote / 4);
+
+            if (e.CurrentTick % ticksPerSixteenth == 0)
+            {
+                TriggerDrums(e.CurrentTick / ticksPerSixteenth % DrumPattern.StepCount);
+            }
+        }
+
+        /// <summary>
+        /// Plays every drum hit on this step.
+        /// </summary>
+        private void TriggerDrums(int step)
+        {
+            foreach (DrumSound sound in DrumPattern.AllSounds)
+            {
+                byte velocity = drumPattern.VelocityAt(sound, step);
+
+                if (velocity > 0)
+                {
+                    PlayDrum(sound, velocity);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Plays one drum hit now, alongside whatever is playing. Safe to call from the UI thread.
+        /// </summary>
+        public void PreviewDrum(DrumSound sound, byte velocity)
+        {
+            PlayDrum(sound, velocity);
+        }
+
+        private void PlayDrum(DrumSound sound, byte velocity)
+        {
+            var voice = new DrumVoice(sound, velocity, sampleRate, (float) drumKit.Volume);
+
+            // On a drum machine the hi-hats share one voice: a new hat cuts off an open one still ringing.
+            if (sound == DrumSound.ClosedHat || sound == DrumSound.OpenHat)
+            {
+                ringingOpenHat?.Choke();
+                ringingOpenHat = sound == DrumSound.OpenHat ? voice : null;
+            }
+
+            mixer.AddMixerInput(voice);
         }
 
         private void StartNotes([NotNull] IPosition currentPosition)

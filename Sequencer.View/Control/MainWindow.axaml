@@ -46,14 +46,8 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                <Button x:Name="TunesButton" Classes="quiet" Focusable="False" ToolTip.Tip="Load a well-known tune to play or edit">
-                    <StackPanel Orientation="Horizontal" Spacing="7">
-                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Tunes}" Stroke="{Binding $parent[Button].Foreground}" Width="14" Height="14" />
-                        <TextBlock Text="Tunes" VerticalAlignment="Center" />
-                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.ChevronDown}" Stroke="{StaticResource TextTertiaryBrush}" Width="10" Height="10" />
-                    </StackPanel>
-                </Button>
-                <Border Classes="segmented" VerticalAlignment="Center">
+                <Border Classes="segmented" VerticalAlignment="Center" IsEnabled="{Binding IsSynthTrack}"
+                        ToolTip.Tip="Tools for the piano roll">
                     <StackPanel Orientation="Horizontal" Spacing="2">
                         <ToggleButton Classes="segment" x:Name="SelectToolButton" Focusable="False" IsChecked="{Binding IsSelectTool}"
                                       ToolTip.Tip="Select, move and resize notes (V)">
@@ -82,31 +76,80 @@
             </Grid>
         </Border>
 
-        <!-- Editor: ruler above, keyboard beside, grid in the middle. -->
+        <!-- Editor: the track bar, the ruler, then the piano roll or the drum grid. -->
         <Grid Grid.Row="1" Grid.Column="0">
             <DockPanel>
-                <!-- The keyboard column and the ruler's spacer share one width so lanes and beats line up. -->
-                <Grid DockPanel.Dock="Top" Height="28" ColumnDefinitions="56,*" Background="{StaticResource PanelBrush}">
+                <!-- Which track is being edited, and its presets. -->
+                <Border DockPanel.Dock="Top" Background="{StaticResource ToolbarBrush}" BorderBrush="{StaticResource HairlineBrush}"
+                        BorderThickness="0,0,0,1" Padding="12,6">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Border Classes="segmented">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <ToggleButton Classes="segment" x:Name="SynthTrackButton" Focusable="False" IsChecked="{Binding IsSynthTrack}"
+                                              ToolTip.Tip="Edit the synth's notes">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.SynthTrack}" Width="14" Height="14" />
+                                        <TextBlock Text="Synth" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton Classes="segment" x:Name="DrumTrackButton" Focusable="False" IsChecked="{Binding IsDrumTrack}"
+                                              ToolTip.Tip="Edit the drum pattern">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.DrumTrack}" Width="14" Height="14" />
+                                        <TextBlock Text="Drums" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ToggleButton>
+                            </StackPanel>
+                        </Border>
+                        <Panel Grid.Column="2">
+                            <Button x:Name="TunesButton" IsVisible="{Binding IsSynthTrack}" Classes="quiet" Focusable="False" ToolTip.Tip="Load a well-known tune to play or edit">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <Path Classes="stroke-icon" Data="{x:Static view:Icons.Tunes}" Stroke="{Binding $parent[Button].Foreground}" Width="14" Height="14" />
+                                    <TextBlock Text="Tunes" VerticalAlignment="Center" />
+                                    <Path Classes="stroke-icon" Data="{x:Static view:Icons.ChevronDown}" Stroke="{StaticResource TextTertiaryBrush}" Width="10" Height="10" />
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="LoopsButton" Classes="quiet" Focusable="False" IsVisible="{Binding IsDrumTrack}"
+                                    ToolTip.Tip="Load a classic drum pattern">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <Path Classes="stroke-icon" Data="{x:Static view:Icons.DrumTrack}" Stroke="{Binding $parent[Button].Foreground}" Width="14" Height="14" />
+                                    <TextBlock Text="Loops" VerticalAlignment="Center" />
+                                    <Path Classes="stroke-icon" Data="{x:Static view:Icons.ChevronDown}" Stroke="{StaticResource TextTertiaryBrush}" Width="10" Height="10" />
+                                </StackPanel>
+                            </Button>
+                        </Panel>
+                    </Grid>
+                </Border>
+
+                <!-- The left column and the ruler's spacer share one width so lanes, steps and beats line up. -->
+                <Grid DockPanel.Dock="Top" Height="28" ColumnDefinitions="72,*" Background="{StaticResource PanelBrush}">
                     <control:SequencerHeaderControl x:Name="Header" Grid.Column="1"
                                                     CurrentPosition="{Binding CurrentPosition}" />
                 </Grid>
-                <ScrollViewer x:Name="EditorScrollViewer"
-                              HorizontalScrollBarVisibility="Disabled"
-                              VerticalScrollBarVisibility="Auto"
-                              Focusable="False">
-                    <Grid ColumnDefinitions="56,*" MinHeight="800">
-                        <control:PianoKeyboardControl x:Name="Keyboard" Grid.Column="0" />
-                        <control:SequencerControl x:Name="Editor" Grid.Column="1"
-                                                  NoteAction="{Binding NoteAction}"
-                                                  SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
-                                                  CurrentPosition="{Binding CurrentPosition}" />
-                    </Grid>
-                </ScrollViewer>
+                <Panel>
+                    <ScrollViewer x:Name="EditorScrollViewer" IsVisible="{Binding IsSynthTrack}"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Focusable="False">
+                        <Grid ColumnDefinitions="72,*" MinHeight="800">
+                            <control:PianoKeyboardControl x:Name="Keyboard" Grid.Column="0" />
+                            <control:SequencerControl x:Name="Editor" Grid.Column="1"
+                                                      NoteAction="{Binding NoteAction}"
+                                                      SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                                      CurrentPosition="{Binding CurrentPosition}" />
+                        </Grid>
+                    </ScrollViewer>
+                    <StackPanel x:Name="DrumArea" IsVisible="{Binding IsDrumTrack}" Background="{StaticResource WindowBrush}">
+                        <control:DrumEditorControl x:Name="DrumEditor" />
+                        <TextBlock x:Name="DrumEmptyHint" Classes="label" Margin="84,16,16,0" Foreground="{StaticResource TextTertiaryBrush}"
+                                   Text="Click the steps to build a beat, or load one from Loops." />
+                    </StackPanel>
+                </Panel>
             </DockPanel>
 
             <!-- Shown on an empty grid with the Draw tool, so the first step is obvious. -->
             <Border x:Name="EmptyHint" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Margin="56,28,0,0" Background="{StaticResource ToolbarBrush}" CornerRadius="8" Padding="16,10"
+                    Margin="72,28,0,0" Background="{StaticResource ToolbarBrush}" CornerRadius="8" Padding="16,10"
                     BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                 <StackPanel Spacing="2">
                     <TextBlock Text="Click anywhere in the grid to draw a note" FontWeight="SemiBold" HorizontalAlignment="Center" />
@@ -126,6 +169,7 @@
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1,0,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
                 <StackPanel Margin="16,14,16,16" Spacing="12">
+                <StackPanel Spacing="12" IsVisible="{Binding IsSynthTrack}">
 
                     <TextBlock Classes="section" Text="NOTE" />
                     <StackPanel Spacing="2" IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNull}}">
@@ -237,9 +281,27 @@
                                         Focusable="False" Margin="0,-6,0,-4" Value="{Binding VolumePercent}" />
                             </StackPanel>
 
-                        <CheckBox x:Name="PreviewOnEditBox" Content="Play notes while editing" Focusable="False" FontSize="12"
-                                  IsChecked="{Binding PreviewOnEdit}" />
                     </StackPanel>
+                </StackPanel>
+
+                    <!-- The drum kit's settings, when the drum track is being edited. -->
+                    <StackPanel x:Name="DrumKitPanel" Spacing="12" IsVisible="{Binding IsDrumTrack}">
+                        <TextBlock Classes="section" Text="DRUMS" />
+                        <TextBlock Classes="label" Foreground="{StaticResource TextTertiaryBrush}" TextWrapping="Wrap"
+                                   Text="Six synthesised drum sounds. A closed hi-hat cuts off an open one, as on a drum machine." />
+                        <StackPanel x:Name="DrumVolumeRow" x:DataType="vm:DrumKitViewModel" Spacing="2" ToolTip.Tip="Drum kit volume">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="label" Text="Volume" />
+                                <TextBlock Grid.Column="1" Classes="value" Text="{Binding VolumePercent, StringFormat='{}{0} %'}" />
+                            </Grid>
+                            <Slider x:Name="DrumVolumeSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                    Focusable="False" Margin="0,-6,0,-4" Value="{Binding VolumePercent}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,2" />
+                    <CheckBox x:Name="PreviewOnEditBox" x:DataType="vm:SynthViewModel" Content="Play sounds while editing" Focusable="False" FontSize="12"
+                              IsChecked="{Binding PreviewOnEdit}" ToolTip.Tip="Hear notes and drum hits as you add or change them" />
                 </StackPanel>
             </ScrollViewer>
         </Border>

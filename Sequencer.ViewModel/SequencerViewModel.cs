@@ -148,6 +148,36 @@ namespace Sequencer.ViewModel
         [CanBeNull]
         public bool IsPlaying => SequencerPlayState == PlayState.Play;
 
+        private bool isDrumTrack;
+
+        /// <summary>
+        /// Which track the editor shows: the synth's piano roll, or the drum grid.
+        /// </summary>
+        public bool IsDrumTrack
+        {
+            get => isDrumTrack;
+            set
+            {
+                if (isDrumTrack == value)
+                {
+                    OnPropertyChanged(nameof(IsDrumTrack));
+                    OnPropertyChanged(nameof(IsSynthTrack));
+                    return;
+                }
+
+                isDrumTrack = value;
+                OnPropertyChanged(nameof(IsDrumTrack));
+                OnPropertyChanged(nameof(IsSynthTrack));
+                OnPropertyChanged(nameof(ToolHint));
+            }
+        }
+
+        public bool IsSynthTrack
+        {
+            get => !IsDrumTrack;
+            set => IsDrumTrack = !value;
+        }
+
         /// <summary>
         /// The playback position as "bar.beat.sixteenth".
         /// </summary>
@@ -182,6 +212,12 @@ namespace Sequencer.ViewModel
             get
             {
                 string command = OperatingSystem.IsMacOS() ? "⌘" : "Ctrl+";
+
+                if (IsDrumTrack)
+                {
+                    string alt = OperatingSystem.IsMacOS() ? "⌥" : "Alt+";
+                    return $"Click a step to add or remove a hit · Drag to paint · {alt}click for an accent · Click a sound's name to hear it";
+                }
 
                 if (NoteAction == NoteAction.Select)
                 {

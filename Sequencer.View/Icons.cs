@@ -29,6 +29,12 @@ namespace Sequencer.View
             "M14,10.5 C14,11.6 13.1,12.5 12,12.5 C10.9,12.5 10,11.6 10,10.5 C10,9.4 10.9,8.5 12,8.5 C13.1,8.5 14,9.4 14,10.5 Z " +
             "M6,12.5 L6,3.5 L14,1.5 L14,10.5 M6,6 L14,4");
 
+        [NotNull] public static readonly Geometry SynthTrack = Geometry.Parse("M2.5,3.5 L13.5,3.5 L13.5,12.5 L2.5,12.5 Z M6.2,3.5 L6.2,12.5 M9.8,3.5 L9.8,12.5 M5,3.5 L5,9 M8,3.5 L8,9 M11,3.5 L11,9");
+
+        [NotNull] public static readonly Geometry DrumTrack = Geometry.Parse(
+            "M2.5,6.5 C2.5,5.1 5,4 8,4 C11,4 13.5,5.1 13.5,6.5 L13.5,11 C13.5,12.4 11,13.5 8,13.5 C5,13.5 2.5,12.4 2.5,11 Z " +
+            "M2.5,6.5 C2.5,7.9 5,9 8,9 C11,9 13.5,7.9 13.5,6.5 M5,2 L8,5 M11,2 L8,5");
+
         [NotNull] public static readonly Geometry ChevronDown = Geometry.Parse("M4,6 L8,10 L12,6");
 
         // Waveforms, drawn as one and a half to two cycles in a 20 x 14 box.
