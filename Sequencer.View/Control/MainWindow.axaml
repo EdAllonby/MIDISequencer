@@ -36,6 +36,11 @@
                 <Button Content="▶" Width="36" Focusable="False" Command="{Binding PlaySequencer}" ToolTip.Tip="Play (Space)" />
                 <Button Content="❚❚" Width="36" Focusable="False" Command="{Binding PauseSequencer}" ToolTip.Tip="Pause (Space)" />
                 <Button Content="■" Width="36" Focusable="False" Command="{Binding StopSequencer}" ToolTip.Tip="Stop (Return)" />
+                <Separator Width="12" Background="Transparent" />
+                <NumericUpDown x:Name="TempoBox" Width="120" Minimum="30" Maximum="300" Increment="1" FormatString="0"
+                               Value="{Binding BeatsPerMinute}" ToolTip.Tip="Tempo (beats per minute)" />
+                <TextBlock Text="BPM" VerticalAlignment="Center" />
+                <Button Content="Tap" Focusable="False" Command="{Binding TapTempo}" ToolTip.Tip="Tap repeatedly to set the tempo" />
             </StackPanel>
         </Grid>
 

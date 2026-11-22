@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 
 namespace Sequencer.Midi
 {
     public interface ISequencerClock
     {
         int Ticks { get; }
+
+        double BeatsPerMinute { get; set; }
 
         int TicksPerQuarterNote { get; }
 

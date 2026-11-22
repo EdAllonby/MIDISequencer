@@ -74,7 +74,7 @@ namespace Sequencer.ViewModel.Tests
 
             viewModel.SequencerPlayState = PlayState.Pause;
 
-            const string expectedInformation = "Note Action Select, Pause";
+            const string expectedInformation = "Note Action Select, Pause, 120 BPM";
 
             ClassicAssert.AreEqual(expectedInformation, viewModel.Information);
         }

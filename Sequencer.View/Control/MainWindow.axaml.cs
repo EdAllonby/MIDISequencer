@@ -134,6 +134,19 @@ namespace Sequencer.View.Control
         {
             keyboardState.CurrentModifiers = e.KeyModifiers;
 
+            if (e.Source is TextBox)
+            {
+                // Typing in a text field (such as the tempo box): leave the keys to it.
+                if (e.Key == Key.Enter || e.Key == Key.Escape)
+                {
+                    // Commit or abandon the edit and hand the keyboard back to the editor.
+                    Focus();
+                    e.Handled = true;
+                }
+
+                return;
+            }
+
             if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Space)
             {
                 viewModel.ToggleSequencer.Execute(null);

@@ -5,7 +5,9 @@ using Autofac;
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.NUnit;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using Avalonia.Threading;
 using NUnit.Framework;
 using Sequencer.View.Control;
@@ -326,6 +328,32 @@ namespace Sequencer.View.Tests.UiTests
 
             Assert.That(TotalTicks(playing), Is.GreaterThan(0));
             Assert.That(TotalTicks(viewModel.CurrentPosition), Is.EqualTo(0), "Stop returns to the start.");
+        }
+
+        [AvaloniaTest]
+        public void TempoBox_IsBoundToTheViewModel()
+        {
+            var tempoBox = window.FindControl<NumericUpDown>("TempoBox");
+
+            tempoBox.Value = 90;
+            Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(90));
+
+            viewModel.BeatsPerMinute = 140;
+            Assert.That(tempoBox.Value, Is.EqualTo(140));
+        }
+
+        [AvaloniaTest]
+        public void TypingInTheTempoBox_DoesNotTriggerEditorShortcuts()
+        {
+            Click(EditorPoint);
+            TextBox tempoText = window.FindControl<NumericUpDown>("TempoBox").GetVisualDescendants().OfType<TextBox>().First();
+            tempoText.Focus();
+
+            Press(Key.Back);
+            Press(Key.Space);
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1), "Backspace edits the text, not the notes.");
+            Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop), "Space types a space, not Play.");
         }
 
         [AvaloniaTest]
