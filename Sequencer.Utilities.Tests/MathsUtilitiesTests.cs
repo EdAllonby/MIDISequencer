@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Windows;
+using System.Drawing;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Utilities.Tests
 {
@@ -36,10 +37,10 @@ namespace Sequencer.Utilities.Tests
 
         private static readonly object[] PolarToCartesianCases =
         {
-            new object[] { new Point(0, 0), 56, 27, new Point(49.9, 25.42) },
-            new object[] { new Point(1, 1), 56, 27, new Point(50.9, 26.42) },
-            new object[] { new Point(0, 0), 100, 90, new Point(0, 100) },
-            new object[] { new Point(0, -100), 100, 90, new Point(0, 0) }
+            new object[] { new PointF(0f, 0f), 56, 27, new PointF(49.9f, 25.42f) },
+            new object[] { new PointF(1f, 1f), 56, 27, new PointF(50.9f, 26.42f) },
+            new object[] { new PointF(0f, 0f), 100, 90, new PointF(0f, 100f) },
+            new object[] { new PointF(0f, -100f), 100, 90, new PointF(0f, 0f) }
         };
 
         [Test]
@@ -48,7 +49,7 @@ namespace Sequencer.Utilities.Tests
         {
             int actual = value.Clamp(min, max);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -67,14 +68,14 @@ namespace Sequencer.Utilities.Tests
         {
             int actualValue = MathsUtilities.NearestValue(value, multiple);
 
-            Assert.AreEqual(expectedValue, actualValue);
+            ClassicAssert.AreEqual(expectedValue, actualValue);
         }
 
         [Test]
         [TestCaseSource(nameof(PolarToCartesianCases))]
-        public void PolarToCartesianTests(Point origin, double radius, double degrees, Point expected)
+        public void PolarToCartesianTests(PointF origin, double radius, double degrees, PointF expected)
         {
-            Point actual = MathsUtilities.PolarToCartesian(origin, radius, degrees);
+            PointF actual = MathsUtilities.PolarToCartesian(origin, radius, degrees);
 
             const double tolerance = 0.01;
             Assert.That(actual.X, Is.InRange(expected.X - tolerance, expected.X + tolerance));

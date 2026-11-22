@@ -23,8 +23,8 @@ Goal: run the sequencer natively on Apple Silicon macOS (and keep Windows/Linux)
 
 All work happens on the `macos-port` branch. Each milestone is a commit with passing tests on macOS, and the branch merges to `master` in one PR once the app runs and plays on the Mac.
 
-1. **SDK-style projects.** Convert every project to SDK-style `net10.0` with `PackageReference`. The non-UI libraries and their tests build and pass on macOS; the WPF View is temporarily left out of the solution.
-2. **Remove WPF from the core.** Replace the WPF types in `Domain`, `Utilities` and `ViewModel`, switch to CommunityToolkit.Mvvm, and remove the service locator.
+1. **Core on .NET 10** ✅ Convert `Utilities`, `Domain`, `Midi` and `ViewModel` (and their tests) to SDK-style `net10.0` with central package management. These projects only compile on macOS once WPF is gone, so this milestone also absorbed most of the original milestone 2: WPF `Color`/`Point` become `System.Drawing` types, MvvmLight becomes CommunityToolkit.Mvvm (commands are created once and notified on play-state changes, because WPF's `CommandManager` no longer re-checks them), `ViewModelLocator` and the service locator are deleted, `IWpfDispatcher` becomes `IUiDispatcher`, `NoteAction` holds an icon name instead of a Windows-only `System.Drawing.Bitmap`, the empty `Sequencer.Shared` project is deleted, and NUnit moves to 4.x (`ClassicAssert`). `Audio`, `Visual` and `View` and their tests are left out of the solution until milestones 3 and 4.
+2. *(Folded into milestone 1.)* Removing the service-locator calls inside the controls happens when they are rewritten in milestone 4.
 3. **Audio and clock.** Build a test app for the output library on osx-arm64, then the mixer behind `IAudioOutput`, then the `Stopwatch` clock.
 4. **Avalonia UI.** Move `Visual` to Avalonia, build the new Avalonia View (main window, sequencer control, header, drag-selection box, radial context menu, note inspector), and add platform-aware key mapping.
 5. **Retire WPF.** Delete the WPF View code, check everything works as it did on Windows, and update the README.

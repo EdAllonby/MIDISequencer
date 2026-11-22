@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Midi.Tests
 {
@@ -11,7 +12,7 @@ namespace Sequencer.Midi.Tests
             var expected = 987;
             var args = new TickEventArgs(expected);
 
-            Assert.AreEqual(expected, args.CurrentTick);
+            ClassicAssert.AreEqual(expected, args.CurrentTick);
         }
     }
 }

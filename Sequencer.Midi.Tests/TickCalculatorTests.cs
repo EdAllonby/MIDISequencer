@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
 
@@ -28,7 +29,7 @@ namespace Sequencer.Midi.Tests
 
             IPosition position = tickCalulcator.CalculatePositionFromTick(tick);
 
-            Assert.AreEqual(expectedPosition, position);
+            ClassicAssert.AreEqual(expectedPosition, position);
         }
     }
 }

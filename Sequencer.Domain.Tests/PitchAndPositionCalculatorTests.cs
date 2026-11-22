@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Sequencer.Domain.Settings;
 
 namespace Sequencer.Domain.Tests
@@ -39,7 +40,7 @@ namespace Sequencer.Domain.Tests
 
             double actualSteps = calculator.FindStepsFromPitches(firstPitch, secondPitch);
 
-            Assert.AreEqual(expectedSteps, actualSteps);
+            ClassicAssert.AreEqual(expectedSteps, actualSteps);
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace Sequencer.Domain.Tests
 
             double actualTicks = calculator.FindTicksBetweenPositions(firstPosition, secondPosition);
 
-            Assert.AreEqual(expectedTicks, actualTicks);
+            ClassicAssert.AreEqual(expectedTicks, actualTicks);
         }
     }
 }

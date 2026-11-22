@@ -1,6 +1,7 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
 
@@ -46,7 +47,7 @@ namespace Sequencer.Midi.Tests
         {
             SequencerClock sequencerClock = GetSequencerClock();
 
-            Assert.AreEqual(120, sequencerClock.BeatsPerMinute);
+            ClassicAssert.AreEqual(120, sequencerClock.BeatsPerMinute);
         }
 
         [Test]
@@ -60,7 +61,7 @@ namespace Sequencer.Midi.Tests
 
             var clock = new SequencerClock(mockSettings.Object, mockInternalClock.Object);
 
-            Assert.AreEqual(expectedTicks, clock.Ticks);
+            ClassicAssert.AreEqual(expectedTicks, clock.Ticks);
         }
 
         [Test]

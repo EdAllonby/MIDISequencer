@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Domain.Tests
 {
@@ -11,8 +12,8 @@ namespace Sequencer.Domain.Tests
             var pitch = new Pitch(Note.A, 2);
             var pitch2 = new Pitch(Note.B, 2);
 
-            Assert.AreNotEqual(pitch, pitch2);
-            Assert.AreNotEqual(pitch.GetHashCode(), pitch2.GetHashCode());
+            ClassicAssert.AreNotEqual(pitch, pitch2);
+            ClassicAssert.AreNotEqual(pitch.GetHashCode(), pitch2.GetHashCode());
         }
 
         [Test]
@@ -21,8 +22,8 @@ namespace Sequencer.Domain.Tests
             var pitch = new Pitch(Note.A, 2);
             var pitch2 = new Pitch(Note.A, 3);
 
-            Assert.AreNotEqual(pitch, pitch2);
-            Assert.AreNotEqual(pitch.GetHashCode(), pitch2.GetHashCode());
+            ClassicAssert.AreNotEqual(pitch, pitch2);
+            ClassicAssert.AreNotEqual(pitch.GetHashCode(), pitch2.GetHashCode());
         }
 
         [Test]
@@ -31,8 +32,8 @@ namespace Sequencer.Domain.Tests
             var pitch = new Pitch(Note.A, 2);
             var pitch2 = new Pitch(Note.A, 2);
 
-            Assert.AreEqual(pitch, pitch2);
-            Assert.AreEqual(pitch.GetHashCode(), pitch2.GetHashCode());
+            ClassicAssert.AreEqual(pitch, pitch2);
+            ClassicAssert.AreEqual(pitch.GetHashCode(), pitch2.GetHashCode());
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace Sequencer.Domain.Tests
             var pitch = new Pitch(Note.A, 2);
             var pitch2 = new Pitch(Note.A, 2);
 
-            Assert.IsTrue(pitch.Equals((object) pitch2));
+            ClassicAssert.IsTrue(pitch.Equals((object) pitch2));
         }
 
         [Test]
@@ -49,7 +50,7 @@ namespace Sequencer.Domain.Tests
         {
             var pitch = new Pitch(Note.A, 2);
 
-            Assert.IsFalse(pitch.Equals(null));
+            ClassicAssert.IsFalse(pitch.Equals(null));
         }
 
         [Test]
@@ -57,7 +58,7 @@ namespace Sequencer.Domain.Tests
         {
             var pitch = new Pitch(Note.A, 2);
 
-            Assert.IsFalse(pitch.Equals((object) null));
+            ClassicAssert.IsFalse(pitch.Equals((object) null));
         }
 
         [Test]
@@ -65,7 +66,7 @@ namespace Sequencer.Domain.Tests
         {
             var pitch = new Pitch(Note.A, 2);
 
-            Assert.IsTrue(pitch.Equals(pitch));
+            ClassicAssert.IsTrue(pitch.Equals(pitch));
         }
 
         [Test]
@@ -73,7 +74,7 @@ namespace Sequencer.Domain.Tests
         {
             var pitch = new Pitch(Note.A, 2);
 
-            Assert.IsTrue(pitch.Equals((object) pitch));
+            ClassicAssert.IsTrue(pitch.Equals((object) pitch));
         }
     }
 }
