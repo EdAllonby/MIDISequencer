@@ -1,6 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Avalonia;
+using Avalonia.Controls.Primitives;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Sequencer.Domain.Tunes;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -24,6 +30,9 @@ namespace Sequencer.View.Control
         private readonly MouseOperator mouseOperator;
         private readonly SequencerViewModel viewModel;
         private readonly ISequencerNotes notes;
+        private readonly SynthViewModel synthViewModel;
+        private readonly IDigitalAudioProtocol protocol;
+        private readonly SequencerSettings settings;
 
         // The button that opened the radial menu: right, or left with Ctrl on macOS.
         private MouseButton? contextMenuButton;
@@ -45,6 +54,9 @@ namespace Sequencer.View.Control
 
             this.viewModel = viewModel;
             this.notes = notes;
+            this.synthViewModel = synthViewModel;
+            this.protocol = protocol;
+            this.settings = settings;
             this.keyboardState = keyboardState;
             this.mouseOperator = mouseOperator;
             DataContext = viewModel;
@@ -57,6 +69,7 @@ namespace Sequencer.View.Control
             viewModel.PropertyChanged += OnViewModelPropertyChanged;
             notes.NotesChanged += (sender, args) => UpdateEmptyHint();
             UpdateEmptyHint();
+            BuildTunesMenu();
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -68,6 +81,131 @@ namespace Sequencer.View.Control
             AddHandler(KeyUpEvent, (sender, args) => keyboardState.CurrentModifiers = args.KeyModifiers, RoutingStrategies.Tunnel);
 
             Log.Info("Main window loaded");
+        }
+
+        /// <summary>
+        /// The confirmation shown before a tune replaces existing notes, while it is open. For tests.
+        /// </summary>
+        [CanBeNull]
+        internal Button ReplaceConfirmButton { get; private set; }
+
+        /// <summary>
+        /// Loads a tune, first asking before it replaces notes (there is no undo).
+        /// </summary>
+        internal void RequestTune([NotNull] Tune tune)
+        {
+            int existing = notes.AllNotes.Count();
+
+            if (existing == 0)
+            {
+                LoadTune(tune);
+                return;
+            }
+
+            var cancel = new Button { Content = "Cancel", Focusable = false };
+            var replace = new Button { Content = "Replace", Focusable = false };
+            cancel.Classes.Add("quiet");
+            replace.Classes.Add("quiet");
+            replace.Classes.Add("accent");
+
+            var flyout = new Flyout
+            {
+                Placement = PlacementMode.BottomEdgeAlignedRight,
+                Content = new StackPanel
+                {
+                    Spacing = 12,
+                    MaxWidth = 260,
+                    Children =
+                    {
+                        new TextBlock { Text = $"Replace your {existing} note{(existing == 1 ? "" : "s")} with {tune.Name}?", TextWrapping = TextWrapping.Wrap, FontWeight = FontWeight.SemiBold },
+                        new TextBlock { Text = "This can't be undone.", Classes = { "label" } },
+                        new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right, Children = { cancel, replace } }
+                    }
+                }
+            };
+
+            cancel.Click += (sender, args) => flyout.Hide();
+            replace.Click += (sender, args) =>
+            {
+                flyout.Hide();
+                LoadTune(tune);
+            };
+            flyout.Closed += (sender, args) => ReplaceConfirmButton = null;
+
+            ReplaceConfirmButton = replace;
+            flyout.ShowAt(TunesButton);
+        }
+
+        /// <summary>
+        /// Replaces the notes with the tune, sets its tempo and sound, and plays it.
+        /// </summary>
+        internal void LoadTune([NotNull] Tune tune)
+        {
+            if (viewModel.StopSequencer.CanExecute(null))
+            {
+                viewModel.StopSequencer.Execute(null);
+            }
+
+            Editor.ReplaceNotes(tune.ToTones(settings.TimeSignature, settings.TicksPerQuarterNote));
+            viewModel.BeatsPerMinute = tune.BeatsPerMinute;
+            synthViewModel.Waveform = tune.Waveform;
+            ScrollNotesIntoView();
+            viewModel.PlaySequencer.Execute(null);
+            Log.Info($"Loaded tune {tune.Name}");
+        }
+
+        private void BuildTunesMenu()
+        {
+            var menu = new MenuFlyout { Placement = PlacementMode.BottomEdgeAlignedRight };
+
+            foreach (Tune tune in TuneLibrary.All)
+            {
+                var item = new MenuItem
+                {
+                    Header = new StackPanel
+                    {
+                        Spacing = 1,
+                        Children =
+                        {
+                            new TextBlock { Text = tune.Name },
+                            new TextBlock { Text = tune.Credit, FontSize = 11, Foreground = (IBrush) this.FindResource("TextTertiaryBrush") }
+                        }
+                    }
+                };
+                item.Click += (sender, args) => RequestTune(tune);
+                menu.Items.Add(item);
+            }
+
+            TunesButton.Flyout = menu;
+        }
+
+        /// <summary>
+        /// Scrolls the grid so the notes are in view, if any are off screen.
+        /// </summary>
+        private void ScrollNotesIntoView()
+        {
+            List<int> noteNumbers = notes.AllNotes.Select(note => protocol.ProtocolNoteNumber(note.Pitch)).ToList();
+
+            if (noteNumbers.Count == 0 || Editor.Bounds.Height <= 0)
+            {
+                return;
+            }
+
+            int lowestOnKeyboard = protocol.ProtocolNoteNumber(settings.LowestPitch);
+            double lane = Editor.Bounds.Height / settings.TotalNotes;
+            double top = (settings.TotalNotes - 1 - (noteNumbers.Max() - lowestOnKeyboard)) * lane;
+            double bottom = (settings.TotalNotes - (noteNumbers.Min() - lowestOnKeyboard)) * lane;
+            double viewport = EditorScrollViewer.Viewport.Height;
+            double offset = EditorScrollViewer.Offset.Y;
+
+            if (top >= offset && bottom <= offset + viewport)
+            {
+                return;
+            }
+
+            double centred = (top + bottom) / 2 - viewport / 2;
+            double maximum = Math.Max(0, EditorScrollViewer.Extent.Height - viewport);
+            EditorScrollViewer.Offset = new Vector(0, Math.Clamp(centred, 0, maximum));
         }
 
         private void OnViewModelPropertyChanged(object sender, [NotNull] PropertyChangedEventArgs e)

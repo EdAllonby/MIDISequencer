@@ -110,6 +110,17 @@
         <Setter Property="Background" Value="{StaticResource RaisedHoverBrush}" />
     </Style>
 
+    <!-- The one primary action in a prompt. -->
+    <Style Selector="Button.accent">
+        <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+        <Setter Property="Foreground" Value="#16171A" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#F2B657" />
+        <Setter Property="Foreground" Value="#16171A" />
+    </Style>
+
     <!-- Segmented controls: a recessed track with one raised, selected segment. -->
     <Style Selector="Border.segmented">
         <Setter Property="Background" Value="{StaticResource FieldBrush}" />
