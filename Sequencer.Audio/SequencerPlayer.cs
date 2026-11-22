@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using Sequencer.Audio.Effects;
 using Sequencer.Domain;
 using Sequencer.Domain.Arrangement;
 using Sequencer.Domain.Drums;
@@ -37,6 +38,9 @@ namespace Sequencer.Audio
         [NotNull] private readonly object voicesLock = new object();
         [NotNull] private readonly Dictionary<ISequencedNote, SoundingNote> voices = new Dictionary<ISequencedNote, SoundingNote>();
 
+        // Each track's channel, where its voices are mixed and its effects applied.
+        [NotNull] private readonly Dictionary<Track, TrackBus> buses = new Dictionary<Track, TrackBus>();
+
         // Each drum track's open hi-hat still ringing, so its next hat can cut it off.
         [NotNull] private readonly Dictionary<Track, DrumVoice> ringingOpenHats = new Dictionary<Track, DrumVoice>();
         private volatile bool isRunning;
@@ -61,6 +65,8 @@ namespace Sequencer.Audio
             limiter = new LimiterSampleProvider(new MasterVolumeSampleProvider(mixer, mixerSettings));
             output.Play(limiter);
 
+            song.Changed += (sender, args) => RetireRemovedTracks();
+
             clock.Tick += OnTick;
             clock.Started += OnClockStarted;
             clock.Stopped += OnClockStopped;
@@ -69,7 +75,16 @@ namespace Sequencer.Audio
         /// <summary>
         /// The number of sounds playing, including notes in their release stage and drum hits.
         /// </summary>
-        public int ActiveVoiceCount => mixer.MixerInputs.Count();
+        public int ActiveVoiceCount
+        {
+            get
+            {
+                lock (buses)
+                {
+                    return buses.Values.Sum(bus => bus.VoiceCount);
+                }
+            }
+        }
 
         /// <summary>
         /// The fraction of the time the master limiter has had to turn the level down.
@@ -96,7 +111,7 @@ namespace Sequencer.Audio
             ISignalProvider voice = CreateVoice(tone, track);
             voice.NoteOn();
             voice.ReleaseAfter(previewSamples);
-            mixer.AddMixerInput(voice);
+            BusFor(track).AddVoice(voice);
         }
 
         /// <summary>
@@ -107,7 +122,7 @@ namespace Sequencer.Audio
         {
             ISignalProvider voice = CreateVoice(tone, track);
             voice.NoteOn();
-            mixer.AddMixerInput(voice);
+            BusFor(track).AddVoice(voice);
             return new HeldNote(voice);
         }
 
@@ -194,7 +209,7 @@ namespace Sequencer.Audio
                     ISignalProvider voice = CreateVoice(note.Tone, track);
                     voice.NoteOn();
                     voices.Add(note, new SoundingNote(voice, track));
-                    mixer.AddMixerInput(voice);
+                    BusFor(track).AddVoice(voice);
                 }
             }
         }
@@ -262,7 +277,41 @@ namespace Sequencer.Audio
                 }
             }
 
-            mixer.AddMixerInput(voice);
+            BusFor(track).AddVoice(voice);
+        }
+
+        /// <summary>
+        /// The track's channel, created the first time it plays.
+        /// </summary>
+        [NotNull]
+        private TrackBus BusFor([NotNull] Track track)
+        {
+            lock (buses)
+            {
+                if (!buses.TryGetValue(track, out TrackBus bus))
+                {
+                    bus = new TrackBus(track, sampleRate, () => clock.BeatsPerMinute);
+                    buses.Add(track, bus);
+                    mixer.AddMixerInput(bus);
+                }
+
+                return bus;
+            }
+        }
+
+        /// <summary>
+        /// Fades out the channels of tracks no longer in the song (after a new song is opened, say).
+        /// </summary>
+        private void RetireRemovedTracks()
+        {
+            lock (buses)
+            {
+                foreach (Track gone in buses.Keys.Where(track => !song.Tracks.Contains(track)).ToList())
+                {
+                    buses[gone].Retire();
+                    buses.Remove(gone);
+                }
+            }
         }
 
         [NotNull]

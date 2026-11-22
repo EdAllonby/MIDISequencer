@@ -186,6 +186,24 @@
     </Style>
 
     <!-- Stroked icons: round caps and joins, consistent weight. -->
+    <!-- An effect's on/off switch: a power symbol, lit in the accent colour when on. -->
+    <Style Selector="ToggleButton.effect-power">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="ToggleButton.effect-power Path">
+        <Setter Property="Stroke" Value="{StaticResource TextTertiaryBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.effect-power:checked Path">
+        <Setter Property="Stroke" Value="{StaticResource AccentBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.effect-power:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.effect-power:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedBrush}" />
+    </Style>
+
     <Style Selector="Path.stroke-icon">
         <Setter Property="StrokeThickness" Value="1.5" />
         <Setter Property="StrokeLineCap" Value="Round" />

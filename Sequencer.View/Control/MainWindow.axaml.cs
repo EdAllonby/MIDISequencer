@@ -216,6 +216,7 @@ namespace Sequencer.View.Control
         private void SelectCell([NotNull] Track track, int section)
         {
             CloseOpenClip();
+            EffectsPanel.Track = track;
 
             arrangement.SelectedTrack = track;
             arrangement.SelectedSection = section;

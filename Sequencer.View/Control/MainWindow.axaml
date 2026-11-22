@@ -508,6 +508,9 @@
                     </StackPanel>
 
                     <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,2" />
+                    <control:EffectsPanel x:Name="EffectsPanel" />
+
+                    <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,2" />
                     <CheckBox x:Name="PreviewOnEditBox" Content="Play sounds while editing" Focusable="False" FontSize="12"
                               IsChecked="{Binding PreviewOnEdit}" ToolTip.Tip="Hear notes and drum hits as you add or change them" />
                 </StackPanel>

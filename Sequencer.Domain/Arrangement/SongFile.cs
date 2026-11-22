@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using Sequencer.Domain.Drums;
+using Sequencer.Domain.Effects;
 using Sequencer.Domain.Settings;
 
 namespace Sequencer.Domain.Arrangement
@@ -92,6 +93,12 @@ namespace Sequencer.Domain.Arrangement
                 Muted = track.IsMuted,
                 Synth = track.Synth,
                 DrumVolume = track.Drums?.Volume,
+                Effects = track.Effects.Count == 0 ? null : track.Effects.Select(effect => new EffectDto
+                {
+                    Kind = effect.Kind,
+                    Enabled = effect.IsEnabled,
+                    Parameters = effect.Parameters.ToDictionary(parameter => parameter.Key, parameter => effect[parameter.Key])
+                }).ToList(),
                 Clips = track.Clips.Select(ToDto).ToList(),
                 Sections = Enumerable.Range(0, track.SectionCount).Select(section => track.ClipAt(section)?.Name).ToList()
             };
@@ -140,6 +147,21 @@ namespace Sequencer.Domain.Arrangement
             if (track.Drums != null && dto.DrumVolume != null)
             {
                 track.Drums.Volume = dto.DrumVolume.Value;
+            }
+
+            foreach (EffectDto effectDto in dto.Effects ?? new List<EffectDto>())
+            {
+                var effect = new Effect(effectDto.Kind) { IsEnabled = effectDto.Enabled };
+
+                foreach (KeyValuePair<string, double> parameter in effectDto.Parameters ?? new Dictionary<string, double>())
+                {
+                    if (effect.Has(parameter.Key))
+                    {
+                        effect[parameter.Key] = parameter.Value;
+                    }
+                }
+
+                track.AddEffect(effect);
             }
 
             var clips = new Dictionary<string, Clip>();
@@ -249,9 +271,20 @@ namespace Sequencer.Domain.Arrangement
 
             public double? DrumVolume { get; set; }
 
+            public List<EffectDto> Effects { get; set; }
+
             public List<ClipDto> Clips { get; set; }
 
             public List<string> Sections { get; set; }
+        }
+
+        private sealed class EffectDto
+        {
+            public EffectKind Kind { get; set; }
+
+            public bool Enabled { get; set; } = true;
+
+            public Dictionary<string, double> Parameters { get; set; }
         }
 
         private sealed class ClipDto

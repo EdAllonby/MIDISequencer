@@ -11,7 +11,9 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using Avalonia.Threading;
 using NUnit.Framework;
+using Sequencer.Domain.Effects;
 using Sequencer.View.Control;
+using Effect = Sequencer.Domain.Effects.Effect;
 using Sequencer.ViewModel;
 using Sequencer.Visual;
 using Sequencer.Visual.Input;
@@ -56,7 +58,7 @@ namespace Sequencer.View.Tests.UiTests
         [TearDown]
         public void TearDown()
         {
-            window.Close();
+            window.CloseDiscardingChanges();
             container.Dispose();
         }
 
@@ -1195,6 +1197,143 @@ namespace Sequencer.View.Tests.UiTests
             {
                 File.Delete(path);
             }
+        }
+
+        [AvaloniaTest]
+        public void Closing_WithUnsavedChanges_AsksFirst()
+        {
+            Click(EditorPoint);
+
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(window.IsVisible, Is.True, "Still open while it asks.");
+            Window dialog = window.OwnedWindows.Single();
+            Assert.That(dialog.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text), Has.Some.EqualTo("Save changes to \"Untitled\"?"));
+
+            Button dontSave = dialog.GetVisualDescendants().OfType<Button>().Single(b => (string) b.Content == "Don't Save");
+            dontSave.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(window.IsVisible, Is.False);
+        }
+
+        private T Named<T>(string name) where T : Avalonia.Controls.Control =>
+            window.GetVisualDescendants().OfType<T>().Single(control => control.Name == name);
+
+        private EffectsPanel Effects => window.FindControl<EffectsPanel>("EffectsPanel");
+
+        private void ClickButton(Button button) => button.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+
+        [AvaloniaTest]
+        public void AnEffect_AddedFromTheMenu_ShowsItsControls_AndMarksTheSongEdited()
+        {
+            var menu = (MenuFlyout) Named<Button>("AddEffectButton").Flyout;
+            Assert.That(menu.Items.Count, Is.EqualTo(EffectCatalogue.All.Count));
+
+            ((MenuItem) menu.Items[EffectCatalogue.All.ToList().IndexOf(EffectKind.Reverb)]).RaiseEvent(
+                new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(SynthTrack.Effects.Single().Kind, Is.EqualTo(EffectKind.Reverb));
+            Assert.That(Named<Slider>("ReverbSizeSlider"), Is.Not.Null);
+            Assert.That(window.HasUnsavedChanges, Is.True);
+        }
+
+        [AvaloniaTest]
+        public void EachTrack_ShowsItsOwnEffects()
+        {
+            Effects.Add(EffectKind.Delay);
+            window.Select(DrumTrack, 0);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(window.GetVisualDescendants().OfType<Slider>().Any(s => s.Name == "DelayFeedbackSlider"), Is.False);
+
+            Effects.Add(EffectKind.Compressor);
+            window.Select(SynthTrack, 0);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(Named<Slider>("DelayFeedbackSlider"), Is.Not.Null);
+            Assert.That(DrumTrack.Effects.Single().Kind, Is.EqualTo(EffectKind.Compressor));
+        }
+
+        [AvaloniaTest]
+        public void Sliders_SetTheEffect_AndDoubleClickResetsThem()
+        {
+            Effects.Add(EffectKind.Compressor);
+            Dispatcher.UIThread.RunJobs();
+            Effect compressor = SynthTrack.Effects.Single();
+            Slider ratio = Named<Slider>("CompressorRatioSlider");
+
+            ratio.Value = ratio.Maximum;
+            Assert.That(compressor["ratio"], Is.EqualTo(20));
+
+            ratio.RaiseEvent(new Avalonia.Input.TappedEventArgs(InputElement.DoubleTappedEvent, null));
+            Assert.That(compressor["ratio"], Is.EqualTo(4).Within(0.01));
+        }
+
+        [AvaloniaTest]
+        public void Effects_CanBeBypassedReorderedAndRemoved()
+        {
+            Effects.Add(EffectKind.Drive);
+            Effects.Add(EffectKind.Reverb);
+            Dispatcher.UIThread.RunJobs();
+            Effect drive = SynthTrack.Effects[0];
+
+            Named<ToggleButton>("Power0").IsChecked = false;
+            Assert.That(drive.IsEnabled, Is.False);
+
+            ClickButton(Named<Border>("Effect1").GetVisualDescendants().OfType<Button>().First(b => ToolTip.GetTip(b) as string == "Earlier in the chain"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.That(SynthTrack.Effects.Select(e => e.Kind), Is.EqualTo(new[] { EffectKind.Reverb, EffectKind.Drive }));
+
+            ClickButton(Named<Button>("RemoveEffect0"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.That(SynthTrack.Effects, Is.EqualTo(new[] { drive }));
+            Assert.That(Named<ToggleButton>("Power0").IsChecked, Is.False, "The remaining card still shows it bypassed.");
+        }
+
+        [AvaloniaTest]
+        public void Effects_AreKeptWhenTheSongIsSavedAndOpened()
+        {
+            string path = TempSongPath();
+
+            try
+            {
+                Effects.Add(EffectKind.Chorus);
+                window.SaveSong(path);
+                window.NewSong();
+                Assert.That(Song.Tracks[0].Effects, Is.Empty);
+
+                window.OpenSong(path);
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.That(Song.Tracks[0].Effects.Single().Kind, Is.EqualTo(EffectKind.Chorus));
+                Assert.That(Named<Slider>("ChorusRateSlider"), Is.Not.Null);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [AvaloniaTest, Explicit("Writes a screenshot for the README.")]
+        public void Screenshot_Effects()
+        {
+            window.Height = 1300;
+            window.Select(DrumTrack, 0);
+            Effects.Add(EffectKind.Compressor);
+            Effects.Add(EffectKind.Equaliser);
+            Effects.Add(EffectKind.Reverb);
+            DrumTrack.Effects[1]["low"] = 4;
+            DrumTrack.Effects[1]["high"] = 2.5;
+            DrumTrack.Effects[2].IsEnabled = false;
+            window.Select(DrumTrack, 0);
+            Dispatcher.UIThread.RunJobs();
+
+            string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "effects.png");
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
+            TestContext.Out.WriteLine($"Screenshot: {path}");
         }
 
         [AvaloniaTest]
