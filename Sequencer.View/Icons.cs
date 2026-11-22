@@ -21,6 +21,16 @@ namespace Sequencer.View
 
         [NotNull] public static readonly Geometry Stop = Geometry.Parse("M3.5,3.5 L12.5,3.5 L12.5,12.5 L3.5,12.5 Z");
 
+        /// <summary>
+        /// Two beamed notes, for the Tunes menu.
+        /// </summary>
+        [NotNull] public static readonly Geometry Tunes = Geometry.Parse(
+            "M6,12.5 C6,13.6 5.1,14.5 4,14.5 C2.9,14.5 2,13.6 2,12.5 C2,11.4 2.9,10.5 4,10.5 C5.1,10.5 6,11.4 6,12.5 Z " +
+            "M14,10.5 C14,11.6 13.1,12.5 12,12.5 C10.9,12.5 10,11.6 10,10.5 C10,9.4 10.9,8.5 12,8.5 C13.1,8.5 14,9.4 14,10.5 Z " +
+            "M6,12.5 L6,3.5 L14,1.5 L14,10.5 M6,6 L14,4");
+
+        [NotNull] public static readonly Geometry ChevronDown = Geometry.Parse("M4,6 L8,10 L12,6");
+
         // Waveforms, drawn as one and a half to two cycles in a 20 x 14 box.
         [NotNull] public static readonly Geometry Sawtooth = Geometry.Parse("M1,12 L9,2 L9,12 L17,2 L17,12");
 

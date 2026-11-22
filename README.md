@@ -65,6 +65,18 @@ On macOS, ⌘ is the command key; on Windows and Linux it is Ctrl.
 | Tempo | Type in the BPM box (30-300), or click **Tap** in time |
 | Play a note | Press a key on the piano keyboard; drag across keys to play each in turn |
 
+### Tunes
+
+**Tunes** in the toolbar loads a well-known tune to play or edit: Ode to Joy, Twinkle, Twinkle, Little Star,
+Frère Jacques (as a round), Jingle Bells, Für Elise, Korobeiniki, In the Hall of the Mountain King and
+Pachelbel's Canon in D. Each sets a tempo and waveform that suit it and starts playing. All are
+traditional or public-domain classical pieces, cut to their best-known four bars. If the grid already has
+notes, you're asked before they're replaced.
+
+Tunes are written in a compact notation in `Sequencer.Domain/Tunes/TuneLibrary.cs`, for example
+`"E4:4 E4:4 F4:4 G4:4 | ..."`: standard pitch names (middle C is C4), lengths in sixteenths, `r` for a rest
+and `|` between bars. Every bar is checked to add up to 16.
+
 Keys on the piano keyboard light up as their notes play back. Creating a note, or changing its pitch,
 plays it briefly. Switch this off with **Play notes while editing**.
 

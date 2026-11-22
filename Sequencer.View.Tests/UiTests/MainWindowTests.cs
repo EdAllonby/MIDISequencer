@@ -108,44 +108,13 @@ namespace Sequencer.View.Tests.UiTests
         [Explicit("Writes a screenshot for the docs.")]
         public void Screenshot_ForTheReadme()
         {
-            var editor = window.FindControl<SequencerControl>("Editor");
-            double cell = editor.Bounds.Width / 64;
-            double lane = LaneHeight();
+            window.RequestTune(TuneNamed("Korobeiniki"));
 
-            Point At(double sixteenth, int laneFromTop) =>
-                editor.TranslatePoint(new Point((sixteenth + 0.5) * cell, (laneFromTop + 0.5) * lane), window) ?? default;
-
-            void DrawNote(int start, int length, int laneFromTop)
-            {
-                window.MouseDown(At(start, laneFromTop), MouseButton.Left);
-                window.MouseMove(At(start + length - 1, laneFromTop));
-                window.MouseUp(At(start + length - 1, laneFromTop), MouseButton.Left);
-            }
-
-            int[,] melody =
-            {
-                { 0, 2, 24 }, { 2, 2, 22 }, { 4, 4, 20 }, { 8, 2, 22 }, { 10, 2, 24 }, { 12, 4, 27 },
-                { 16, 3, 24 }, { 19, 1, 22 }, { 20, 4, 20 }, { 24, 2, 19 }, { 26, 2, 20 }, { 28, 4, 22 },
-                { 32, 2, 24 }, { 34, 2, 27 }, { 36, 4, 29 }, { 40, 2, 27 }, { 42, 2, 24 }, { 44, 4, 22 },
-                { 48, 4, 20 }, { 52, 4, 22 }, { 56, 8, 24 }
-            };
-            int[,] bass = { { 0, 4, 44 }, { 8, 4, 44 }, { 16, 4, 41 }, { 24, 4, 41 }, { 32, 4, 39 }, { 40, 4, 39 }, { 48, 4, 46 }, { 56, 6, 44 } };
-
-            for (var i = 0; i < melody.GetLength(0); i++)
-            {
-                DrawNote(melody[i, 0], melody[i, 1], melody[i, 2]);
-            }
-
-            for (var i = 0; i < bass.GetLength(0); i++)
-            {
-                DrawNote(bass[i, 0], bass[i, 1], bass[i, 2]);
-            }
-
-            // Select one note so the inspector has something to show, then play to the middle of the loop.
+            // Select one note so the inspector has something to show, mid-way through the loop.
             Press(Key.V);
-            Click(At(37, 29));
-            Press(Key.Space);
-            System.Threading.Thread.Sleep(2600);
+            IVisualNote highest = notes.AllNotes.OrderByDescending(n => NoteNumber(n.Pitch)).First();
+            Click(NoteCentreInWindow(highest));
+            System.Threading.Thread.Sleep(3000);
             Dispatcher.UIThread.RunJobs();
 
             string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "screenshot.png");
@@ -153,7 +122,7 @@ namespace Sequencer.View.Tests.UiTests
             TestContext.Out.WriteLine($"Screenshot: {path}");
             Press(Key.Enter);
 
-            Assert.That(notes.AllNotes.Count(), Is.EqualTo(melody.GetLength(0) + bass.GetLength(0)));
+            Assert.That(notes.AllNotes, Is.Not.Empty);
         }
 
         [AvaloniaTest]
@@ -663,6 +632,63 @@ namespace Sequencer.View.Tests.UiTests
 
             Assert.That(window.FindControl<TextBlock>("SelectedLength").Text, Is.EqualTo("1/16"));
             Assert.That(window.FindControl<TextBlock>("SelectedStart").Text, Does.Match(@"^\d+\.\d\.\d$"));
+        }
+
+        private static Domain.Tunes.Tune TuneNamed(string name) => Domain.Tunes.TuneLibrary.All.Single(t => t.Name == name);
+
+        [AvaloniaTest]
+        public void TunesMenu_ListsEveryTune()
+        {
+            var menu = (MenuFlyout) window.FindControl<Button>("TunesButton").Flyout;
+
+            Assert.That(menu.Items.Count, Is.EqualTo(Domain.Tunes.TuneLibrary.All.Count));
+        }
+
+        [AvaloniaTest]
+        public void LoadingATune_OnAnEmptyGrid_FillsItAndPlays()
+        {
+            Domain.Tunes.Tune ode = TuneNamed("Ode to Joy");
+
+            window.RequestTune(ode);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(ode.ToTones(Domain.TimeSignature.FourFour, 96).Count));
+            Assert.That(notes.SelectedNotes, Is.Empty, "Loaded notes start unselected.");
+            Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(ode.BeatsPerMinute));
+            Assert.That(container.Resolve<Domain.Settings.SynthSettings>().Waveform, Is.EqualTo(ode.Waveform));
+            Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Play));
+            Assert.That(previewer.Pitches, Is.Empty, "Loading does not preview every note.");
+            Press(Key.Enter);
+        }
+
+        [AvaloniaTest]
+        public void LoadingATune_OverExistingNotes_AsksFirst()
+        {
+            Click(EditorPoint);
+
+            window.RequestTune(TuneNamed("Jingle Bells"));
+            Assert.That(window.ReplaceConfirmButton, Is.Not.Null, "Asks before replacing.");
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1), "Nothing replaced yet.");
+
+            window.ReplaceConfirmButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(notes.AllNotes.Count(), Is.GreaterThan(1));
+            Press(Key.Enter);
+        }
+
+        [AvaloniaTest]
+        public void LoadingATune_ThenCancelling_KeepsTheNotes()
+        {
+            Click(EditorPoint);
+
+            window.RequestTune(TuneNamed("Jingle Bells"));
+            var flyoutCancel = ((Panel) window.ReplaceConfirmButton.Parent).Children.OfType<Button>().First();
+            flyoutCancel.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+            Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop));
         }
 
         [AvaloniaTest]

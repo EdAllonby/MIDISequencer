@@ -45,7 +45,15 @@
                             ToolTip.Tip="Tap in time to set the tempo" />
                 </StackPanel>
 
-                <Border Grid.Column="4" Classes="segmented" VerticalAlignment="Center">
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <Button x:Name="TunesButton" Classes="quiet" Focusable="False" ToolTip.Tip="Load a well-known tune to play or edit">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Tunes}" Stroke="{Binding $parent[Button].Foreground}" Width="14" Height="14" />
+                        <TextBlock Text="Tunes" VerticalAlignment="Center" />
+                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.ChevronDown}" Stroke="{StaticResource TextTertiaryBrush}" Width="10" Height="10" />
+                    </StackPanel>
+                </Button>
+                <Border Classes="segmented" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="2">
                         <ToggleButton Classes="segment" x:Name="SelectToolButton" Focusable="False" IsChecked="{Binding IsSelectTool}"
                                       ToolTip.Tip="Select, move and resize notes (V)">
@@ -70,6 +78,7 @@
                         </ToggleButton>
                     </StackPanel>
                 </Border>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -101,7 +110,7 @@
                     BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
                 <StackPanel Spacing="2">
                     <TextBlock Text="Click anywhere in the grid to draw a note" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                    <TextBlock Classes="label" Text="Then press Space to play it" HorizontalAlignment="Center" />
+                    <TextBlock Classes="label" Text="or load one from Tunes, then press Space to play" HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>
 

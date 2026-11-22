@@ -53,6 +53,7 @@ namespace Sequencer.View.Control
         private SequencerDrawer sequencerDrawer;
         private SequencerSettings sequencerSettings;
         private UpdateNewlyCreatedNoteCommand updateNewlyCreatedNoteCommand;
+        private IVisualNoteFactory visualNoteFactory;
         [CanBeNull] private IMousePointNoteCommand moveNoteFromPointCommand;
 
         public SequencerControl()
@@ -101,7 +102,7 @@ namespace Sequencer.View.Control
 
             ISequencerCanvasWrapper canvasWrapper = new SequencerCanvasWrapper(sequencerCanvas);
             sequencerDimensionsCalculator = new SequencerDimensionsCalculator(protocol, canvasWrapper, sequencerSettings, pitchAndPositionCalculator);
-            IVisualNoteFactory visualNoteFactory = new VisualNoteFactory(sequencerSettings, protocol, sequencerDimensionsCalculator, canvasWrapper, notePreviewer);
+            visualNoteFactory = new VisualNoteFactory(sequencerSettings, protocol, sequencerDimensionsCalculator, canvasWrapper, notePreviewer);
             INoteStateCommandFactory noteStateCommandFactory = new NoteStateCommandFactory(notes, keyboardStateProcessor);
 
             mousePointNoteCommandFactory = new MousePointNoteCommandFactory(visualNoteFactory, mouseOperator, keyboardStateProcessor, notes,
@@ -113,6 +114,27 @@ namespace Sequencer.View.Control
             keyPressCommandHandler = new SequencerKeyPressCommandHandler(sequencerSettings, notes, keyboardStateProcessor, commandModifier);
 
             Redraw();
+        }
+
+        /// <summary>
+        /// Replaces every note with these, unselected and at their own velocities (no previews).
+        /// </summary>
+        public void ReplaceNotes([NotNull] [ItemNotNull] IEnumerable<Tone> tones)
+        {
+            foreach (IVisualNote note in notes.AllNotes)
+            {
+                notes.DeleteNote(note);
+            }
+
+            foreach (Tone tone in tones)
+            {
+                IVisualNote note = visualNoteFactory.CreateNote(tone.Pitch, tone.StartPosition, tone.EndPosition);
+                note.Velocity = tone.Velocity;
+                note.NoteState = NoteState.Unselected;
+                notes.AddNote(note);
+            }
+
+            notes.NoteStateChanged();
         }
 
         public void HandleLeftMouseDown([NotNull] IMousePoint mouseDownPoint)
