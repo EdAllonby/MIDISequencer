@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Sequencer.Domain.Drums;
+using Sequencer.Domain.Effects;
 using Sequencer.Domain.Settings;
 
 namespace Sequencer.Domain.Arrangement
@@ -20,6 +22,9 @@ namespace Sequencer.Domain.Arrangement
         [NotNull] [ItemCanBeNull] private readonly Clip[] sections;
         [NotNull] [ItemNotNull] private readonly List<Clip> clips = new List<Clip>();
         private volatile bool isMuted;
+
+        // Copy-on-write, so the audio thread can read the chain without a lock.
+        [NotNull] [ItemNotNull] private volatile Effect[] effects = Array.Empty<Effect>();
 
         public Track(TrackKind kind, [NotNull] string name, int colourIndex, int sectionCount)
         {
@@ -99,6 +104,77 @@ namespace Sequencer.Domain.Arrangement
                     return name;
                 }
             }
+        }
+
+        /// <summary>
+        /// The track's effects, in the order the sound passes through them. Safe to read from the audio thread.
+        /// </summary>
+        [NotNull]
+        [ItemNotNull]
+        public IReadOnlyList<Effect> Effects => effects;
+
+        /// <summary>
+        /// Raised when an effect is added, removed, moved, switched on or off, or a parameter changes.
+        /// </summary>
+        public event EventHandler EffectsChanged;
+
+        public void AddEffect([NotNull] Effect effect)
+        {
+            InsertEffect(effects.Length, effect);
+        }
+
+        public void InsertEffect(int index, [NotNull] Effect effect)
+        {
+            if (effects.Contains(effect))
+            {
+                throw new InvalidOperationException($"{effect.Name} is already on {Name}.");
+            }
+
+            List<Effect> chain = effects.ToList();
+            chain.Insert(Math.Clamp(index, 0, chain.Count), effect);
+            effect.Changed += OnEffectChanged;
+            SetEffects(chain);
+        }
+
+        public void RemoveEffect([NotNull] Effect effect)
+        {
+            if (!effects.Contains(effect))
+            {
+                return;
+            }
+
+            effect.Changed -= OnEffectChanged;
+            SetEffects(effects.Where(e => e != effect).ToList());
+        }
+
+        /// <summary>
+        /// Moves an effect earlier (negative) or later (positive) in the chain.
+        /// </summary>
+        public void MoveEffect([NotNull] Effect effect, int offset)
+        {
+            List<Effect> chain = effects.ToList();
+            int from = chain.IndexOf(effect);
+            int to = Math.Clamp(from + offset, 0, chain.Count - 1);
+
+            if (from < 0 || from == to)
+            {
+                return;
+            }
+
+            chain.RemoveAt(from);
+            chain.Insert(to, effect);
+            SetEffects(chain);
+        }
+
+        private void SetEffects([NotNull] [ItemNotNull] List<Effect> chain)
+        {
+            effects = chain.ToArray();
+            EffectsChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnEffectChanged(object sender, EventArgs e)
+        {
+            EffectsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public override string ToString() => Name;

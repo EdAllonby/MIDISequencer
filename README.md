@@ -99,6 +99,26 @@ noise ────────┘          ↑          ↑
 
 <img src="docs/images/synth.png" alt="The synth panel with the Acid Bass preset" width="290">
 
+### Effects
+
+Every track has its own effects, under **Effects** in the side panel. **Add** puts one at the end of the
+chain, and the sound passes through them from top to bottom:
+
+| Effect | What it does |
+|---|---|
+| Compressor | Evens out the level (threshold, ratio, attack, release, makeup); makes drums punchier |
+| EQ | Low shelf at 120 Hz, a sweepable mid bell, high shelf at 8 kHz |
+| Drive | tanh saturation, levelled so more drive changes the tone rather than the volume; oversampled 4×, so no aliasing |
+| Chorus | A copy on a slowly swaying delay, for width and thickness |
+| Delay | Echoes in time with the tempo (1/16 to 1/2, dotted too), each repeat darker |
+| Reverb | A Freeverb-style room, from small to hall |
+
+The power button bypasses an effect, keeping its settings; the arrows move it in the chain; double-click a
+slider to reset it. Adding, removing and bypassing crossfade over 20 ms, so changes while playing don't
+click. Effects are saved with the song and included in WAV export.
+
+<img src="docs/images/effects.png" alt="A drum track's compressor, EQ and bypassed reverb" width="290">
+
 ### Drums
 
 Select a drum track's clip for a step sequencer: six synthesised sounds (kick, snare,

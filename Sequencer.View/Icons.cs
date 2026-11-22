@@ -37,6 +37,15 @@ namespace Sequencer.View
 
         [NotNull] public static readonly Geometry ChevronDown = Geometry.Parse("M4,6 L8,10 L12,6");
 
+        [NotNull] public static readonly Geometry ChevronUp = Geometry.Parse("M4,10 L8,6 L12,10");
+
+        [NotNull] public static readonly Geometry Plus = Geometry.Parse("M8,3 L8,13 M3,8 L13,8");
+
+        [NotNull] public static readonly Geometry Close = Geometry.Parse("M4,4 L12,12 M12,4 L4,12");
+
+        // A power symbol: an open ring and a stroke through its gap.
+        [NotNull] public static readonly Geometry Power = Geometry.Parse("M5.2,4.6 A5,5 0 1 0 10.8,4.6 M8,2.5 L8,8");
+
         // Waveforms, drawn as one and a half to two cycles in a 20 x 14 box.
         [NotNull] public static readonly Geometry Sawtooth = Geometry.Parse("M1,12 L9,2 L9,12 L17,2 L17,12");
 

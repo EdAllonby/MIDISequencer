@@ -53,6 +53,7 @@ namespace Sequencer.View.Control
             song.Changed += (sender, args) => MarkEdited();
             synthViewModel.PropertyChanged += (sender, args) => MarkEdited();
             drumKitViewModel.PropertyChanged += (sender, args) => MarkEdited();
+            EffectsPanel.Edited += (sender, args) => MarkEdited();
             viewModel.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(viewModel.BeatsPerMinute))
@@ -284,6 +285,15 @@ namespace Sequencer.View.Control
                 default:
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Closes without asking about unsaved changes.
+        /// </summary>
+        internal void CloseDiscardingChanges()
+        {
+            closeConfirmed = true;
+            Close();
         }
 
         private async void OnWindowClosing(object sender, [NotNull] WindowClosingEventArgs e)
