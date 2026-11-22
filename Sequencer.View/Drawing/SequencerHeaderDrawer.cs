@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
 using JetBrains.Annotations;
 using Sequencer.Domain.Settings;
 using Sequencer.Visual;
@@ -11,7 +11,7 @@ namespace Sequencer.View.Drawing
 {
     public class SequencerHeaderDrawer
     {
-        [NotNull] [ItemNotNull] private readonly List<UIElement> elementCache = new List<UIElement>();
+        [NotNull] [ItemNotNull] private readonly List<Avalonia.Controls.Control> elementCache = new List<Avalonia.Controls.Control>();
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
         private readonly ISequencerCanvasWrapper sequencerHeaderCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
@@ -79,7 +79,7 @@ namespace Sequencer.View.Drawing
 
         private void DrawBeatNumber(double currentPosition, int currentBeat)
         {
-            var textBlock = new TextBlock { Text = currentBeat.ToString() };
+            var textBlock = new TextBlock { Text = currentBeat.ToString(), FontSize = 11, Foreground = Brushes.Black };
 
             Canvas.SetLeft(textBlock, currentPosition + 2);
             Canvas.SetTop(textBlock, 0);
@@ -91,12 +91,10 @@ namespace Sequencer.View.Drawing
         {
             var sequencerLine = new Line
             {
-                X1 = currentPosition,
-                X2 = currentPosition,
-                Y1 = sequencerHeaderCanvas.Height - sequencerHeaderCanvas.Height / heightModifier,
-                Y2 = sequencerHeaderCanvas.Height,
+                StartPoint = new Point(currentPosition, sequencerHeaderCanvas.Height - sequencerHeaderCanvas.Height / heightModifier),
+                EndPoint = new Point(currentPosition, sequencerHeaderCanvas.Height),
                 StrokeThickness = 1,
-                Stroke = new SolidColorBrush(sequencerSettings.LineColour)
+                Stroke = sequencerSettings.LineColour.ToBrush()
             };
 
             elementCache.Add(sequencerLine);
@@ -104,7 +102,7 @@ namespace Sequencer.View.Drawing
 
         private void AddElements()
         {
-            foreach (UIElement uiElement in elementCache)
+            foreach (Avalonia.Controls.Control uiElement in elementCache)
             {
                 sequencerHeaderCanvas.AddChild(uiElement);
             }
@@ -112,7 +110,7 @@ namespace Sequencer.View.Drawing
 
         private void RemoveElements()
         {
-            foreach (UIElement uiElement in elementCache)
+            foreach (Avalonia.Controls.Control uiElement in elementCache)
             {
                 sequencerHeaderCanvas.RemoveChild(uiElement);
             }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
 using Sequencer.View.Command.NotesCommand;
@@ -18,7 +17,7 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
 
             var sequencerNotesMock = new Mock<ISequencerNotes>();
             var keyboardStateMock = new Mock<IKeyboardStateProcessor>();
-            keyboardStateMock.Setup(x => x.IsKeyDown(Key.LeftCtrl)).Returns(true);
+            keyboardStateMock.Setup(x => x.IsCommandModifierDown).Returns(true);
 
             var command = new UpdateNoteStateCommand(sequencerNotesMock.Object, keyboardStateMock.Object, expectedNoteState);
 
@@ -42,7 +41,7 @@ namespace Sequencer.View.Tests.CommandTests.NotesCommandTests
             var sequencerNotesMock = new Mock<ISequencerNotes>();
 
             var keyboardStateMock = new Mock<IKeyboardStateProcessor>();
-            keyboardStateMock.Setup(x => x.IsKeyDown(Key.LeftCtrl)).Returns(false);
+            keyboardStateMock.Setup(x => x.IsCommandModifierDown).Returns(false);
 
             var command = new UpdateNoteStateCommand(sequencerNotesMock.Object, keyboardStateMock.Object, expectedNoteState);
 

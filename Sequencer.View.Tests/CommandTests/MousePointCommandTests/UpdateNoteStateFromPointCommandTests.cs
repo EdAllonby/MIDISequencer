@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
 using Sequencer.View.Command.MousePointCommand;
@@ -22,7 +21,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
         private static Mock<IKeyboardStateProcessor> CreateKeyboardStateProcessorMock(bool isLeftCtrlPressed)
         {
             var keyboardStateProcessorMock = new Mock<IKeyboardStateProcessor>();
-            keyboardStateProcessorMock.Setup(x => x.IsKeyDown(Key.LeftCtrl)).Returns(isLeftCtrlPressed);
+            keyboardStateProcessorMock.Setup(x => x.IsCommandModifierDown).Returns(isLeftCtrlPressed);
             return keyboardStateProcessorMock;
         }
 

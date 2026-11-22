@@ -24,7 +24,7 @@ namespace Sequencer.Domain
         /// <summary>
         /// The velocity value.
         /// </summary>
-        private int Value { get; }
+        public int Value { get; }
 
         /// <summary>
         /// The velocity as a percentage, ranging from 0 to 1.

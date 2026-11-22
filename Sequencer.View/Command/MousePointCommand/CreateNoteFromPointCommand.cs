@@ -47,6 +47,9 @@ namespace Sequencer.View.Command.MousePointCommand
             IVisualNote newNote = visualNoteFactory.CreateNote(pitch, notePosition, defaultEndPosition);
 
             sequencerNotes.AddNote(newNote);
+
+            // The new note starts selected, and the selection display needs to know.
+            sequencerNotes.NoteStateChanged();
         }
     }
 }

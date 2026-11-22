@@ -1,9 +1,9 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Sequencer.Domain;
 
 namespace Sequencer.Visual
 {
-    public interface IVisualNote : IPositionAware
+    public interface IVisualNote : IPositionAware, ISequencedNote
     {
         NoteState NoteState { get; set; }
 
@@ -15,10 +15,6 @@ namespace Sequencer.Visual
 
         [NotNull]
         IPosition EndPosition { [NotNull] get; [NotNull] set; }
-
-
-        [NotNull]
-        Tone Tone { get; }
 
         [NotNull]
         Velocity Velocity { get; set; }

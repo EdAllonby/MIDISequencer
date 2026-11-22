@@ -1,12 +1,16 @@
-﻿using System.Windows;
+using Avalonia;
 
 namespace Sequencer.Visual.Input
 {
-    public struct MousePoint : IMousePoint
+    public readonly struct MousePoint : IMousePoint
     {
         public MousePoint(Point point)
         {
             Point = point;
+        }
+
+        public MousePoint(double x, double y) : this(new Point(x, y))
+        {
         }
 
         public double X => Point.X;

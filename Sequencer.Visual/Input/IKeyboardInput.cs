@@ -1,10 +1,11 @@
-﻿using System.Windows.Input;
+using Avalonia.Input;
 
 namespace Sequencer.Visual.Input
 {
     public interface IKeyboardInput
     {
         Key KeyPress { get; }
-        ModifierKeys Modifiers { get; }
+
+        KeyModifiers Modifiers { get; }
     }
 }

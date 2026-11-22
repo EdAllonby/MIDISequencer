@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using Avalonia.Controls;
 using JetBrains.Annotations;
 
 namespace Sequencer.Visual
@@ -8,7 +8,9 @@ namespace Sequencer.Visual
         double Width { get; }
 
         double Height { get; }
-        void AddChild([NotNull] UIElement child);
-        void RemoveChild([NotNull] UIElement child);
+
+        void AddChild([NotNull] Control child);
+
+        void RemoveChild([NotNull] Control child);
     }
 }

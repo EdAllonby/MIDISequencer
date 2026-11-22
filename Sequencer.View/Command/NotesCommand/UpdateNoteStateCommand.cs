@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Utilities;
@@ -38,7 +37,7 @@ namespace Sequencer.View.Command.NotesCommand
                 }
             }
 
-            if (!keyboardStateProcessor.IsKeyDown(Key.LeftCtrl))
+            if (!keyboardStateProcessor.IsCommandModifierDown)
             {
                 foreach (IVisualNote visualNote in sequencerNotes.FindAllOtherNotes(notesList))
                 {

@@ -1,6 +1,5 @@
-﻿using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
@@ -28,12 +27,12 @@ namespace Sequencer.View.Drawing
             {
                 StrokeThickness = 0.5,
                 Width = IndicatorWidth,
-                Fill = new SolidColorBrush(sequencerSettings.IndicatorColour)
+                Fill = sequencerSettings.IndicatorColour.ToBrush(),
+                ZIndex = int.MaxValue
             };
 
             sequencerCanvas.AddChild(indicator);
 
-            Panel.SetZIndex(indicator, int.MaxValue);
 
             DrawPositionIndicator(CurrentPosition);
         }
@@ -43,7 +42,7 @@ namespace Sequencer.View.Drawing
 
         public void DrawPositionIndicator([NotNull] IPosition position)
         {
-            Log.Info($"New Indicator Position drawing: {position}");
+            Log.Debug($"New Indicator Position drawing: {position}");
 
             indicator.Height = sequencerCanvas.Height;
 

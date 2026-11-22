@@ -1,4 +1,3 @@
-﻿using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.View.Command.NotesCommand;
@@ -75,7 +74,7 @@ namespace Sequencer.View.Command.MousePointCommand
         {
             MoveNotePositions(mousePoint);
 
-            if (!keyboardStateProcessor.IsKeyDown(Key.LeftShift))
+            if (!keyboardStateProcessor.IsShiftDown)
             {
                 MoveNotePitch(mousePoint);
             }

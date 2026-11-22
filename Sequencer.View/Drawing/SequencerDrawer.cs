@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
@@ -16,7 +15,7 @@ namespace Sequencer.View.Drawing
     public sealed class SequencerDrawer
     {
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerDrawer));
-        [NotNull] [ItemNotNull] private readonly List<UIElement> elementCache = new List<UIElement>();
+        [NotNull] [ItemNotNull] private readonly List<Avalonia.Controls.Control> elementCache = new List<Avalonia.Controls.Control>();
         [NotNull] private readonly IDigitalAudioProtocol protocol;
 
         [NotNull] private readonly ISequencerCanvasWrapper sequencerCanvas;
@@ -92,12 +91,10 @@ namespace Sequencer.View.Drawing
         {
             var sequencerLine = new Line
             {
-                X1 = currentBeatPosition,
-                X2 = currentBeatPosition,
-                Y1 = 0,
-                Y2 = sequencerCanvas.Height,
+                StartPoint = new Point(currentBeatPosition, 0),
+                EndPoint = new Point(currentBeatPosition, sequencerCanvas.Height),
                 StrokeThickness = thickness,
-                Stroke = new SolidColorBrush(sequencerSettings.LineColour)
+                Stroke = sequencerSettings.LineColour.ToBrush()
             };
 
             elementCache.Add(sequencerLine);
@@ -105,13 +102,13 @@ namespace Sequencer.View.Drawing
 
         private void DrawNoteLaneBackground(double currentNotePosition, double noteSize, [NotNull] Pitch pitch)
         {
-            Color backgroundColour = pitch.Note.IsAccidental ? sequencerSettings.AccidentalKeyColour : sequencerSettings.KeyColour;
+            System.Drawing.Color backgroundColour = pitch.Note.IsAccidental ? sequencerSettings.AccidentalKeyColour : sequencerSettings.KeyColour;
 
             var noteBackground = new Rectangle
             {
                 Width = sequencerCanvas.Width,
                 Height = noteSize,
-                Fill = new SolidColorBrush(backgroundColour)
+                Fill = backgroundColour.ToBrush()
             };
 
             Canvas.SetLeft(noteBackground, 0);
@@ -124,12 +121,10 @@ namespace Sequencer.View.Drawing
         {
             var sequencerLine = new Line
             {
-                X1 = 0,
-                X2 = sequencerCanvas.Width,
-                Y1 = currentNotePosition,
-                Y2 = currentNotePosition,
+                StartPoint = new Point(0, currentNotePosition),
+                EndPoint = new Point(sequencerCanvas.Width, currentNotePosition),
                 StrokeThickness = thickness,
-                Stroke = new SolidColorBrush(sequencerSettings.LineColour)
+                Stroke = sequencerSettings.LineColour.ToBrush()
             };
 
             elementCache.Add(sequencerLine);
@@ -137,7 +132,7 @@ namespace Sequencer.View.Drawing
 
         private void AddElements()
         {
-            foreach (UIElement uiElement in elementCache)
+            foreach (Avalonia.Controls.Control uiElement in elementCache)
             {
                 sequencerCanvas.AddChild(uiElement);
             }
@@ -145,7 +140,7 @@ namespace Sequencer.View.Drawing
 
         private void RemoveElements()
         {
-            foreach (UIElement uiElement in elementCache)
+            foreach (Avalonia.Controls.Control uiElement in elementCache)
             {
                 sequencerCanvas.RemoveChild(uiElement);
             }

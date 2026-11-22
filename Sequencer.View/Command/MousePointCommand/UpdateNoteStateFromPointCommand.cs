@@ -1,4 +1,3 @@
-﻿using System.Windows.Input;
 using JetBrains.Annotations;
 using Sequencer.Utilities;
 using Sequencer.View.Command.NotesCommand;
@@ -36,7 +35,7 @@ namespace Sequencer.View.Command.MousePointCommand
 
             if (actionableNote != null)
             {
-                if (actionableNote.NoteState == NoteState.Selected && keyboardStateProcessor.IsKeyDown(Key.LeftCtrl))
+                if (actionableNote.NoteState == NoteState.Selected && keyboardStateProcessor.IsCommandModifierDown)
                 {
                     noteStateUnselectedCommand.Execute(actionableNote.Yield());
                 }
@@ -45,7 +44,7 @@ namespace Sequencer.View.Command.MousePointCommand
                     noteStateSelectedCommand.Execute(actionableNote.Yield());
                 }
             }
-            else if (!keyboardStateProcessor.IsKeyDown(Key.LeftCtrl))
+            else if (!keyboardStateProcessor.IsCommandModifierDown)
             {
                 noteStateUnselectedCommand.Execute(sequencerNotes.SelectedNotes);
             }

@@ -1,7 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
@@ -29,25 +28,25 @@ namespace Sequencer.Visual
 
             noteRectangle = new Rectangle
             {
-                Stroke = new SolidColorBrush(sequencerSettings.LineColour),
+                Stroke = sequencerSettings.LineColour.ToBrush(),
                 StrokeThickness = 0.5,
                 RadiusX = 5,
                 RadiusY = 5
             };
 
-            velocityRectangle = new Rectangle { Fill = new SolidColorBrush(sequencerSettings.LineColour) };
+            velocityRectangle = new Rectangle { Fill = sequencerSettings.LineColour.ToBrush() };
 
             sequencer.AddChild(noteRectangle);
             sequencer.AddChild(velocityRectangle);
 
             // We always want the notes to be in the foreground.
-            Panel.SetZIndex(noteRectangle, 99);
-            Panel.SetZIndex(velocityRectangle, 100);
+            noteRectangle.ZIndex = 99;
+            velocityRectangle.ZIndex = 100;
         }
 
         public void DrawNote([NotNull] Pitch pitch, [NotNull] Velocity velocity, [NotNull] IPosition startPosition, [NotNull] IPosition endPosition, NoteState noteState)
         {
-            Log.InfoFormat($"Drawing note Pitch [{pitch}], Velocity [{velocity}] Start Position [{startPosition}] to End Position [{endPosition}]");
+            Log.DebugFormat($"Drawing note Pitch [{pitch}], Velocity [{velocity}] Start Position [{startPosition}] to End Position [{endPosition}]");
 
             double noteHeight = sequencerDimensionsCalculator.NoteHeight;
 
@@ -77,10 +76,10 @@ namespace Sequencer.Visual
             switch (noteState)
             {
                 case NoteState.Selected:
-                    noteRectangle.Fill = new SolidColorBrush(sequencerSettings.SelectedNoteColour);
+                    noteRectangle.Fill = sequencerSettings.SelectedNoteColour.ToBrush();
                     break;
                 case NoteState.Unselected:
-                    noteRectangle.Fill = new SolidColorBrush(sequencerSettings.UnselectedNoteColour);
+                    noteRectangle.Fill = sequencerSettings.UnselectedNoteColour.ToBrush();
                     break;
             }
         }
@@ -89,7 +88,7 @@ namespace Sequencer.Visual
         {
             var noteRect = new Rect(Canvas.GetLeft(noteRectangle), Canvas.GetTop(noteRectangle), noteRectangle.Width, noteRectangle.Height);
 
-            return rectangle.IntersectsWith(noteRect);
+            return rectangle.Intersects(noteRect);
         }
 
         public void RemoveNote()
@@ -107,7 +106,7 @@ namespace Sequencer.Visual
             return newNoteWidth >= 0 ? newNoteWidth : 0;
         }
 
-        private static void SetRectanglePosition([NotNull] UIElement rectangle, double leftPosition, double topPosition)
+        private static void SetRectanglePosition([NotNull] Control rectangle, double leftPosition, double topPosition)
         {
             Canvas.SetLeft(rectangle, leftPosition);
             Canvas.SetTop(rectangle, topPosition);

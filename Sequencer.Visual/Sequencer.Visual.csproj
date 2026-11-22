@@ -1,88 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sequencer.Visual</RootNamespace>
-    <AssemblyName>Sequencer.Visual</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
+
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="WindowsBase" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="log4net" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Input\IKeyboardInput.cs" />
-    <Compile Include="Input\IKeyboardStateProcessor.cs" />
-    <Compile Include="Input\IMouseOperator.cs" />
-    <Compile Include="Input\IMousePoint.cs" />
-    <Compile Include="Input\IMouseStateProcessor.cs" />
-    <Compile Include="Input\KeyboardInput.cs" />
-    <Compile Include="Input\KeyboardStateProcessor.cs" />
-    <Compile Include="Input\MouseOperator.cs" />
-    <Compile Include="Input\MousePoint.cs" />
-    <Compile Include="Input\MouseStateProcessor.cs" />
-    <Compile Include="IPositionAware.cs" />
-    <Compile Include="ISequencerCanvasWrapper.cs" />
-    <Compile Include="ISequencerDimensionsCalculator.cs" />
-    <Compile Include="ISequencerNotes.cs" />
-    <Compile Include="IVisualNote.cs" />
-    <Compile Include="IVisualNoteFactory.cs" />
-    <Compile Include="NoteDrawer.cs" />
-    <Compile Include="NoteState.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SelectedNotesEventArgs.cs" />
-    <Compile Include="SequencerNotes.cs" />
-    <Compile Include="VisualNote.cs" />
-    <Compile Include="VisualNoteFactory.cs" />
+    <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj" />
+    <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj" />
+    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
-      <Project>{2F107EEB-5405-4D9A-A21E-866FBD9E697B}</Project>
-      <Name>Sequencer.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj">
-      <Project>{8ADB7C17-3648-4992-AAD4-C0E6D8B1D23B}</Project>
-      <Name>Sequencer.Midi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
-      <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
-      <Name>Sequencer.Utilities</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:control="using:Sequencer.View.Control"
+        xmlns:radial="using:Sequencer.View.Control.RadialContextMenu"
+        xmlns:vm="using:Sequencer.ViewModel"
+        x:Class="Sequencer.View.Control.MainWindow"
+        x:DataType="vm:SequencerViewModel"
+        Title="Sequencer" Width="1200" Height="500" MinWidth="600" MinHeight="300">
+
+    <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto,300">
+
+        <!-- Editor and transport -->
+        <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*,Auto">
+            <Grid Grid.Row="0">
+                <DockPanel>
+                    <control:SequencerHeaderControl x:Name="Header" DockPanel.Dock="Top" Height="30"
+                                                    CurrentPosition="{Binding CurrentPosition}" />
+                    <ScrollViewer x:Name="EditorScrollViewer"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Focusable="False">
+                        <control:SequencerControl x:Name="Editor" MinHeight="800"
+                                                  NoteAction="{Binding NoteAction}"
+                                                  SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                                  CurrentPosition="{Binding CurrentPosition}" />
+                    </ScrollViewer>
+                </DockPanel>
+
+                <radial:NoteActionRadialContextMenuWrapper x:Name="NoteActionMenu"
+                                                           SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
+                                                           MenuRadius="40" />
+            </Grid>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" Margin="6">
+                <Button Content="▶" Width="36" Focusable="False" Command="{Binding PlaySequencer}" ToolTip.Tip="Play (Space)" />
+                <Button Content="❚❚" Width="36" Focusable="False" Command="{Binding PauseSequencer}" ToolTip.Tip="Pause (Space)" />
+                <Button Content="■" Width="36" Focusable="False" Command="{Binding StopSequencer}" ToolTip.Tip="Stop (Return)" />
+            </StackPanel>
+        </Grid>
+
+        <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" ResizeDirection="Columns" />
+
+        <!-- Note inspector -->
+        <Border Grid.Row="0" Grid.Column="2" Padding="12" Background="#F5F5F5">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Selected note" FontWeight="SemiBold" />
+                <TextBlock Text="Select a single note to see its details."
+                           TextWrapping="Wrap" Foreground="Gray"
+                           IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNull}}" />
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="12"
+                      IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Pitch" Foreground="Gray" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedNote.Pitch, FallbackValue=''}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Velocity" Foreground="Gray" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedNote.Velocity, FallbackValue=''}" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Start" Foreground="Gray" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedNote.Start, FallbackValue=''}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="End" Foreground="Gray" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedNote.End, FallbackValue=''}" TextWrapping="Wrap" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Status bar -->
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Padding="8,4" Background="#EAEAEA">
+            <TextBlock HorizontalAlignment="Right" Text="{Binding Information}" />
+        </Border>
+    </Grid>
+</Window>

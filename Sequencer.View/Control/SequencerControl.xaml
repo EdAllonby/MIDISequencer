@@ -1,7 +1,0 @@
-﻿<Grid x:Class="Sequencer.View.Control.SequencerControl"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:control="clr-namespace:Sequencer.View.Control">
-    <Canvas x:Name="SequencerCanvas" />
-    <control:DragSelectionBox x:Name="DragSelectionBox" />
-</Grid>
