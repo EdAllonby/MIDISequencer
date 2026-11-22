@@ -6,6 +6,8 @@ using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Sequencer.Domain.Arrangement;
+using Track = Sequencer.Domain.Arrangement.Track;
 using Sequencer.Domain.Drums;
 using Sequencer.Domain.Tunes;
 using Avalonia.Controls;
@@ -34,7 +36,13 @@ namespace Sequencer.View.Control
         private readonly SynthViewModel synthViewModel;
         private readonly IDigitalAudioProtocol protocol;
         private readonly SequencerSettings settings;
-        private readonly DrumPattern drumPattern;
+        private readonly Song song;
+        private readonly ArrangementState arrangement;
+        private readonly DrumKitViewModel drumKitViewModel;
+
+        // The note clip open in the piano roll, which plays from the editor's notes until it's closed.
+        [CanBeNull] private NoteClip openNoteClip;
+        [CanBeNull] private DrumPattern openDrumPattern;
 
         // The button that opened the radial menu: right, or left with Ctrl on macOS.
         private MouseButton? contextMenuButton;
@@ -51,7 +59,7 @@ namespace Sequencer.View.Control
             [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IDigitalAudioProtocol protocol,
             [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator,
             [NotNull] SynthViewModel synthViewModel, [NotNull] INotePreviewer notePreviewer,
-            [NotNull] DrumPattern drumPattern, [NotNull] DrumKitViewModel drumKitViewModel)
+            [NotNull] DrumKitViewModel drumKitViewModel, [NotNull] Song song, [NotNull] ArrangementState arrangement)
         {
             InitializeComponent();
 
@@ -60,12 +68,13 @@ namespace Sequencer.View.Control
             this.synthViewModel = synthViewModel;
             this.protocol = protocol;
             this.settings = settings;
-            this.drumPattern = drumPattern;
+            this.song = song;
+            this.arrangement = arrangement;
+            this.drumKitViewModel = drumKitViewModel;
             this.keyboardState = keyboardState;
             this.mouseOperator = mouseOperator;
             DataContext = viewModel;
             SynthPanel.DataContext = synthViewModel;
-            PreviewOnEditBox.DataContext = synthViewModel;
             DrumVolumeRow.DataContext = drumKitViewModel;
 
             Header.Initialise(pitchAndPositionCalculator, protocol, settings);
@@ -78,10 +87,23 @@ namespace Sequencer.View.Control
             BuildTunesMenu();
             BuildLoopsMenu();
 
-            DrumEditor.Pattern = drumPattern;
             DrumEditor.PreviewSound = notePreviewer.PreviewDrum;
             DrumEditor.AuditionSound = notePreviewer.PlayDrum;
-            drumPattern.Changed += (sender, args) => DrumEmptyHint.IsVisible = drumPattern.IsEmpty;
+
+            Arrangement.Initialise(song, arrangement);
+            synthViewModel.PropertyChanged += (sender, args) => Arrangement.InvalidateVisual();
+            Arrangement.CellClicked += (sender, args) => Select(args.Track, args.Section);
+            Arrangement.CellDoubleClicked += (sender, args) => CreateClipAt(args.Track, args.Section);
+            Arrangement.CellContextRequested += (sender, args) => ShowCellMenu(args);
+            Arrangement.MuteToggled += (sender, track) => ToggleMute(track);
+            Arrangement.AddTrackRequested += (sender, kind) => AddTrack(kind);
+            NewClipButton.Click += (sender, args) => CreateClipAt(arrangement.SelectedTrack, arrangement.SelectedSection);
+
+            // Redraw the arrangement's clip miniatures after edits in the piano roll.
+            Editor.PointerReleased += (sender, args) => song.NotifyClipEdited();
+            notes.NotesChanged += (sender, args) => song.NotifyClipEdited();
+
+            Select(song.Tracks.First(), 0);
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -106,6 +128,7 @@ namespace Sequencer.View.Control
         /// </summary>
         internal void RequestTune([NotNull] Tune tune)
         {
+            EnsureClip(TrackKind.Synth);
             int existing = notes.AllNotes.Count();
 
             if (existing == 0)
@@ -122,13 +145,16 @@ namespace Sequencer.View.Control
         /// </summary>
         internal void RequestLoop([NotNull] DrumLoop loop)
         {
-            if (drumPattern.IsEmpty)
+            EnsureClip(TrackKind.Drums);
+            DrumPattern pattern = openDrumPattern;
+
+            if (pattern == null || pattern.IsEmpty)
             {
                 LoadLoop(loop);
                 return;
             }
 
-            ConfirmReplace($"Replace your {drumPattern.HitCount}-hit pattern with {loop.Name}?", LoopsButton, () => LoadLoop(loop));
+            ConfirmReplace($"Replace your {pattern.HitCount}-hit pattern with {loop.Name}?", LoopsButton, () => LoadLoop(loop));
         }
 
         /// <summary>
@@ -141,10 +167,240 @@ namespace Sequencer.View.Control
                 viewModel.StopSequencer.Execute(null);
             }
 
-            drumPattern.CopyFrom(loop.ToPattern());
+            EnsureClip(TrackKind.Drums);
+            openDrumPattern?.CopyFrom(loop.ToPattern());
             viewModel.BeatsPerMinute = loop.BeatsPerMinute;
             viewModel.PlaySequencer.Execute(null);
             Log.Info($"Loaded drum loop {loop.Name}");
+        }
+
+        /// <summary>
+        /// The track and section being edited.
+        /// </summary>
+        [CanBeNull]
+        internal Clip SelectedClip => arrangement.SelectedTrack?.ClipAt(arrangement.SelectedSection);
+
+        /// <summary>
+        /// Opens a cell for editing: its clip in the piano roll or drum grid, and its track's instrument in the
+        /// side panel. In section mode, that section loops.
+        /// </summary>
+        internal void Select([NotNull] Track track, int section)
+        {
+            CloseOpenClip();
+
+            arrangement.SelectedTrack = track;
+            arrangement.SelectedSection = section;
+
+            if (!viewModel.IsSongMode)
+            {
+                arrangement.LoopSection = section;
+            }
+
+            viewModel.IsDrumTrack = track.Kind == TrackKind.Drums;
+            Clip clip = track.ClipAt(section);
+
+            if (track.Kind == TrackKind.Synth)
+            {
+                synthViewModel.Settings = track.Synth;
+                var noteClip = clip as NoteClip;
+                Editor.ReplaceNotes(noteClip?.Tones ?? Array.Empty<Tone>());
+
+                if (noteClip != null)
+                {
+                    // From now on playback reads the editor's notes, so edits are heard straight away.
+                    noteClip.Open(notes as ISequencedNotes ?? throw new InvalidOperationException("The editor's notes can't be played."));
+                    openNoteClip = noteClip;
+                }
+            }
+            else
+            {
+                drumKitViewModel.Settings = track.Drums;
+                openDrumPattern = (clip as DrumClip)?.Pattern;
+
+                if (openDrumPattern != null)
+                {
+                    openDrumPattern.Changed += OnOpenDrumPatternChanged;
+                }
+
+                DrumEditor.Pattern = openDrumPattern;
+                DrumEmptyHint.IsVisible = openDrumPattern?.IsEmpty ?? false;
+            }
+
+            NoClipPanel.IsVisible = clip == null;
+            NoClipTitle.Text = $"No {(track.Kind == TrackKind.Synth ? "synth" : "drum")} clip in section {section + 1}";
+            Header.FirstBarNumber = section * 4 + 1;
+            ClipColour.Fill = new SolidColorBrush(ArrangementControl.TrackColours[track.ColourIndex % ArrangementControl.TrackColours.Length]);
+            ClipTitle.Text = track.Name;
+            ClipDetail.Text = clip == null ? $"section {section + 1} · empty" : $"clip {clip.Name} · bars {section * 4 + 1}–{section * 4 + 4}";
+            UpdateEmptyHint();
+            Arrangement.InvalidateVisual();
+        }
+
+        /// <summary>
+        /// Makes a new, empty clip in a cell and opens it.
+        /// </summary>
+        internal void CreateClipAt([CanBeNull] Track track, int section)
+        {
+            if (track == null)
+            {
+                return;
+            }
+
+            CloseOpenClip();
+            song.Place(track, section, song.CreateClip(track));
+            Select(track, section);
+        }
+
+        /// <summary>
+        /// Repeats the selected clip in the next section (the same clip, so editing either changes both).
+        /// </summary>
+        internal void RepeatSelectedClip()
+        {
+            Track track = arrangement.SelectedTrack;
+            Clip clip = SelectedClip;
+            int next = arrangement.SelectedSection + 1;
+
+            if (track == null || clip == null || next >= song.SectionCount)
+            {
+                return;
+            }
+
+            CloseOpenClip();
+            song.Place(track, next, clip);
+            Select(track, next);
+        }
+
+        internal void AddTrack(TrackKind kind)
+        {
+            if (song.Tracks.Count >= Song.MaximumTracks)
+            {
+                return;
+            }
+
+            Track track = song.AddTrack(kind);
+            song.Place(track, arrangement.SelectedSection, song.CreateClip(track));
+            Select(track, arrangement.SelectedSection);
+        }
+
+        internal void ToggleMute([NotNull] Track track)
+        {
+            track.IsMuted = !track.IsMuted;
+            Arrangement.InvalidateVisual();
+        }
+
+        /// <summary>
+        /// The menu for a cell: repeat or copy its clip into the next section, reuse another of the track's
+        /// clips, or clear it.
+        /// </summary>
+        private void ShowCellMenu([NotNull] CellEventArgs cell)
+        {
+            Clip clip = cell.Track.ClipAt(cell.Section);
+            bool hasNext = cell.Section + 1 < song.SectionCount;
+            string command = OperatingSystem.IsMacOS() ? "⌘D" : "Ctrl+D";
+            var menu = new ContextMenu();
+
+            if (clip == null)
+            {
+                menu.Items.Add(MenuItem("New clip", () => CreateClipAt(cell.Track, cell.Section)));
+            }
+            else
+            {
+                menu.Items.Add(MenuItem($"Repeat in next section ({command})", RepeatSelectedClip, hasNext,
+                    "Plays the same clip again; editing either changes both"));
+                menu.Items.Add(MenuItem("Copy to next section", () =>
+                {
+                    CloseOpenClip();
+                    song.Place(cell.Track, cell.Section + 1, song.CopyClip(clip));
+                    Select(cell.Track, cell.Section + 1);
+                }, hasNext, "A new clip with the same notes, to change separately"));
+            }
+
+            List<Clip> others = cell.Track.Clips.Where(other => other != clip).ToList();
+
+            if (others.Count > 0)
+            {
+                var use = new MenuItem { Header = "Use clip" };
+
+                foreach (Clip other in others)
+                {
+                    use.Items.Add(MenuItem($"Clip {other.Name}", () =>
+                    {
+                        CloseOpenClip();
+                        song.Place(cell.Track, cell.Section, other);
+                        Select(cell.Track, cell.Section);
+                    }));
+                }
+
+                menu.Items.Add(use);
+            }
+
+            if (clip != null)
+            {
+                menu.Items.Add(new Separator());
+                menu.Items.Add(MenuItem("Remove from section", () =>
+                {
+                    CloseOpenClip();
+                    song.Place(cell.Track, cell.Section, null);
+                    Select(cell.Track, cell.Section);
+                }));
+            }
+
+            menu.Open(Arrangement);
+        }
+
+        [NotNull]
+        private static MenuItem MenuItem([NotNull] string header, [NotNull] Action action, bool enabled = true, [CanBeNull] string tip = null)
+        {
+            var item = new MenuItem { Header = header, IsEnabled = enabled };
+            item.Click += (sender, args) => action();
+
+            if (tip != null)
+            {
+                ToolTip.SetTip(item, tip);
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// Makes sure the selected cell has a clip of the given kind, selecting the first such track if needed.
+        /// </summary>
+        private void EnsureClip(TrackKind kind)
+        {
+            Track track = arrangement.SelectedTrack?.Kind == kind ? arrangement.SelectedTrack : song.Tracks.FirstOrDefault(t => t.Kind == kind);
+
+            if (track == null)
+            {
+                return;
+            }
+
+            if (track != arrangement.SelectedTrack)
+            {
+                Select(track, arrangement.SelectedSection);
+            }
+
+            if (SelectedClip == null)
+            {
+                CreateClipAt(track, arrangement.SelectedSection);
+            }
+        }
+
+        private void CloseOpenClip()
+        {
+            openNoteClip?.Close();
+            openNoteClip = null;
+
+            if (openDrumPattern != null)
+            {
+                openDrumPattern.Changed -= OnOpenDrumPatternChanged;
+                openDrumPattern = null;
+            }
+        }
+
+        private void OnOpenDrumPatternChanged(object sender, EventArgs e)
+        {
+            DrumEmptyHint.IsVisible = openDrumPattern?.IsEmpty ?? false;
+            song.NotifyClipEdited();
         }
 
         /// <summary>
@@ -291,6 +547,12 @@ namespace Sequencer.View.Control
                 UpdatePlayingKeys();
             }
 
+            if (e.PropertyName == nameof(SequencerViewModel.SongTick) || e.PropertyName == nameof(SequencerViewModel.SequencerPlayState))
+            {
+                // The arrangement's playhead shows while playing or paused, not when stopped.
+                Arrangement.PlayheadTick = viewModel.SequencerPlayState == PlayState.Stop ? -1 : viewModel.SongTick;
+            }
+
             if (e.PropertyName == nameof(SequencerViewModel.NoteAction) || e.PropertyName == nameof(SequencerViewModel.IsDrumTrack))
             {
                 UpdateEmptyHint();
@@ -302,7 +564,7 @@ namespace Sequencer.View.Control
         /// </summary>
         private void UpdateEmptyHint()
         {
-            EmptyHint.IsVisible = viewModel.IsSynthTrack && viewModel.IsDrawTool && !notes.AllNotes.Any();
+            EmptyHint.IsVisible = viewModel.IsSynthTrack && viewModel.IsDrawTool && SelectedClip != null && !notes.AllNotes.Any();
         }
 
         /// <summary>
@@ -424,7 +686,12 @@ namespace Sequencer.View.Control
                 return;
             }
 
-            if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Space)
+            if (e.Key == Key.D && e.KeyModifiers == keyboardState.CommandModifier)
+            {
+                RepeatSelectedClip();
+                e.Handled = true;
+            }
+            else if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.Space)
             {
                 viewModel.ToggleSequencer.Execute(null);
                 e.Handled = true;

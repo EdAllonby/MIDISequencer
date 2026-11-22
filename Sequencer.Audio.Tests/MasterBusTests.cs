@@ -122,13 +122,11 @@ namespace Sequencer.Audio.Tests
         [Test]
         public void MasterVolume_GlidesToANewValue()
         {
-            double volume = 1.0;
-            var settings = new Mock<IAudioSettings>();
-            settings.Setup(x => x.MasterVolume).Returns(() => volume);
-            var master = new MasterVolumeSampleProvider(new TestSignal(_ => 1.0), settings.Object);
+            var settings = new MixerSettings { MasterVolume = 1.0 };
+            var master = new MasterVolumeSampleProvider(new TestSignal(_ => 1.0), settings);
             Render(master, 1000);
 
-            volume = 0.0;
+            settings.MasterVolume = 0.0;
             float[] afterChange = Render(master, SampleRate / 10);
 
             Assert.That(afterChange.Take(20).Max(Math.Abs), Is.GreaterThan(0.01f), "Not cut off instantly.");

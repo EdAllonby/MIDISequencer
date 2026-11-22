@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using Sequencer.Domain;
+using Sequencer.Domain.Arrangement;
 using Sequencer.Domain.Drums;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
@@ -12,8 +13,9 @@ using Sequencer.Midi;
 namespace Sequencer.Audio
 {
     /// <summary>
-    /// Turns clock ticks into note-on and note-off events. Every sounding note is a voice in a single
-    /// mixer, which plays through one output stream.
+    /// Plays the song: on each clock tick, works out which section is playing and starts and stops each
+    /// track's notes and drum hits with that track's instrument. Every sound is a voice in one mixer, which
+    /// plays through one output stream.
     /// </summary>
     [UsedImplicitly]
     public sealed class SequencerPlayer : IDisposable
@@ -23,40 +25,39 @@ namespace Sequencer.Audio
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly MixingSampleProvider mixer;
         [NotNull] private readonly IAudioOutput output;
-        [NotNull] private readonly ISequencedNotes sequencedNotes;
         [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
         [NotNull] private readonly ITickCalculator tickCalculator;
-        [NotNull] private readonly DrumPattern drumPattern;
-        [NotNull] private readonly DrumKitSettings drumKit;
+        [NotNull] private readonly Song song;
+        [NotNull] private readonly ArrangementState state;
         private readonly int sampleRate;
-
-        // The open hi-hat still ringing, so the next closed or open hat can cut it off.
-        [CanBeNull] private DrumVoice ringingOpenHat;
         private readonly int previewSamples;
 
-        // Ticks arrive on the clock thread; Stopped can be raised from the UI thread.
+        // Ticks arrive on the clock thread; Stopped and mute changes can come from the UI thread.
         [NotNull] private readonly object voicesLock = new object();
-        [NotNull] private readonly Dictionary<ISequencedNote, ISignalProvider> voices = new Dictionary<ISequencedNote, ISignalProvider>();
+        [NotNull] private readonly Dictionary<ISequencedNote, SoundingNote> voices = new Dictionary<ISequencedNote, SoundingNote>();
+
+        // Each drum track's open hi-hat still ringing, so its next hat can cut it off.
+        [NotNull] private readonly Dictionary<Track, DrumVoice> ringingOpenHats = new Dictionary<Track, DrumVoice>();
         private volatile bool isRunning;
 
-        public SequencerPlayer([NotNull] ISignalProviderFactory signalProviderFactory, [NotNull] ISequencedNotes sequencedNotes,
-            [NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IAudioSettings audioSettings,
-            [NotNull] IAudioOutput output, [NotNull] DrumPattern drumPattern, [NotNull] DrumKitSettings drumKit)
+        public SequencerPlayer([NotNull] ISignalProviderFactory signalProviderFactory, [NotNull] Song song, [NotNull] ArrangementState state,
+            [NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] MixerSettings mixerSettings,
+            [NotNull] IAudioOutput output)
         {
-            this.drumPattern = drumPattern;
-            this.drumKit = drumKit;
-            sampleRate = audioSettings.SampleRate;
             this.signalProviderFactory = signalProviderFactory;
-            this.sequencedNotes = sequencedNotes;
+            this.song = song;
+            this.state = state;
             this.clock = clock;
             this.tickCalculator = tickCalculator;
             this.output = output;
-            previewSamples = (int) (PreviewSeconds * audioSettings.SampleRate);
+            sampleRate = mixerSettings.SampleRate;
+            previewSamples = (int) (PreviewSeconds * sampleRate);
 
-            // ReadFully keeps the stream running with silence when no notes are playing.
-            mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(audioSettings.SampleRate, 1)) { ReadFully = true };
+            // ReadFully keeps the stream running with silence when nothing is playing.
+            mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, 1)) { ReadFully = true };
+
             // Master volume, then a limiter so overlapping notes can never clip.
-            output.Play(new LimiterSampleProvider(new MasterVolumeSampleProvider(mixer, audioSettings)));
+            output.Play(new LimiterSampleProvider(new MasterVolumeSampleProvider(mixer, mixerSettings)));
 
             clock.Tick += OnTick;
             clock.Started += OnClockStarted;
@@ -64,31 +65,46 @@ namespace Sequencer.Audio
         }
 
         /// <summary>
-        /// The number of notes currently sounding, including ones in their release stage.
+        /// The number of sounds playing, including notes in their release stage and drum hits.
         /// </summary>
         public int ActiveVoiceCount => mixer.MixerInputs.Count();
 
         /// <summary>
-        /// Plays a short, self-releasing note alongside whatever is playing. Safe to call from the UI thread.
+        /// Ticks in one four-bar section.
         /// </summary>
-        public void Preview([NotNull] Tone tone)
+        public int TicksPerSection => Math.Max(1, clock.TicksPerQuarterNote * 16);
+
+        private int TicksPerSixteenth => Math.Max(1, clock.TicksPerQuarterNote / 4);
+
+        /// <summary>
+        /// Plays a short, self-releasing note on a track's instrument. Safe to call from the UI thread.
+        /// </summary>
+        public void Preview([NotNull] Tone tone, [NotNull] Track track)
         {
-            ISignalProvider voice = signalProviderFactory.CreateSignalProvider(new PreviewNote(tone));
+            ISignalProvider voice = CreateVoice(tone, track);
             voice.NoteOn();
             voice.ReleaseAfter(previewSamples);
             mixer.AddMixerInput(voice);
         }
 
         /// <summary>
-        /// Starts a note that plays until the returned handle is disposed. Safe to call from the UI thread.
+        /// Starts a note on a track's instrument that plays until the returned handle is disposed.
         /// </summary>
         [NotNull]
-        public IDisposable Hold([NotNull] Tone tone)
+        public IDisposable Hold([NotNull] Tone tone, [NotNull] Track track)
         {
-            ISignalProvider voice = signalProviderFactory.CreateSignalProvider(new PreviewNote(tone));
+            ISignalProvider voice = CreateVoice(tone, track);
             voice.NoteOn();
             mixer.AddMixerInput(voice);
             return new HeldNote(voice);
+        }
+
+        /// <summary>
+        /// Plays one drum hit on a drum track's kit now. Safe to call from the UI thread.
+        /// </summary>
+        public void PreviewDrum(DrumSound sound, byte velocity, [NotNull] Track track)
+        {
+            PlayDrum(sound, velocity, track);
         }
 
         public void Dispose()
@@ -107,7 +123,7 @@ namespace Sequencer.Audio
         private void OnClockStopped(object sender, EventArgs e)
         {
             isRunning = false;
-            ReleaseAllNotes();
+            ReleaseNotes(voice => true);
         }
 
         private void OnTick(object sender, [NotNull] TickEventArgs e)
@@ -118,67 +134,43 @@ namespace Sequencer.Audio
                 return;
             }
 
-            if (e.CurrentTick == 0)
+            int section = state.Mode == PlaybackMode.Song ? e.CurrentTick / TicksPerSection : state.LoopSection;
+            int tickInSection = e.CurrentTick % TicksPerSection;
+
+            if (tickInSection == 0)
             {
-                // The loop has wrapped. A note ending exactly at the end of the sequence never sees its
-                // ending tick, because that tick is reported as 0, so release everything still sounding.
-                ReleaseAllNotes();
+                // A new section (or the loop wrapped). Notes never cross a section, and one ending exactly at its
+                // end never sees its ending tick (that tick is the next section's 0), so release everything.
+                ReleaseNotes(voice => true);
             }
 
-            IPosition currentPosition = tickCalculator.CalculatePositionFromTick(e.CurrentTick);
+            IPosition position = tickCalculator.CalculatePositionFromTick(tickInSection);
+            bool onSixteenth = tickInSection % TicksPerSixteenth == 0;
 
-            StartNotes(currentPosition);
-            ReleaseNotes(currentPosition);
-
-            int ticksPerSixteenth = Math.Max(1, clock.TicksPerQuarterNote / 4);
-
-            if (e.CurrentTick % ticksPerSixteenth == 0)
+            foreach (Track track in song.Tracks)
             {
-                TriggerDrums(e.CurrentTick / ticksPerSixteenth % DrumPattern.StepCount);
-            }
-        }
-
-        /// <summary>
-        /// Plays every drum hit on this step.
-        /// </summary>
-        private void TriggerDrums(int step)
-        {
-            foreach (DrumSound sound in DrumPattern.AllSounds)
-            {
-                byte velocity = drumPattern.VelocityAt(sound, step);
-
-                if (velocity > 0)
+                if (track.IsMuted)
                 {
-                    PlayDrum(sound, velocity);
+                    ReleaseNotes(voice => voice.Track == track);
+                    continue;
+                }
+
+                switch (track.ClipAt(section))
+                {
+                    case NoteClip notes:
+                        StartNotes(notes, position, track);
+                        ReleaseEndingNotes(notes, position);
+                        break;
+                    case DrumClip drums when onSixteenth:
+                        TriggerDrums(drums.Pattern, tickInSection / TicksPerSixteenth % DrumPattern.StepCount, track);
+                        break;
                 }
             }
         }
 
-        /// <summary>
-        /// Plays one drum hit now, alongside whatever is playing. Safe to call from the UI thread.
-        /// </summary>
-        public void PreviewDrum(DrumSound sound, byte velocity)
+        private void StartNotes([NotNull] ISequencedNotes notes, [NotNull] IPosition position, [NotNull] Track track)
         {
-            PlayDrum(sound, velocity);
-        }
-
-        private void PlayDrum(DrumSound sound, byte velocity)
-        {
-            var voice = new DrumVoice(sound, velocity, sampleRate, (float) drumKit.Volume);
-
-            // On a drum machine the hi-hats share one voice: a new hat cuts off an open one still ringing.
-            if (sound == DrumSound.ClosedHat || sound == DrumSound.OpenHat)
-            {
-                ringingOpenHat?.Choke();
-                ringingOpenHat = sound == DrumSound.OpenHat ? voice : null;
-            }
-
-            mixer.AddMixerInput(voice);
-        }
-
-        private void StartNotes([NotNull] IPosition currentPosition)
-        {
-            foreach (ISequencedNote note in sequencedNotes.FindNotesFromStartingPosition(currentPosition))
+            foreach (ISequencedNote note in notes.FindNotesFromStartingPosition(position))
             {
                 lock (voicesLock)
                 {
@@ -187,46 +179,100 @@ namespace Sequencer.Audio
                         continue;
                     }
 
-                    ISignalProvider voice = signalProviderFactory.CreateSignalProvider(note);
+                    ISignalProvider voice = CreateVoice(note.Tone, track);
                     voice.NoteOn();
-                    voices.Add(note, voice);
+                    voices.Add(note, new SoundingNote(voice, track));
                     mixer.AddMixerInput(voice);
                 }
             }
         }
 
-        private void ReleaseNotes([NotNull] IPosition currentPosition)
+        private void ReleaseEndingNotes([NotNull] ISequencedNotes notes, [NotNull] IPosition position)
         {
-            foreach (ISequencedNote note in sequencedNotes.FindNotesFromEndingPosition(currentPosition))
+            foreach (ISequencedNote note in notes.FindNotesFromEndingPosition(position))
             {
-                ReleaseNote(note);
+                lock (voicesLock)
+                {
+                    if (voices.TryGetValue(note, out SoundingNote sounding))
+                    {
+                        // The voice stays in the mixer through its release stage and removes itself once silent.
+                        sounding.Voice.NoteOff();
+                        voices.Remove(note);
+                    }
+                }
             }
         }
 
-        private void ReleaseAllNotes()
+        private void ReleaseNotes([NotNull] Func<SoundingNote, bool> which)
         {
             lock (voicesLock)
             {
-                foreach (ISignalProvider voice in voices.Values)
+                foreach (KeyValuePair<ISequencedNote, SoundingNote> sounding in voices.Where(pair => which(pair.Value)).ToList())
                 {
-                    voice.NoteOff();
+                    sounding.Value.Voice.NoteOff();
+                    voices.Remove(sounding.Key);
                 }
-
-                voices.Clear();
             }
         }
 
-        private void ReleaseNote([NotNull] ISequencedNote note)
+        private void TriggerDrums([NotNull] DrumPattern pattern, int step, [NotNull] Track track)
         {
-            lock (voicesLock)
+            foreach (DrumSound sound in DrumPattern.AllSounds)
             {
-                if (voices.TryGetValue(note, out ISignalProvider voice))
+                byte velocity = pattern.VelocityAt(sound, step);
+
+                if (velocity > 0)
                 {
-                    // The voice stays in the mixer through its release stage and removes itself once silent.
-                    voice.NoteOff();
-                    voices.Remove(note);
+                    PlayDrum(sound, velocity, track);
                 }
             }
+        }
+
+        private void PlayDrum(DrumSound sound, byte velocity, [NotNull] Track track)
+        {
+            var voice = new DrumVoice(sound, velocity, sampleRate, (float) (track.Drums?.Volume ?? 1));
+
+            // On a drum machine the hi-hats share one voice: a new hat cuts off an open one still ringing.
+            if (sound == DrumSound.ClosedHat || sound == DrumSound.OpenHat)
+            {
+                lock (ringingOpenHats)
+                {
+                    if (ringingOpenHats.TryGetValue(track, out DrumVoice ringing))
+                    {
+                        ringing.Choke();
+                        ringingOpenHats.Remove(track);
+                    }
+
+                    if (sound == DrumSound.OpenHat)
+                    {
+                        ringingOpenHats[track] = voice;
+                    }
+                }
+            }
+
+            mixer.AddMixerInput(voice);
+        }
+
+        [NotNull]
+        private ISignalProvider CreateVoice([NotNull] Tone tone, [NotNull] Track track)
+        {
+            IAudioSettings instrument = track.Synth ?? throw new ArgumentException($"{track.Name} has no synth.", nameof(track));
+            return signalProviderFactory.CreateSignalProvider(new PreviewNote(tone), instrument);
+        }
+
+        private readonly struct SoundingNote
+        {
+            public SoundingNote([NotNull] ISignalProvider voice, [NotNull] Track track)
+            {
+                Voice = voice;
+                Track = track;
+            }
+
+            [NotNull]
+            public ISignalProvider Voice { get; }
+
+            [NotNull]
+            public Track Track { get; }
         }
 
         private sealed class HeldNote : IDisposable

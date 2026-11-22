@@ -5,6 +5,8 @@ using Moq;
 using NAudio.Wave;
 using NUnit.Framework;
 using Sequencer.Domain;
+using Sequencer.Domain.Arrangement;
+using Sequencer.Domain.Drums;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
 
@@ -14,52 +16,51 @@ namespace Sequencer.Audio.Tests
     public class SequencerPlayerTests
     {
         private const int SampleRate = 44100;
+        private const int TicksPerSixteenth = 24;
+        private const int TicksPerSection = 1536;
 
         private Mock<ISequencerClock> clock;
-        private Mock<ISequencedNotes> notes;
         private Mock<IAudioOutput> output;
-        private Mock<ITickCalculator> tickCalculator;
-        private Dictionary<ISequencedNote, FakeVoice> voices;
+        private Song song;
+        private ArrangementState state;
+        private MixerSettings mixer;
+        private Track synth;
+        private Track drums;
+        private NoteClip melody;
+        private DrumClip beat;
+        private List<(Tone Tone, IAudioSettings Instrument, FakeVoice Voice)> created;
         private SequencerPlayer player;
-        private Domain.Drums.DrumPattern drums;
         private ISampleProvider playedSource;
-        private double masterVolume = 1.0;
-
-        private readonly IPosition start = new Position(1, 1, 1);
-        private readonly IPosition end = new Position(1, 2, 1);
+        private TickCalculator ticks;
 
         [SetUp]
         public void SetUp()
         {
             clock = new Mock<ISequencerClock>();
-            notes = new Mock<ISequencedNotes>();
+            clock.Setup(x => x.TicksPerQuarterNote).Returns(96);
             output = new Mock<IAudioOutput>();
             output.Setup(x => x.Play(It.IsAny<ISampleProvider>())).Callback<ISampleProvider>(source => playedSource = source);
-            voices = new Dictionary<ISequencedNote, FakeVoice>();
-
-            notes.Setup(x => x.FindNotesFromStartingPosition(It.IsAny<IPosition>())).Returns(Array.Empty<ISequencedNote>());
-            notes.Setup(x => x.FindNotesFromEndingPosition(It.IsAny<IPosition>())).Returns(Array.Empty<ISequencedNote>());
+            created = new List<(Tone, IAudioSettings, FakeVoice)>();
 
             var factory = new Mock<ISignalProviderFactory>();
-            factory.Setup(x => x.CreateSignalProvider(It.IsAny<ISequencedNote>())).Returns<ISequencedNote>(note =>
-            {
-                var voice = new FakeVoice();
-                voices[note] = voice;
-                return voice;
-            });
+            factory.Setup(x => x.CreateSignalProvider(It.IsAny<ISequencedNote>(), It.IsAny<IAudioSettings>()))
+                .Returns<ISequencedNote, IAudioSettings>((note, instrument) =>
+                {
+                    var voice = new FakeVoice();
+                    created.Add((note.Tone, instrument, voice));
+                    return voice;
+                });
 
-            // Tick 0 is the start position, tick 1 the end position.
-            tickCalculator = new Mock<ITickCalculator>();
-            tickCalculator.Setup(x => x.CalculatePositionFromTick(0)).Returns(start);
-            tickCalculator.Setup(x => x.CalculatePositionFromTick(1)).Returns(end);
+            song = Song.CreateDefault();
+            synth = song.Tracks.Single(t => t.Kind == TrackKind.Synth);
+            drums = song.Tracks.Single(t => t.Kind == TrackKind.Drums);
+            melody = (NoteClip) synth.ClipAt(0);
+            beat = (DrumClip) drums.ClipAt(0);
+            state = new ArrangementState();
+            mixer = new MixerSettings();
+            ticks = new TickCalculator(new SequencerSettings());
 
-            var audioSettings = new Mock<IAudioSettings>();
-            audioSettings.Setup(x => x.SampleRate).Returns(SampleRate);
-            audioSettings.Setup(x => x.MasterVolume).Returns(() => masterVolume);
-
-            drums = new Domain.Drums.DrumPattern();
-            player = new SequencerPlayer(factory.Object, notes.Object, clock.Object, tickCalculator.Object, audioSettings.Object, output.Object,
-                drums, new Domain.Drums.DrumKitSettings());
+            player = new SequencerPlayer(factory.Object, song, state, clock.Object, ticks, mixer, output.Object);
         }
 
         [TearDown]
@@ -68,19 +69,20 @@ namespace Sequencer.Audio.Tests
             player.Dispose();
         }
 
-        private ISequencedNote AddNote()
-        {
-            var note = new Mock<ISequencedNote>().Object;
-            notes.Setup(x => x.FindNotesFromStartingPosition(start)).Returns(new[] { note });
-            notes.Setup(x => x.FindNotesFromEndingPosition(end)).Returns(new[] { note });
-            return note;
-        }
+        private Tone ToneAt(int startSixteenth, int lengthSixteenths, Note note = null) =>
+            new Tone(new Pitch(note ?? Note.C, 5), new Velocity(100),
+                ticks.CalculatePositionFromTick(startSixteenth * TicksPerSixteenth),
+                ticks.CalculatePositionFromTick((startSixteenth + lengthSixteenths) * TicksPerSixteenth));
+
+        private FakeVoice VoiceFor(Tone tone) => created.Single(c => c.Tone == tone).Voice;
 
         private void RaiseStarted() => clock.Raise(x => x.Started += null, EventArgs.Empty);
 
         private void RaiseStopped() => clock.Raise(x => x.Stopped += null, EventArgs.Empty);
 
         private void RaiseTick(int tick) => clock.Raise(x => x.Tick += null, new TickEventArgs(tick));
+
+        private void RaiseSixteenth(int sixteenth) => RaiseTick(sixteenth * TicksPerSixteenth);
 
         [Test]
         public void Constructor_StartsTheOutputWithOneMixedStream()
@@ -90,87 +92,79 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
-        public void Tick_AtNoteStart_StartsTheNote()
+        public void ANote_StartsAndReleasesOnItsTicks()
         {
-            ISequencedNote note = AddNote();
+            Tone tone = ToneAt(2, 4);
+            melody.SetTones(new[] { tone });
             RaiseStarted();
 
-            RaiseTick(0);
+            RaiseSixteenth(2);
+            Assert.That(VoiceFor(tone).NoteOnCount, Is.EqualTo(1));
 
-            Assert.That(voices[note].NoteOnCount, Is.EqualTo(1));
-            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
+            RaiseSixteenth(6);
+            Assert.That(VoiceFor(tone).NoteOffCount, Is.EqualTo(1));
         }
 
         [Test]
-        public void Tick_AtNoteEnd_ReleasesTheNote()
-        {
-            ISequencedNote note = AddNote();
-            RaiseStarted();
-            RaiseTick(0);
-
-            RaiseTick(1);
-
-            Assert.That(voices[note].NoteOffCount, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void Tick_WhenClockIsNotRunning_DoesNotStartNotes()
+        public void NotesAndDrums_DoNotPlayWhenStopped()
         {
             // Stop and Pause raise a tick to update the position display.
-            AddNote();
+            melody.SetTones(new[] { ToneAt(0, 1) });
+            beat.Pattern.SetVelocity(DrumSound.Kick, 0, 96);
 
             RaiseTick(0);
 
-            Assert.That(voices, Is.Empty);
+            Assert.That(created, Is.Empty);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(0));
         }
 
         [Test]
-        public void Tick_ForANoteAlreadySounding_DoesNotStartItAgain()
+        public void ANoteAlreadySounding_IsNotStartedAgain()
         {
-            // Tick 0 means the loop wrapped, so use a later tick that also maps to the note's start.
-            AddNote();
-            tickCalculator.Setup(x => x.CalculatePositionFromTick(2)).Returns(start);
+            melody.SetTones(new[] { ToneAt(2, 4) });
             RaiseStarted();
 
-            RaiseTick(2);
-            RaiseTick(2);
+            RaiseSixteenth(2);
+            RaiseSixteenth(2);
 
-            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
+            Assert.That(created.Count, Is.EqualTo(1));
         }
 
         [Test]
         public void Stopped_ReleasesSoundingNotes()
         {
-            ISequencedNote note = AddNote();
+            Tone tone = ToneAt(0, 8);
+            melody.SetTones(new[] { tone });
             RaiseStarted();
             RaiseTick(0);
 
             RaiseStopped();
 
-            Assert.That(voices[note].NoteOffCount, Is.EqualTo(1));
+            Assert.That(VoiceFor(tone).NoteOffCount, Is.EqualTo(1));
         }
 
         [Test]
-        public void Tick_AtLoopStart_ReleasesNotesStillSounding()
+        public void TheStartOfASection_ReleasesNotesStillSounding()
         {
-            var longNote = new Mock<ISequencedNote>().Object;
-            notes.Setup(x => x.FindNotesFromStartingPosition(end)).Returns(new[] { longNote });
+            // A note ending at the end of the section is reported as tick 0 of the next.
+            Tone tone = ToneAt(60, 4);
+            melody.SetTones(new[] { tone });
             RaiseStarted();
-            RaiseTick(1);
+            RaiseSixteenth(60);
 
-            // The note ends at the end of the sequence, which is reported as tick 0 of the next loop.
             RaiseTick(0);
 
-            Assert.That(voices[longNote].NoteOffCount, Is.EqualTo(1));
+            Assert.That(VoiceFor(tone).NoteOffCount, Is.EqualTo(1));
         }
 
         [Test]
         public void FinishedVoices_AreRemovedFromTheMixer()
         {
-            ISequencedNote note = AddNote();
+            Tone tone = ToneAt(0, 1);
+            melody.SetTones(new[] { tone });
             RaiseStarted();
             RaiseTick(0);
-            voices[note].Finished = true;
+            VoiceFor(tone).Finished = true;
 
             playedSource.Read(new float[64]);
 
@@ -180,11 +174,12 @@ namespace Sequencer.Audio.Tests
         [Test]
         public void Output_IsScaledByTheMasterVolume()
         {
-            ISequencedNote note = AddNote();
+            Tone tone = ToneAt(0, 4);
+            melody.SetTones(new[] { tone });
             RaiseStarted();
             RaiseTick(0);
-            voices[note].Level = 0.8f;
-            masterVolume = 0.5;
+            VoiceFor(tone).Level = 0.8f;
+            mixer.MasterVolume = 0.5;
 
             var buffer = new float[16];
             playedSource.Read(buffer);
@@ -193,83 +188,114 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
-        public void Preview_PlaysAShortSelfReleasingNote()
+        public void Notes_UseTheirTracksInstrument()
         {
-            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+            Track second = song.AddTrack(TrackKind.Synth);
+            var secondClip = (NoteClip) song.CreateClip(second);
+            song.Place(second, 0, secondClip);
+            Tone first = ToneAt(0, 1);
+            Tone other = ToneAt(0, 1, Note.E);
+            melody.SetTones(new[] { first });
+            secondClip.SetTones(new[] { other });
+            RaiseStarted();
 
-            player.Preview(tone);
+            RaiseTick(0);
 
-            FakeVoice voice = voices.Values.Single();
-            Assert.That(voice.NoteOnCount, Is.EqualTo(1));
-            Assert.That(voice.ReleaseAfterSamples, Is.EqualTo((int) (0.15 * SampleRate)));
-            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
+            Assert.That(created.Single(c => c.Tone == first).Instrument, Is.SameAs(synth.Synth));
+            Assert.That(created.Single(c => c.Tone == other).Instrument, Is.SameAs(second.Synth));
         }
 
         [Test]
-        public void Hold_PlaysUntilTheHandleIsDisposed()
+        public void SongMode_PlaysEachSectionsClipsInTurn()
         {
-            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+            var later = (NoteClip) song.CreateClip(synth);
+            song.Place(synth, 1, later);
+            Tone inFirst = ToneAt(0, 1);
+            Tone inSecond = ToneAt(0, 1, Note.G);
+            melody.SetTones(new[] { inFirst });
+            later.SetTones(new[] { inSecond });
+            state.Mode = PlaybackMode.Song;
+            RaiseStarted();
 
-            IDisposable held = player.Hold(tone);
-            FakeVoice voice = voices.Values.Single();
-            Assert.That(voice.NoteOnCount, Is.EqualTo(1));
-            Assert.That(voice.ReleaseAfterSamples, Is.Null, "Held notes do not release by themselves.");
-            Assert.That(voice.NoteOffCount, Is.EqualTo(0));
+            RaiseTick(0);
+            Assert.That(created.Select(c => c.Tone), Is.EqualTo(new[] { inFirst }));
 
-            held.Dispose();
-
-            Assert.That(voice.NoteOffCount, Is.EqualTo(1));
+            RaiseTick(TicksPerSection);
+            Assert.That(created.Select(c => c.Tone), Is.EqualTo(new[] { inFirst, inSecond }));
         }
 
         [Test]
-        public void NotePreviewer_HoldPlaysEvenWithPreviewsSwitchedOff()
+        public void SectionMode_LoopsTheChosenSection()
         {
-            var previewer = new NotePreviewer(player, new SynthSettings { PreviewOnEdit = false });
+            var later = (NoteClip) song.CreateClip(synth);
+            song.Place(synth, 1, later);
+            Tone inSecond = ToneAt(0, 1, Note.G);
+            later.SetTones(new[] { inSecond });
+            melody.SetTones(new[] { ToneAt(0, 1) });
+            state.LoopSection = 1;
+            RaiseStarted();
 
-            previewer.Hold(new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end));
+            RaiseTick(0);
 
-            Assert.That(voices.Count, Is.EqualTo(1));
+            Assert.That(created.Select(c => c.Tone), Is.EqualTo(new[] { inSecond }), "Tick 0 of the loop is the second section.");
         }
 
         [Test]
-        public void NotePreviewer_OnlyPreviewsWhenSwitchedOn()
+        public void AClipInTwoSections_PlaysInBoth()
         {
-            var settings = new SynthSettings { PreviewOnEdit = false };
-            var previewer = new NotePreviewer(player, settings);
-            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+            Tone tone = ToneAt(0, 1);
+            melody.SetTones(new[] { tone });
+            song.Place(synth, 1, melody);
+            state.Mode = PlaybackMode.Song;
+            RaiseStarted();
 
-            previewer.Preview(tone);
-            Assert.That(voices, Is.Empty);
+            RaiseTick(0);
+            RaiseTick(TicksPerSection);
 
-            settings.PreviewOnEdit = true;
-            previewer.Preview(tone);
-            Assert.That(voices.Count, Is.EqualTo(1));
+            Assert.That(created.Count(c => c.Tone == tone), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void MutedTracks_AreSilent_AndMutingReleasesTheirNotes()
+        {
+            Tone tone = ToneAt(0, 8);
+            melody.SetTones(new[] { tone });
+            beat.Pattern.SetVelocity(DrumSound.Kick, 1, 96);
+            RaiseStarted();
+            RaiseTick(0);
+
+            synth.IsMuted = true;
+            drums.IsMuted = true;
+            RaiseSixteenth(1);
+
+            Assert.That(VoiceFor(tone).NoteOffCount, Is.EqualTo(1), "Muting releases the sounding note.");
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1), "No kick: only the releasing note.");
         }
 
         [Test]
         public void DrumHits_PlayOnTheirSteps()
         {
-            // The mock clock has no ticks per quarter note, so every tick is a step.
-            drums.SetVelocity(Domain.Drums.DrumSound.Kick, 0, 96);
-            drums.SetVelocity(Domain.Drums.DrumSound.Snare, 2, 96);
+            beat.Pattern.SetVelocity(DrumSound.Kick, 0, 96);
+            beat.Pattern.SetVelocity(DrumSound.Snare, 2, 96);
             RaiseStarted();
 
-            RaiseTick(0);
+            RaiseSixteenth(0);
             Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
 
-            RaiseTick(1);
+            RaiseSixteenth(1);
             Assert.That(player.ActiveVoiceCount, Is.EqualTo(1), "Nothing on step 1.");
 
-            RaiseTick(2);
+            RaiseSixteenth(2);
             Assert.That(player.ActiveVoiceCount, Is.EqualTo(2));
         }
 
         [Test]
-        public void DrumHits_DoNotPlayWhenStopped()
+        public void DrumHits_OnlyPlayOnSixteenths()
         {
-            drums.SetVelocity(Domain.Drums.DrumSound.Kick, 0, 96);
+            beat.Pattern.SetVelocity(DrumSound.Kick, 0, 96);
+            RaiseStarted();
 
-            RaiseTick(0);
+            RaiseTick(5);
 
             Assert.That(player.ActiveVoiceCount, Is.EqualTo(0));
         }
@@ -277,13 +303,13 @@ namespace Sequencer.Audio.Tests
         [Test]
         public void ClosedHat_ChokesARingingOpenHat()
         {
-            drums.SetVelocity(Domain.Drums.DrumSound.OpenHat, 0, 96);
-            drums.SetVelocity(Domain.Drums.DrumSound.ClosedHat, 1, 96);
+            beat.Pattern.SetVelocity(DrumSound.OpenHat, 0, 96);
+            beat.Pattern.SetVelocity(DrumSound.ClosedHat, 1, 96);
             RaiseStarted();
-            RaiseTick(0);
+            RaiseSixteenth(0);
             playedSource.Read(new float[256]);
 
-            RaiseTick(1);
+            RaiseSixteenth(1);
             Assert.That(player.ActiveVoiceCount, Is.EqualTo(2));
 
             // 1000 samples is about 23 ms: long enough for the choke, shorter than the closed hat.
@@ -291,6 +317,59 @@ namespace Sequencer.Audio.Tests
             playedSource.Read(new float[16]);
 
             Assert.That(player.ActiveVoiceCount, Is.EqualTo(1), "Only the closed hat is left.");
+        }
+
+        [Test]
+        public void Preview_PlaysAShortSelfReleasingNoteOnTheTracksInstrument()
+        {
+            Tone tone = ToneAt(0, 1);
+
+            player.Preview(tone, synth);
+
+            Assert.That(VoiceFor(tone).NoteOnCount, Is.EqualTo(1));
+            Assert.That(VoiceFor(tone).ReleaseAfterSamples, Is.EqualTo((int) (0.15 * SampleRate)));
+            Assert.That(created.Single().Instrument, Is.SameAs(synth.Synth));
+        }
+
+        [Test]
+        public void Hold_PlaysUntilTheHandleIsDisposed()
+        {
+            Tone tone = ToneAt(0, 1);
+
+            IDisposable held = player.Hold(tone, synth);
+            Assert.That(VoiceFor(tone).ReleaseAfterSamples, Is.Null, "Held notes do not release by themselves.");
+            Assert.That(VoiceFor(tone).NoteOffCount, Is.EqualTo(0));
+
+            held.Dispose();
+
+            Assert.That(VoiceFor(tone).NoteOffCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void NotePreviewer_PreviewsOnlyWhenSwitchedOn_ButHoldAlwaysPlays()
+        {
+            var editing = new EditingSettings { PreviewOnEdit = false };
+            var previewer = new NotePreviewer(player, editing, state, song);
+
+            previewer.Preview(ToneAt(0, 1));
+            previewer.PreviewDrum(DrumSound.Kick, 96);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(0));
+
+            previewer.Hold(ToneAt(0, 1));
+            previewer.PlayDrum(DrumSound.Kick, 96);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void NotePreviewer_UsesTheSelectedTracksInstrument()
+        {
+            Track second = song.AddTrack(TrackKind.Synth);
+            state.SelectedTrack = second;
+            var previewer = new NotePreviewer(player, new EditingSettings(), state, song);
+
+            previewer.Preview(ToneAt(0, 1));
+
+            Assert.That(created.Single().Instrument, Is.SameAs(second.Synth));
         }
 
         [Test]
@@ -307,6 +386,8 @@ namespace Sequencer.Audio.Tests
 
             public int NoteOffCount { get; private set; }
 
+            public int? ReleaseAfterSamples { get; private set; }
+
             public bool Finished { get; set; }
 
             public float Level { get; set; }
@@ -322,8 +403,6 @@ namespace Sequencer.Audio.Tests
             public void NoteOn() => NoteOnCount++;
 
             public void NoteOff() => NoteOffCount++;
-
-            public int? ReleaseAfterSamples { get; private set; }
 
             public void ReleaseAfter(int sampleCount) => ReleaseAfterSamples = sampleCount;
 

@@ -8,7 +8,9 @@ using Avalonia.Markup.Xaml;
 using log4net;
 using log4net.Config;
 using Sequencer.Audio;
+using System.Linq;
 using Sequencer.Domain;
+using Sequencer.Domain.Arrangement;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
 using Sequencer.View.Control;
@@ -62,7 +64,10 @@ namespace Sequencer.View
 
             builder.RegisterType<AvaloniaDispatcher>().As<IUiDispatcher>().SingleInstance();
             builder.RegisterType<SequencerSettings>().AsSelf().As<IColourSettings, IMusicalSettings>().SingleInstance();
-            builder.RegisterType<SynthSettings>().AsSelf().As<IAudioSettings>().SingleInstance();
+            builder.Register(context => Song.CreateDefault()).SingleInstance();
+            builder.RegisterType<ArrangementState>().SingleInstance();
+            builder.RegisterType<EditingSettings>().SingleInstance();
+            builder.RegisterType<MixerSettings>().SingleInstance();
             builder.RegisterType<TickCalculator>().As<ITickCalculator>().SingleInstance();
             builder.RegisterType<InternalClock>().As<IInternalClock>().SingleInstance();
             builder.RegisterType<SequencerClock>().As<ISequencerClock>().SingleInstance();
@@ -73,14 +78,13 @@ namespace Sequencer.View
             builder.RegisterType<PortAudioOutput>().As<IAudioOutput>().SingleInstance();
             builder.RegisterType<SequencerNotes>().As<ISequencerNotes, ISequencedNotes>().SingleInstance();
             builder.RegisterType<SequencerPlayer>().SingleInstance();
-            builder.RegisterType<Sequencer.Domain.Drums.DrumPattern>().SingleInstance();
-            builder.RegisterType<Sequencer.Domain.Drums.DrumKitSettings>().SingleInstance();
             builder.RegisterType<NotePreviewer>().As<INotePreviewer>().SingleInstance();
             builder.RegisterType<KeyboardStateProcessor>().AsSelf().As<IKeyboardStateProcessor>().SingleInstance();
             builder.RegisterType<MouseOperator>().AsSelf().As<IMouseOperator>().SingleInstance();
             builder.RegisterType<SequencerViewModel>().SingleInstance();
-            builder.RegisterType<SynthViewModel>().SingleInstance();
-            builder.RegisterType<DrumKitViewModel>().SingleInstance();
+            // The side panel starts on the first synth and drum tracks; selecting a track retargets it.
+            builder.Register(context => new SynthViewModel(context.Resolve<Song>().Tracks.First(t => t.Kind == TrackKind.Synth).Synth)).SingleInstance();
+            builder.Register(context => new DrumKitViewModel(context.Resolve<Song>().Tracks.First(t => t.Kind == TrackKind.Drums).Drums)).SingleInstance();
             builder.RegisterType<MainWindow>().SingleInstance();
 
             overrides?.Invoke(builder);

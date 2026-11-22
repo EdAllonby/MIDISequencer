@@ -14,11 +14,27 @@ namespace Sequencer.ViewModel
     {
         public const int MaximumEnvelopeMilliseconds = 2000;
 
-        [NotNull] private readonly SynthSettings settings;
+        [NotNull] private SynthSettings settings;
 
         public SynthViewModel([NotNull] SynthSettings settings)
         {
             this.settings = settings;
+        }
+
+        /// <summary>
+        /// The synth being edited: the selected track's.
+        /// </summary>
+        [NotNull]
+        public SynthSettings Settings
+        {
+            get => settings;
+            set
+            {
+                settings = value;
+
+                // Every property now reads from a different synth.
+                OnPropertyChanged(string.Empty);
+            }
         }
 
         [NotNull]
@@ -62,12 +78,6 @@ namespace Sequencer.ViewModel
             set => SelectWaveformIf(value, Waveform.Sine);
         }
 
-        public bool PreviewOnEdit
-        {
-            get => settings.PreviewOnEdit;
-            set => SetSetting(settings.PreviewOnEdit, value, v => settings.PreviewOnEdit = v);
-        }
-
         public int AttackMilliseconds
         {
             get => ToMilliseconds(settings.AttackSeconds);
@@ -94,8 +104,8 @@ namespace Sequencer.ViewModel
 
         public int VolumePercent
         {
-            get => ToPercent(settings.MasterVolume);
-            set => SetSetting(VolumePercent, value, v => settings.MasterVolume = v / 100.0);
+            get => ToPercent(settings.Volume);
+            set => SetSetting(VolumePercent, value, v => settings.Volume = v / 100.0);
         }
 
         private void SelectWaveformIf(bool selected, Waveform waveform)

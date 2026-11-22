@@ -10,11 +10,25 @@ namespace Sequencer.ViewModel
     /// </summary>
     public sealed class DrumKitViewModel : ObservableObject
     {
-        [NotNull] private readonly DrumKitSettings settings;
+        [NotNull] private DrumKitSettings settings;
 
         public DrumKitViewModel([NotNull] DrumKitSettings settings)
         {
             this.settings = settings;
+        }
+
+        /// <summary>
+        /// The kit being edited: the selected drum track's.
+        /// </summary>
+        [NotNull]
+        public DrumKitSettings Settings
+        {
+            get => settings;
+            set
+            {
+                settings = value;
+                OnPropertyChanged(string.Empty);
+            }
         }
 
         public int VolumePercent

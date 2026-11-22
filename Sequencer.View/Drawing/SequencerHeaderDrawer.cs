@@ -28,6 +28,11 @@ namespace Sequencer.View.Drawing
             this.sequencerSettings = sequencerSettings;
         }
 
+        /// <summary>
+        /// The number of the first bar shown, so a section later in the song shows its real bar numbers.
+        /// </summary>
+        public int FirstBarNumber { get; set; } = 1;
+
         public void RedrawHeader()
         {
             RemoveElements();
@@ -63,7 +68,7 @@ namespace Sequencer.View.Drawing
                 {
                     var barNumber = new TextBlock
                     {
-                        Text = (step / sixteenthsPerBar + 1).ToString(),
+                        Text = (step / sixteenthsPerBar + FirstBarNumber).ToString(),
                         FontSize = 11,
                         FontWeight = FontWeight.SemiBold,
                         Foreground = text

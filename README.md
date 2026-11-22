@@ -1,9 +1,9 @@
 # MIDISequencer
 
-A piano-roll step sequencer written in C#. Draw notes on a one-measure grid and it loops them through a
-built-in synthesiser, with a piano keyboard for trying out notes.
+A small music workstation written in C#: write melodies in a piano roll and beats in a drum grid, then
+arrange them into a song across tracks and sections.
 
-![The sequencer playing a melody and bassline, with a note selected in the inspector](docs/images/screenshot.png)
+![A song arranged across a synth and a drum track, playing in song mode](docs/images/screenshot.png)
 
 It started in 2015 as a WPF app for Windows. It now runs on .NET 10 with an [Avalonia](https://avaloniaui.net)
 UI, so it runs natively on Apple Silicon Macs as well as Windows and Linux. The port is described in
@@ -65,14 +65,27 @@ On macOS, ⌘ is the command key; on Windows and Linux it is Ctrl.
 | Tempo | Type in the BPM box (30-300), or click **Tap** in time |
 | Play a note | Press a key on the piano keyboard; drag across keys to play each in turn |
 
+### Arranging a song
+
+The arrangement across the top has a row per **track** and a column per four-bar **section**. Each cell holds
+a **clip** (a four-bar pattern) or nothing. Click a cell to edit its clip below; double-click an empty cell,
+or use **New clip**, to start one. The same clip can play in several sections: **⌘D** (Ctrl+D) repeats the
+selected clip in the next section, and editing it changes every place it plays. Right-click a cell to copy a
+clip instead (a new clip to change separately), reuse another of the track's clips, or remove it.
+
+**+ Synth track** and **+ Drum track** add tracks (up to eight), each with its own instrument; **M** mutes one.
+
+**Section** mode loops the section you're editing while you work on it. **Song** mode plays the arrangement
+from the start, up to the last clip. The position readout and the ruler show bars in the whole song.
+
 ### Drums
 
-Switch the editor to **Drums** (above the grid) for a step sequencer: six synthesised sounds (kick, snare,
+Select a drum track's clip for a step sequencer: six synthesised sounds (kick, snare,
 clap, tom, closed and open hi-hat) across 64 sixteenth steps. Click a step to add or remove a hit, drag to
 paint, ⌥/Alt-click for an accent, and click a sound's name to hear it. A closed hi-hat cuts off an open one,
-as on a drum machine. The drums play along with the synth.
+as on a drum machine. Drum tracks play along with the synth tracks.
 
-**Loops** loads a classic pattern: four on the floor, rock, boom bap, breakbeat, disco, dembow, bossa nova
+**Loops** (above a drum clip) loads a classic pattern: four on the floor, rock, boom bap, breakbeat, disco, dembow, bossa nova
 or trap. Patterns are written as grids in `Sequencer.Domain/Drums/DrumLoopLibrary.cs` (`x` a hit, `X` an
 accent, `.` a rest).
 
@@ -80,7 +93,7 @@ accent, `.` a rest).
 
 ### Tunes
 
-**Tunes** in the toolbar loads a well-known tune to play or edit: Ode to Joy, Twinkle, Twinkle, Little Star,
+**Tunes** (above a synth clip) loads a well-known tune into it: Ode to Joy, Twinkle, Twinkle, Little Star,
 Frère Jacques (as a round), Jingle Bells, Für Elise, Korobeiniki, In the Hall of the Mountain King and
 Pachelbel's Canon in D. Each sets a tempo and waveform that suit it and starts playing. All are
 traditional or public-domain classical pieces, cut to their best-known four bars. If the grid already has
@@ -101,7 +114,7 @@ Volume changes apply immediately; the others apply to the next note played.
 
 | Project | Contents |
 |---|---|
-| `Sequencer.Domain` | Pitches, positions, velocities, tones and settings |
+| `Sequencer.Domain` | Pitches, positions, velocities, tones, settings; the song, tracks and clips; drums; tunes |
 | `Sequencer.Midi` | The tempo clock (a `Stopwatch`-timed thread), tick/position maths, MIDI note numbers |
 | `Sequencer.Audio` | Voices with ADSR envelopes, wavetable waveforms, previews, one mixed stream played through PortAudio |
 | `Sequencer.ViewModel` | The main view model (CommunityToolkit.Mvvm) |

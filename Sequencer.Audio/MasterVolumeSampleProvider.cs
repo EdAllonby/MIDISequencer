@@ -11,15 +11,15 @@ namespace Sequencer.Audio
     /// </summary>
     public sealed class MasterVolumeSampleProvider : ISampleProvider
     {
-        [NotNull] private readonly IAudioSettings audioSettings;
+        [NotNull] private readonly MixerSettings mixerSettings;
         [NotNull] private readonly ISampleProvider source;
         private readonly float glideCoefficient;
         private float currentVolume = float.NaN;
 
-        public MasterVolumeSampleProvider([NotNull] ISampleProvider source, [NotNull] IAudioSettings audioSettings)
+        public MasterVolumeSampleProvider([NotNull] ISampleProvider source, [NotNull] MixerSettings mixerSettings)
         {
             this.source = source;
-            this.audioSettings = audioSettings;
+            this.mixerSettings = mixerSettings;
 
             // About 5 ms to settle.
             glideCoefficient = (float) Math.Exp(-1.0 / (0.005 * source.WaveFormat.SampleRate));
@@ -30,7 +30,7 @@ namespace Sequencer.Audio
         public int Read(Span<float> buffer)
         {
             int read = source.Read(buffer);
-            var target = (float) audioSettings.MasterVolume;
+            var target = (float) mixerSettings.MasterVolume;
 
             if (float.IsNaN(currentVolume))
             {

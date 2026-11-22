@@ -19,8 +19,8 @@ using Sequencer.Visual.Input;
 namespace Sequencer.View.Tests.UiTests
 {
     /// <summary>
-    /// Drives the real main window with simulated input. The window is 1200 x 500: the editor fills the
-    /// left 895 px below a 30 px header, so one beat is about 224 px wide and one note lane 12.5 px tall.
+    /// Drives the real main window with simulated input. Points are worked out from the controls' own
+    /// positions, so the tests don't depend on the layout around them.
     /// </summary>
     [TestFixture]
     public class MainWindowTests
@@ -32,7 +32,8 @@ namespace Sequencer.View.Tests.UiTests
         private RawInputModifiers commandModifier;
         private RecordingNotePreviewer previewer;
 
-        private static readonly Point EditorPoint = new Point(120, 230);
+        // A point in the piano roll, worked out from the editor's position (the layout above it can change).
+        private Point EditorPoint;
 
         [SetUp]
         public void SetUp()
@@ -49,6 +50,7 @@ namespace Sequencer.View.Tests.UiTests
 
             window.Show();
             Dispatcher.UIThread.RunJobs();
+            EditorPoint = window.FindControl<SequencerControl>("Editor").TranslatePoint(new Point(64, 150), window) ?? default;
         }
 
         [TearDown]
@@ -89,13 +91,14 @@ namespace Sequencer.View.Tests.UiTests
             Click(EditorPoint);
             Click(EditorPoint + new Point(170, -40));
             Click(EditorPoint + new Point(340, -80));
-            window.MouseDown(new Point(700, 300), MouseButton.Right);
-            window.MouseMove(new Point(730, 300));
+            Point menuCentre = EditorPoint + new Point(580, 70);
+            window.MouseDown(menuCentre, MouseButton.Right);
+            window.MouseMove(menuCentre + new Point(30, 0));
 
             string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "notes-and-menu.png");
             window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
             TestContext.Out.WriteLine($"Rendered frame: {path}");
-            window.MouseUp(new Point(730, 300), MouseButton.Right);
+            window.MouseUp(menuCentre + new Point(30, 0), MouseButton.Right);
 
             Assert.That(notes.AllNotes.Count(), Is.EqualTo(3));
         }
@@ -135,6 +138,39 @@ namespace Sequencer.View.Tests.UiTests
             Dispatcher.UIThread.RunJobs();
 
             string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "drums.png");
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
+            TestContext.Out.WriteLine($"Screenshot: {path}");
+            Press(Key.Enter);
+        }
+
+        [AvaloniaTest]
+        [Explicit("Writes a screenshot for the docs.")]
+        public void Screenshot_Arrangement()
+        {
+            // Korobeiniki (A) twice, then Ode to Joy (B) twice, over a disco beat with a rock fill in section 3.
+            window.RequestTune(TuneNamed("Korobeiniki"));
+            window.RepeatSelectedClip();
+            window.CreateClipAt(SynthTrack, 2);
+            window.RequestTune(TuneNamed("Ode to Joy"));
+            window.RepeatSelectedClip();
+
+            window.Select(DrumTrack, 0);
+            window.RequestLoop(Domain.Drums.DrumLoopLibrary.All.Single(l => l.Name == "Disco"));
+            window.RepeatSelectedClip();
+            window.CreateClipAt(DrumTrack, 2);
+            window.RequestLoop(Domain.Drums.DrumLoopLibrary.All.Single(l => l.Name == "Rock Beat"));
+            Song.Place(DrumTrack, 3, DrumTrack.ClipAt(0));
+            Press(Key.Enter);
+
+            window.Select(SynthTrack, 2);
+            window.FindControl<ToggleButton>("SongModeButton").IsChecked = true;
+            viewModel.BeatsPerMinute = 120;
+            container.Resolve<Midi.IInternalClock>().Ticks = 2 * 1536 + 400;
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(300);
+            Dispatcher.UIThread.RunJobs();
+
+            string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "arrangement.png");
             window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
             TestContext.Out.WriteLine($"Screenshot: {path}");
             Press(Key.Enter);
@@ -474,7 +510,7 @@ namespace Sequencer.View.Tests.UiTests
         [AvaloniaTest]
         public void SynthPanel_IsBoundToTheSynthSettings()
         {
-            var settings = container.Resolve<Domain.Settings.SynthSettings>();
+            var settings = SynthTrack.Synth;
 
             window.FindControl<ToggleButton>("TriangleWaveButton").IsChecked = true;
             window.FindControl<Slider>("ReleaseMillisecondsSlider").Value = 750;
@@ -482,7 +518,7 @@ namespace Sequencer.View.Tests.UiTests
 
             Assert.That(settings.Waveform, Is.EqualTo(Domain.Settings.Waveform.Triangle));
             Assert.That(settings.ReleaseSeconds, Is.EqualTo(0.75));
-            Assert.That(settings.MasterVolume, Is.EqualTo(0.3));
+            Assert.That(settings.Volume, Is.EqualTo(0.3));
         }
 
         [AvaloniaTest]
@@ -527,11 +563,9 @@ namespace Sequencer.View.Tests.UiTests
         [AvaloniaTest]
         public void PreviewCheckbox_IsBoundToTheSetting()
         {
-            var settings = container.Resolve<Domain.Settings.SynthSettings>();
-
             window.FindControl<CheckBox>("PreviewOnEditBox").IsChecked = false;
 
-            Assert.That(settings.PreviewOnEdit, Is.False);
+            Assert.That(container.Resolve<Domain.Settings.EditingSettings>().PreviewOnEdit, Is.False);
         }
 
         private PianoKeyboardControl Keyboard => window.FindControl<PianoKeyboardControl>("Keyboard");
@@ -670,7 +704,7 @@ namespace Sequencer.View.Tests.UiTests
             Assert.That(notes.AllNotes.Count(), Is.EqualTo(ode.ToTones(Domain.TimeSignature.FourFour, 96).Count));
             Assert.That(notes.SelectedNotes, Is.Empty, "Loaded notes start unselected.");
             Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(ode.BeatsPerMinute));
-            Assert.That(container.Resolve<Domain.Settings.SynthSettings>().Waveform, Is.EqualTo(ode.Waveform));
+            Assert.That(SynthTrack.Synth.Waveform, Is.EqualTo(ode.Waveform));
             Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Play));
             Assert.That(previewer.Pitches, Is.Empty, "Loading does not preview every note.");
             Press(Key.Enter);
@@ -706,11 +740,17 @@ namespace Sequencer.View.Tests.UiTests
             Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop));
         }
 
-        private Domain.Drums.DrumPattern DrumPattern => container.Resolve<Domain.Drums.DrumPattern>();
+        private Domain.Arrangement.Song Song => container.Resolve<Domain.Arrangement.Song>();
+
+        private Domain.Arrangement.Track SynthTrack => Song.Tracks.First(t => t.Kind == Domain.Arrangement.TrackKind.Synth);
+
+        private Domain.Arrangement.Track DrumTrack => Song.Tracks.First(t => t.Kind == Domain.Arrangement.TrackKind.Drums);
+
+        private Domain.Drums.DrumPattern DrumPattern => ((Domain.Arrangement.DrumClip) DrumTrack.ClipAt(0)).Pattern;
 
         private void ShowDrums()
         {
-            window.FindControl<ToggleButton>("DrumTrackButton").IsChecked = true;
+            window.Select(DrumTrack, 0);
             Dispatcher.UIThread.RunJobs();
         }
 
@@ -851,6 +891,165 @@ namespace Sequencer.View.Tests.UiTests
 
             Press(Key.Enter);
             Assert.That(editor.CurrentStep, Is.EqualTo(-1));
+        }
+
+        private ArrangementControl ArrangementView => window.FindControl<ArrangementControl>("Arrangement");
+
+        private Point CellInWindow(Domain.Arrangement.Track track, int section) =>
+            ArrangementView.TranslatePoint(ArrangementView.CellCentre(Song.Tracks.ToList().IndexOf(track), section), window) ?? default;
+
+        private Domain.Arrangement.ArrangementState Arrangement => container.Resolve<Domain.Arrangement.ArrangementState>();
+
+        [AvaloniaTest]
+        public void TheDefaultSong_HasASynthAndADrumTrack_WithTheSynthOpen()
+        {
+            Assert.That(Song.Tracks.Select(t => t.Kind), Is.EqualTo(new[] { Domain.Arrangement.TrackKind.Synth, Domain.Arrangement.TrackKind.Drums }));
+            Assert.That(Arrangement.SelectedTrack, Is.SameAs(SynthTrack));
+            Assert.That(window.FindControl<TextBlock>("ClipTitle").Text, Is.EqualTo("Synth"));
+        }
+
+        [AvaloniaTest]
+        public void ClickingACell_OpensItsClip()
+        {
+            Click(CellInWindow(DrumTrack, 0));
+
+            Assert.That(Arrangement.SelectedTrack, Is.SameAs(DrumTrack));
+            Assert.That(viewModel.IsDrumTrack, Is.True);
+            Assert.That(window.FindControl<DrumEditorControl>("DrumEditor").Pattern, Is.SameAs(DrumPattern));
+        }
+
+        [AvaloniaTest]
+        public void ClickingAnEmptyCell_OffersANewClip_AndLoopsThatSection()
+        {
+            Click(CellInWindow(SynthTrack, 2));
+
+            Assert.That(window.FindControl<Border>("NoClipPanel").IsVisible, Is.True);
+            Assert.That(Arrangement.LoopSection, Is.EqualTo(2), "Section mode loops what you're editing.");
+            Assert.That(window.FindControl<SequencerHeaderControl>("Header").FirstBarNumber, Is.EqualTo(9), "Section 3 starts at bar 9.");
+
+            window.FindControl<Button>("NewClipButton").RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+
+            Assert.That(SynthTrack.ClipAt(2), Is.Not.Null);
+            Assert.That(window.FindControl<Border>("NoClipPanel").IsVisible, Is.False);
+        }
+
+        [AvaloniaTest]
+        public void DoubleClickingAnEmptyCell_MakesAClip()
+        {
+            Point cell = CellInWindow(DrumTrack, 3);
+            window.MouseDown(cell, MouseButton.Left);
+            window.MouseUp(cell, MouseButton.Left);
+            window.MouseDown(cell, MouseButton.Left);
+            window.MouseUp(cell, MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(DrumTrack.ClipAt(3), Is.InstanceOf<Domain.Arrangement.DrumClip>());
+            Assert.That(DrumTrack.ClipAt(3).Name, Is.EqualTo("B"));
+        }
+
+        [AvaloniaTest]
+        public void CommandD_RepeatsTheClipInTheNextSection_AsTheSameClip()
+        {
+            Click(EditorPoint);
+
+            Press(Key.D, commandModifier);
+
+            Assert.That(SynthTrack.ClipAt(1), Is.SameAs(SynthTrack.ClipAt(0)));
+            Assert.That(Arrangement.SelectedSection, Is.EqualTo(1));
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1), "The repeated clip opens with its note.");
+        }
+
+        [AvaloniaTest]
+        public void ARepeatedClip_EditedInOneSection_ChangesInBoth()
+        {
+            Press(Key.D, commandModifier);
+            Click(EditorPoint);
+
+            Click(CellInWindow(SynthTrack, 0));
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+        }
+
+        [AvaloniaTest]
+        public void Notes_SurviveSwitchingToAnotherClipAndBack()
+        {
+            Click(EditorPoint);
+            Click(EditorPoint + new Point(100, 30));
+
+            Click(CellInWindow(DrumTrack, 0));
+            Click(CellInWindow(SynthTrack, 0));
+
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(2));
+            Assert.That(((Domain.Arrangement.NoteClip) SynthTrack.ClipAt(0)).Tones.Count, Is.EqualTo(2));
+        }
+
+        [AvaloniaTest]
+        public void TheMuteButton_MutesItsTrack()
+        {
+            Click(ArrangementView.TranslatePoint(ArrangementView.MuteButtonCentre(1), window) ?? default);
+
+            Assert.That(DrumTrack.IsMuted, Is.True);
+            Assert.That(Arrangement.SelectedTrack, Is.SameAs(SynthTrack), "Muting doesn't change what's being edited.");
+        }
+
+        [AvaloniaTest]
+        public void AddTrackButtons_AddATrackWithAClip_AndOpenIt()
+        {
+            Click(ArrangementView.TranslatePoint(ArrangementView.AddTrackButtonCentre(Domain.Arrangement.TrackKind.Synth), window) ?? default);
+
+            Assert.That(Song.Tracks.Count, Is.EqualTo(3));
+            Domain.Arrangement.Track added = Song.Tracks.Last();
+            Assert.That(added.Name, Is.EqualTo("Synth 2"));
+            Assert.That(Arrangement.SelectedTrack, Is.SameAs(added));
+            Assert.That(added.ClipAt(0), Is.Not.Null);
+        }
+
+        [AvaloniaTest]
+        public void SongMode_LoopsTheWholeSong_AndSectionModeOneSection()
+        {
+            var clock = container.Resolve<Midi.ISequencerClock>();
+            Press(Key.D, commandModifier);
+            Press(Key.D, commandModifier);
+
+            window.FindControl<ToggleButton>("SongModeButton").IsChecked = true;
+            Assert.That(clock.LoopLengthTicks, Is.EqualTo(3 * 1536), "Up to the last clip: three sections.");
+
+            window.FindControl<ToggleButton>("SectionModeButton").IsChecked = true;
+            Assert.That(clock.LoopLengthTicks, Is.EqualTo(1536));
+        }
+
+        [AvaloniaTest]
+        public void ThePositionReadout_ShowsTheBarInTheSong()
+        {
+            Click(CellInWindow(SynthTrack, 1));
+
+            Assert.That(window.FindControl<TextBlock>("PositionReadout").Text, Is.EqualTo("5.1.1"));
+        }
+
+        [AvaloniaTest]
+        public void LoadingATune_IntoAnEmptySection_MakesAClipForIt()
+        {
+            Click(CellInWindow(SynthTrack, 4));
+
+            window.RequestTune(TuneNamed("Ode to Joy"));
+
+            Assert.That(SynthTrack.ClipAt(4), Is.Not.Null);
+            Assert.That(notes.AllNotes, Is.Not.Empty);
+            Press(Key.Enter);
+        }
+
+        [AvaloniaTest]
+        public void ThePlayhead_ShowsInTheArrangementWhilePlaying()
+        {
+            Assert.That(ArrangementView.PlayheadTick, Is.EqualTo(-1));
+
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(200);
+            Dispatcher.UIThread.RunJobs();
+            Assert.That(ArrangementView.PlayheadTick, Is.GreaterThanOrEqualTo(0));
+
+            Press(Key.Enter);
+            Assert.That(ArrangementView.PlayheadTick, Is.EqualTo(-1));
         }
 
         [AvaloniaTest]

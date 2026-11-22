@@ -23,7 +23,7 @@ namespace Sequencer.ViewModel.Tests
             Assert.That(viewModel.DecayMilliseconds, Is.EqualTo(100));
             Assert.That(viewModel.SustainPercent, Is.EqualTo(70));
             Assert.That(viewModel.ReleaseMilliseconds, Is.EqualTo(200));
-            Assert.That(viewModel.VolumePercent, Is.EqualTo(100));
+            Assert.That(viewModel.VolumePercent, Is.EqualTo(80));
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace Sequencer.ViewModel.Tests
             Assert.That(settings.Waveform, Is.EqualTo(Waveform.Square));
             Assert.That(settings.AttackSeconds, Is.EqualTo(0.25));
             Assert.That(settings.SustainLevel, Is.EqualTo(0.4));
-            Assert.That(settings.MasterVolume, Is.EqualTo(0.6));
+            Assert.That(settings.Volume, Is.EqualTo(0.6));
         }
 
         [Test]
