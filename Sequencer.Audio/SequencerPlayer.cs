@@ -45,7 +45,8 @@ namespace Sequencer.Audio
 
             // ReadFully keeps the stream running with silence when no notes are playing.
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(audioSettings.SampleRate, 1)) { ReadFully = true };
-            output.Play(new MasterVolumeSampleProvider(mixer, audioSettings));
+            // Master volume, then a limiter so overlapping notes can never clip.
+            output.Play(new LimiterSampleProvider(new MasterVolumeSampleProvider(mixer, audioSettings)));
 
             clock.Tick += OnTick;
             clock.Started += OnClockStarted;

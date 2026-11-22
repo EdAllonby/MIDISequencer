@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using JetBrains.Annotations;
 using NAudio.Wave;
 using PortAudioSharp;
@@ -15,7 +16,31 @@ namespace Sequencer.Audio
         [CanBeNull] private ISampleProvider source;
         [CanBeNull] private Stream.Callback callback;
         [NotNull] private float[] buffer = new float[8192];
+        private readonly uint framesPerBuffer;
         private bool initialised;
+
+        // Diagnostics, written only by the audio thread.
+        private long callbackCount;
+        private long underflowCount;
+        private long clippedSampleCount;
+        private int smallestBuffer = int.MaxValue;
+        private int largestBuffer;
+        private float peakLevel;
+        private double requestedLatencySeconds;
+
+        /// <param name="framesPerBuffer">Frames per audio callback, or 0 to let PortAudio choose.</param>
+        public PortAudioOutput(uint framesPerBuffer = 0)
+        {
+            this.framesPerBuffer = framesPerBuffer;
+        }
+
+        /// <summary>
+        /// Counts of underruns (the device ran out of audio) and clipped samples (beyond ±1) since playback began.
+        /// </summary>
+        public AudioOutputStatistics Statistics => new AudioOutputStatistics(
+            Interlocked.Read(ref callbackCount), Interlocked.Read(ref underflowCount), Interlocked.Read(ref clippedSampleCount),
+            smallestBuffer == int.MaxValue ? 0 : smallestBuffer, largestBuffer, peakLevel,
+            requestedLatencySeconds);
 
         public void Play(ISampleProvider sampleProvider)
         {
@@ -47,10 +72,12 @@ namespace Sequencer.Audio
                 hostApiSpecificStreamInfo = IntPtr.Zero
             };
 
+            requestedLatencySeconds = outputParameters.suggestedLatency;
+
             // Keep a reference to the delegate so it is not garbage collected while native code holds it.
             callback = OnAudioRequested;
 
-            stream = new PortAudioSharp.Stream(null, outputParameters, sampleProvider.WaveFormat.SampleRate, 0,
+            stream = new PortAudioSharp.Stream(null, outputParameters, sampleProvider.WaveFormat.SampleRate, framesPerBuffer,
                 StreamFlags.ClipOff, callback, IntPtr.Zero);
             stream.Start();
         }
@@ -98,9 +125,38 @@ namespace Sequencer.Audio
                 samples.Clear();
             }
 
+            RecordStatistics(samples, statusFlags, (int) frameCount);
             Marshal.Copy(buffer, 0, output, sampleCount);
 
             return StreamCallbackResult.Continue;
+        }
+
+        private void RecordStatistics(ReadOnlySpan<float> samples, StreamCallbackFlags statusFlags, int frameCount)
+        {
+            Interlocked.Increment(ref callbackCount);
+
+            if ((statusFlags & StreamCallbackFlags.OutputUnderflow) != 0)
+            {
+                Interlocked.Increment(ref underflowCount);
+            }
+
+            smallestBuffer = Math.Min(smallestBuffer, frameCount);
+            largestBuffer = Math.Max(largestBuffer, frameCount);
+
+            foreach (float sample in samples)
+            {
+                float level = Math.Abs(sample);
+
+                if (level > peakLevel)
+                {
+                    peakLevel = level;
+                }
+
+                if (level > 1f)
+                {
+                    Interlocked.Increment(ref clippedSampleCount);
+                }
+            }
         }
     }
 }
