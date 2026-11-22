@@ -4,6 +4,8 @@ namespace Sequencer.Domain.Settings
     {
         int SampleRate { get; }
 
+        Waveform Waveform { get; }
+
         double AttackSeconds { get; }
 
         double DecaySeconds { get; }
@@ -14,5 +16,10 @@ namespace Sequencer.Domain.Settings
         double SustainLevel { get; }
 
         double ReleaseSeconds { get; }
+
+        /// <summary>
+        /// Output volume, from 0 to 1.
+        /// </summary>
+        double MasterVolume { get; }
     }
 }

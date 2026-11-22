@@ -357,6 +357,20 @@ namespace Sequencer.View.Tests.UiTests
         }
 
         [AvaloniaTest]
+        public void SynthPanel_IsBoundToTheSynthSettings()
+        {
+            var settings = container.Resolve<Domain.Settings.SynthSettings>();
+
+            window.FindControl<ComboBox>("WaveformBox").SelectedItem = Domain.Settings.Waveform.Triangle;
+            window.FindControl<Slider>("ReleaseMillisecondsSlider").Value = 750;
+            window.FindControl<Slider>("VolumePercentSlider").Value = 30;
+
+            Assert.That(settings.Waveform, Is.EqualTo(Domain.Settings.Waveform.Triangle));
+            Assert.That(settings.ReleaseSeconds, Is.EqualTo(0.75));
+            Assert.That(settings.MasterVolume, Is.EqualTo(0.3));
+        }
+
+        [AvaloniaTest]
         public void Space_TogglesPlayAndPause_AndReturnStops()
         {
             Press(Key.Space);

@@ -21,6 +21,7 @@ namespace Sequencer.Audio.Tests
         private Dictionary<ISequencedNote, FakeVoice> voices;
         private SequencerPlayer player;
         private ISampleProvider playedSource;
+        private double masterVolume = 1.0;
 
         private readonly IPosition start = new Position(1, 1, 1);
         private readonly IPosition end = new Position(1, 2, 1);
@@ -52,6 +53,7 @@ namespace Sequencer.Audio.Tests
 
             var audioSettings = new Mock<IAudioSettings>();
             audioSettings.Setup(x => x.SampleRate).Returns(SampleRate);
+            audioSettings.Setup(x => x.MasterVolume).Returns(() => masterVolume);
 
             player = new SequencerPlayer(factory.Object, notes.Object, clock.Object, tickCalculator.Object, audioSettings.Object, output.Object);
         }
@@ -172,6 +174,21 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
+        public void Output_IsScaledByTheMasterVolume()
+        {
+            ISequencedNote note = AddNote();
+            RaiseStarted();
+            RaiseTick(0);
+            voices[note].Level = 0.8f;
+            masterVolume = 0.5;
+
+            var buffer = new float[16];
+            playedSource.Read(buffer);
+
+            Assert.That(buffer, Is.All.EqualTo(0.4f).Within(1e-6));
+        }
+
+        [Test]
         public void Dispose_DisposesTheOutput()
         {
             player.Dispose();
@@ -186,6 +203,8 @@ namespace Sequencer.Audio.Tests
             public int NoteOffCount { get; private set; }
 
             public bool Finished { get; set; }
+
+            public float Level { get; set; }
 
             public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(SampleRate, 1);
 
@@ -206,7 +225,7 @@ namespace Sequencer.Audio.Tests
                     return 0;
                 }
 
-                buffer.Clear();
+                buffer.Fill(Level);
                 return buffer.Length;
             }
         }

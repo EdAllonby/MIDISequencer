@@ -35,7 +35,8 @@ namespace Sequencer.View.Control
 
         public MainWindow([NotNull] SequencerViewModel viewModel, [NotNull] ISequencerNotes notes,
             [NotNull] IPitchAndPositionCalculator pitchAndPositionCalculator, [NotNull] IDigitalAudioProtocol protocol,
-            [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator)
+            [NotNull] SequencerSettings settings, [NotNull] KeyboardStateProcessor keyboardState, [NotNull] MouseOperator mouseOperator,
+            [NotNull] SynthViewModel synthViewModel)
         {
             InitializeComponent();
 
@@ -43,6 +44,7 @@ namespace Sequencer.View.Control
             this.keyboardState = keyboardState;
             this.mouseOperator = mouseOperator;
             DataContext = viewModel;
+            SynthPanel.DataContext = synthViewModel;
 
             Header.Initialise(pitchAndPositionCalculator, protocol, settings);
             Editor.Initialise(notes, pitchAndPositionCalculator, protocol, settings, keyboardState, mouseOperator, keyboardState.CommandModifier);
