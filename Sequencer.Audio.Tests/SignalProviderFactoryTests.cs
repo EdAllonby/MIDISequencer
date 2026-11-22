@@ -52,7 +52,8 @@ namespace Sequencer.Audio.Tests
         [TestCase(Waveform.Triangle)]
         public void RampWaveforms_HaveTheRmsOfARamp(Waveform waveform)
         {
-            Assert.That(RmsToPeak(waveform), Is.InRange(0.5, 0.65));
+            // An ideal ramp is 0.577; a band-limited edge overshoots a little (Gibbs), lowering it.
+            Assert.That(RmsToPeak(waveform), Is.InRange(0.45, 0.65));
         }
     }
 }

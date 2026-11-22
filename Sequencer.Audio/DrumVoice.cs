@@ -11,6 +11,11 @@ namespace Sequencer.Audio
     {
         private const double ChokeSeconds = 0.006;
 
+        // A hit fades in over a millisecond (half that for hats) so it doesn't start with a click, and fades
+        // to silence over its last 30 ms so it doesn't end with one.
+        private const double FadeInSeconds = 0.001;
+        private const double FadeOutSeconds = 0.03;
+
         // The six square-wave frequencies of the TR-808's cymbal circuit: an inharmonic, metallic cluster.
         private static readonly double[] MetallicFrequencies = { 205.3, 304.4, 369.6, 522.7, 540.0, 800.0 };
 
@@ -59,6 +64,18 @@ namespace Sequencer.Audio
             chokeRequested = true;
         }
 
+        /// <summary>
+        /// The fade-in and fade-out around the hit: 0 at the very start and end, 1 in between.
+        /// </summary>
+        private double Fade(double t)
+        {
+            double fadeIn = sound == DrumSound.ClosedHat || sound == DrumSound.OpenHat ? FadeInSeconds / 2 : FadeInSeconds;
+            double rise = Math.Min(1, t / fadeIn);
+            double untilEnd = lengthSeconds - t;
+            double fall = untilEnd >= FadeOutSeconds ? 1 : 0.5 - 0.5 * Math.Cos(Math.PI * Math.Max(0, untilEnd) / FadeOutSeconds);
+            return rise * fall;
+        }
+
         public static double LengthOf(DrumSound sound)
         {
             switch (sound)
@@ -88,7 +105,7 @@ namespace Sequencer.Audio
             for (var n = 0; n < buffer.Length; n++)
             {
                 double t = (double) sampleIndex / sampleRate;
-                float sample = t < lengthSeconds ? amplitude * Synthesise(t) : 0f;
+                float sample = t < lengthSeconds ? amplitude * Synthesise(t) * (float) Fade(t) : 0f;
 
                 if (chokeStartSample >= 0)
                 {

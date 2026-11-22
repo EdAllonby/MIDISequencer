@@ -24,6 +24,7 @@ namespace Sequencer.Audio
 
         [NotNull] private readonly ISequencerClock clock;
         [NotNull] private readonly MixingSampleProvider mixer;
+        [NotNull] private readonly LimiterSampleProvider limiter;
         [NotNull] private readonly IAudioOutput output;
         [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
         [NotNull] private readonly ITickCalculator tickCalculator;
@@ -57,7 +58,8 @@ namespace Sequencer.Audio
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, 1)) { ReadFully = true };
 
             // Master volume, then a limiter so overlapping notes can never clip.
-            output.Play(new LimiterSampleProvider(new MasterVolumeSampleProvider(mixer, mixerSettings)));
+            limiter = new LimiterSampleProvider(new MasterVolumeSampleProvider(mixer, mixerSettings));
+            output.Play(limiter);
 
             clock.Tick += OnTick;
             clock.Started += OnClockStarted;
@@ -68,6 +70,16 @@ namespace Sequencer.Audio
         /// The number of sounds playing, including notes in their release stage and drum hits.
         /// </summary>
         public int ActiveVoiceCount => mixer.MixerInputs.Count();
+
+        /// <summary>
+        /// The fraction of the time the master limiter has had to turn the level down.
+        /// </summary>
+        public double LimiterActivity => limiter.Activity;
+
+        /// <summary>
+        /// The loudest the mix has been before the limiter.
+        /// </summary>
+        public float PeakBeforeLimiter => limiter.PeakInput;
 
         /// <summary>
         /// Ticks in one four-bar section.
@@ -230,7 +242,7 @@ namespace Sequencer.Audio
 
         private void PlayDrum(DrumSound sound, byte velocity, [NotNull] Track track)
         {
-            var voice = new DrumVoice(sound, velocity, sampleRate, (float) (track.Drums?.Volume ?? 1));
+            var voice = new DrumVoice(sound, velocity, sampleRate, (float) (track.Drums?.Volume ?? 1) * MixLevels.DrumHit);
 
             // On a drum machine the hi-hats share one voice: a new hat cuts off an open one still ringing.
             if (sound == DrumSound.ClosedHat || sound == DrumSound.OpenHat)

@@ -114,7 +114,7 @@ namespace Sequencer.Audio
             for (var n = 0; n < buffer.Length; n++)
             {
                 float envelopeAmplitude = envelope.Process();
-                buffer[n] = Amplitude * envelopeAmplitude * waveformCalculator.CalculateForPhase(phase);
+                buffer[n] = Amplitude * envelopeAmplitude * waveformCalculator.CalculateForPhase(phase, Frequency);
 
                 phase += phaseStep;
 

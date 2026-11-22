@@ -181,10 +181,11 @@ namespace Sequencer.Audio.Tests
             VoiceFor(tone).Level = 0.8f;
             mixer.MasterVolume = 0.5;
 
-            var buffer = new float[16];
+            // Read past the limiter's look-ahead delay.
+            var buffer = new float[400];
             playedSource.Read(buffer);
 
-            Assert.That(buffer, Is.All.EqualTo(0.4f).Within(1e-6));
+            Assert.That(buffer.Skip(380), Is.All.EqualTo(0.4f).Within(1e-6));
         }
 
         [Test]

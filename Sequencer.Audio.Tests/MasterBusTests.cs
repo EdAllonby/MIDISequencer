@@ -54,9 +54,14 @@ namespace Sequencer.Audio.Tests
         public void Limiter_LeavesNormalLevelsUntouched()
         {
             float[] dry = Render(new TestSignal(_ => 0.6), SampleRate);
-            float[] limited = Render(new LimiterSampleProvider(new TestSignal(_ => 0.6)), SampleRate);
+            var limiter = new LimiterSampleProvider(new TestSignal(_ => 0.6));
+            float[] limited = Render(limiter, SampleRate);
 
-            Assert.That(limited, Is.EqualTo(dry));
+            // Identical, just later by the look-ahead.
+            int delay = limiter.LookaheadSamples;
+            Assert.That(limited.Skip(delay), Is.EqualTo(dry.Take(dry.Length - delay)));
+            Assert.That(limiter.Activity, Is.EqualTo(0));
+            Assert.That(limiter.PeakInput, Is.EqualTo(0.6f).Within(0.001));
         }
 
         [Test]
@@ -99,6 +104,18 @@ namespace Sequencer.Audio.Tests
             }
 
             return sharpest;
+        }
+
+        [Test]
+        public void Limiter_TurnsTheGainDownBeforeAPeakArrives()
+        {
+            // Silence, then a sudden, very loud tone: with look-ahead the first loud samples out are already limited.
+            var limiter = new LimiterSampleProvider(new TestSignal(n => n < SampleRate / 2 ? 0 : 3.0));
+            float[] limited = Render(limiter, SampleRate);
+
+            int arrival = SampleRate / 2 + limiter.LookaheadSamples;
+            Assert.That(limited.Skip(arrival).Take(200).Max(Math.Abs), Is.LessThanOrEqualTo(LimiterSampleProvider.Threshold + 0.02f),
+                "Already turned down when the peak comes out, not slammed down after it.");
         }
 
         [TestCase(0.0f)]

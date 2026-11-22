@@ -174,7 +174,8 @@ namespace Sequencer.Audio
                 double pitch = lfoTarget == LfoTarget.Pitch ? Math.Pow(2, lfo / 12.0) : 1.0;
                 double step1 = frequency * pitch / sampleRate;
                 double step2 = step1 * oscillator2Ratio;
-                double oscillators = oscillator1.CalculateForPhase(phase1) * (1 - oscillatorMix) + oscillator2.CalculateForPhase(phase2) * oscillatorMix;
+                double oscillators = oscillator1.CalculateForPhase(phase1, step1 * sampleRate) * (1 - oscillatorMix) +
+                                     oscillator2.CalculateForPhase(phase2, step2 * sampleRate) * oscillatorMix;
                 double input = oscillators + Noise() * noiseLevel;
                 phase1 = Advance(phase1, step1);
                 phase2 = Advance(phase2, step2);
