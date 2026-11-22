@@ -1,255 +1,39 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F891ABD0-A37F-42A2-9B98-C1723D58CED3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Sequencer</AssemblyName>
     <RootNamespace>Sequencer.View</RootNamespace>
-    <AssemblyName>Sequencer.View</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationIcon />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.3.5.0\lib\net40\Autofac.dll</HintPath>
-    </Reference>
-    <Reference Include="Autofac.Extras.CommonServiceLocator, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.Extras.CommonServiceLocator.4.0.0\lib\portable40-net40+sl5+win8+wp8+wpa81\Autofac.Extras.CommonServiceLocator.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
-    </Reference>
-    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.3.0.19032, Culture=neutral, PublicKeyToken=669f0b5e8f868abf, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.Extras.dll</HintPath>
-    </Reference>
-    <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.3.0.19032, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio, Version=1.8.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.1.8.3\lib\net35\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.AvalonDock, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.DataGrid, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
-    </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit, Version=3.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.3.2.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
+    <AvaloniaResource Include="Assets\**" />
+    <None Update="log4net.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Command\MousePointCommand\EmptyMousePointCommand.cs" />
-    <Compile Include="Command\MousePointCommand\INoteStateCommandFactory.cs" />
-    <Compile Include="Command\MousePointCommand\NoteStateCommandFactory.cs" />
-    <Compile Include="Console\ConsolePosition.cs" />
-    <Compile Include="Console\DesiredAccess.cs" />
-    <Compile Include="Console\StdHandle.cs" />
-    <Compile Include="Control\DragSelectionBox.xaml.cs">
-      <DependentUpon>DragSelectionBox.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Control\DrawingUtilities.cs" />
-    <Compile Include="Control\HeaderedScrollViewer.cs" />
-    <Compile Include="Control\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Control\RadialContextMenu\ContextMenuSegment.cs" />
-    <Compile Include="Control\RadialContextMenu\NoteActionRadialContextMenuWrapper.cs" />
-    <Compile Include="Control\RadialContextMenu\RadialContextMenu.cs" />
-    <Compile Include="Control\RadialContextMenu\RadialCursorLine.cs" />
-    <Compile Include="Control\SequencerControl.xaml.cs">
-      <DependentUpon>SequencerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Control\SequencerHeaderControl.xaml.cs">
-      <DependentUpon>SequencerHeaderControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Drawing\PositionIndicatorHeaderDrawer.cs" />
-    <Compile Include="Drawing\PositionIndicatorDrawer.cs" />
-    <Compile Include="Command\MousePointCommand\UpdateNewlyCreatedNoteCommand.cs" />
-    <Compile Include="Command\MousePointCommand\UpdateNoteStartPositionFromInitialPointCommand.cs" />
-    <Compile Include="Command\NotesCommand\IDeleteNotesCommand.cs" />
-    <Compile Include="Drawing\SequencerCanvasWrapper.cs" />
-    <Compile Include="Command\NotesCommand\DecrementVelocityCommand.cs" />
-    <Compile Include="Command\NotesCommand\IncrementVelocityCommand.cs" />
-    <Compile Include="Command\NotesCommand\ChangeVelocityCommand.cs" />
-    <Compile Include="Command\NotesCommand\INotesCommand.cs" />
-    <Compile Include="Command\MousePointCommand\CreateNoteFromPointCommand.cs" />
-    <Compile Include="Command\NotesCommand\DeleteNotesCommand.cs" />
-    <Compile Include="Command\MousePointCommand\DeleteNoteFromPointCommand.cs" />
-    <Compile Include="Command\MousePointCommand\IMousePointNoteCommand.cs" />
-    <Compile Include="Command\MousePointCommand\MoveNoteFromPointCommand.cs" />
-    <Compile Include="Command\MousePointCommand\MousePointNoteCommand.cs" />
-    <Compile Include="Command\MousePointCommand\MousePointNoteCommandFactory.cs" />
-    <Compile Include="Command\NotesCommand\MoveNotePitchCommand.cs" />
-    <Compile Include="Command\NotesCommand\MoveNotePositionCommand.cs" />
-    <Compile Include="Command\NotesCommand\UpdateNoteStateCommand.cs" />
-    <Compile Include="Command\MousePointCommand\UpdateNoteStateFromPointCommand.cs" />
-    <Compile Include="Command\MousePointCommand\UpdateNoteEndPositionFromInitialPointCommand.cs" />
-    <Compile Include="Console\ConsoleManager.cs" />
-    <Compile Include="Drawing\SequencerDimensionsCalculator.cs" />
-    <Compile Include="Drawing\SequencerDrawer.cs" />
-    <Compile Include="Command\SequencerKeyPressCommandHandler.cs" />
-    <Compile Include="Console\UnsafeNativeMethods.cs" />
-    <Compile Include="Drawing\SequencerHeaderDrawer.cs" />
-    <Compile Include="WpfDispatcher.cs" />
-    <Page Include="Control\DragSelectionBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Control\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Control\SequencerControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Control\SequencerHeaderControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <PackageReference Include="Autofac" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="log4net" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="log4netDebug.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="log4netRelease.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <AppDesigner Include="Properties\" />
+    <ProjectReference Include="..\Sequencer.Audio\Sequencer.Audio.csproj" />
+    <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj" />
+    <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj" />
+    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj" />
+    <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj" />
+    <ProjectReference Include="..\Sequencer.Visual\Sequencer.Visual.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <InternalsVisibleTo Include="Sequencer.View.Tests" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sequencer.Audio\Sequencer.Audio.csproj">
-      <Project>{A4DD60B7-A760-4871-BCCA-B2FA604F8A28}</Project>
-      <Name>Sequencer.Audio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Domain\Sequencer.Domain.csproj">
-      <Project>{2f107eeb-5405-4d9a-a21e-866fbd9e697b}</Project>
-      <Name>Sequencer.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Midi\Sequencer.Midi.csproj">
-      <Project>{8ADB7C17-3648-4992-AAD4-C0E6D8B1D23B}</Project>
-      <Name>Sequencer.Midi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Utilities\Sequencer.Utilities.csproj">
-      <Project>{00083716-D3DB-46FE-9E9F-083FF0C77CBA}</Project>
-      <Name>Sequencer.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.ViewModel\Sequencer.ViewModel.csproj">
-      <Project>{68A8D4A6-B8EE-4684-8F1B-21B686014069}</Project>
-      <Name>Sequencer.ViewModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sequencer.Visual\Sequencer.Visual.csproj">
-      <Project>{08D2CF5D-545A-4ACF-AE26-BD02CE5A116E}</Project>
-      <Name>Sequencer.Visual</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

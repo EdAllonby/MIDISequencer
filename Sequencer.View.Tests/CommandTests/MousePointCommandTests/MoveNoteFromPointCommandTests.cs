@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
 using Sequencer.Domain;
@@ -29,7 +28,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 
             var relativePitchesToMove = 2;
 
-            mockKeyboardStateProcessor.Setup(x => x.IsKeyDown(Key.LeftShift)).Returns(false);
+            mockKeyboardStateProcessor.Setup(x => x.IsShiftDown).Returns(false);
             calculator.Setup(x => x.FindStepsFromPitches(It.IsAny<Pitch>(), It.IsAny<Pitch>())).Returns(relativePitchesToMove);
             endPosition.Setup(x => x.NextPosition(It.IsAny<NoteResolution>(), It.IsAny<TimeSignature>(), It.IsAny<int>())).Returns(mockNextPosition.Object);
             mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);
@@ -91,7 +90,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
 
             var relativeBeatsToMove = 12;
 
-            mockKeyboardStateProcessor.Setup(x => x.IsKeyDown(Key.LeftShift)).Returns(false);
+            mockKeyboardStateProcessor.Setup(x => x.IsShiftDown).Returns(false);
             calculator.Setup(x => x.FindTicksBetweenPositions(It.IsAny<IPosition>(), It.IsAny<IPosition>())).Returns(relativeBeatsToMove);
             endPosition.Setup(x => x.NextPosition(It.IsAny<NoteResolution>(), It.IsAny<TimeSignature>(), It.IsAny<int>())).Returns(mockNextPosition.Object);
             mockMouseOperator.Setup(x => x.CanModifyNote).Returns(true);

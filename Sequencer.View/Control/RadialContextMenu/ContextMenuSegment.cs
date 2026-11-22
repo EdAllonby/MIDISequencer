@@ -1,138 +1,122 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using System;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using JetBrains.Annotations;
-using Sequencer.Utilities;
 using Sequencer.ViewModel;
-using Sequencer.Visual;
 
 namespace Sequencer.View.Control.RadialContextMenu
 {
     /// <summary>
-    /// A context menu segment.
+    /// One pie slice of the radial menu, with the item's icon in the middle.
     /// </summary>
-    /// <typeparam name="TMenuItem">The menu item to represent.</typeparam>
-    public sealed class ContextMenuSegment<TMenuItem> : Canvas, IPositionAware
+    public sealed class ContextMenuSegment<TMenuItem> : Canvas
         where TMenuItem : VisualEnumerableType<TMenuItem>
     {
+        [NotNull] private static readonly Dictionary<string, Bitmap> IconCache = new Dictionary<string, Bitmap>();
+        [NotNull] private static readonly IBrush SelectedBrush = new SolidColorBrush(Colors.CornflowerBlue);
+        [NotNull] private static readonly IBrush UnselectedBrush = new SolidColorBrush(Colors.LightSteelBlue, 0.7);
+
         [NotNull] private readonly Path segmentShape = new Path();
-        private readonly Color selectedColor = Colors.CornflowerBlue;
-        private readonly Color unselectedColor = Colors.LightSteelBlue;
+        private readonly Point centre;
+        private readonly double startAngle;
+        private readonly double sweepAngle;
 
-        /// <summary>
-        /// Creates a visual context menu segment.
-        /// </summary>
-        /// <param name="menuItem">The item to draw.</param>
-        /// <param name="startingPoint">The starting position.</param>
-        /// <param name="menuRadius">The radius of the menu.</param>
-        /// <param name="startAngle">The starting angle to start drawing.</param>
-        /// <param name="angle">The size of the segment in degrees.</param>
-        public ContextMenuSegment([NotNull] TMenuItem menuItem, Point startingPoint, double menuRadius, double startAngle, double angle)
+        public ContextMenuSegment([NotNull] TMenuItem menuItem, Point centre, double menuRadius, double startAngle, double sweepAngle)
         {
-            // This uses 3 points to create the segment. The starting point, the beginning of the arc point, and the end of the arc point.
-            // This will create the segment geometry we can use to draw the shape.
-
             MenuItem = menuItem;
-            double endAngle = startAngle + angle;
+            this.centre = centre;
+            this.startAngle = startAngle;
+            this.sweepAngle = sweepAngle;
 
-            // path container
-            var pathData = new PathFigure
+            // The slice is the centre, a line out to the start of the arc, and the arc itself.
+            double endAngle = startAngle + sweepAngle;
+            Point arcStart = RadialMenuGeometry.PolarToCartesian(centre, menuRadius, startAngle);
+            Point arcEnd = RadialMenuGeometry.PolarToCartesian(centre, menuRadius, endAngle);
+
+            var figure = new PathFigure
             {
-                StartPoint = startingPoint,
-                IsClosed = true
+                StartPoint = centre,
+                IsClosed = true,
+                Segments = new PathSegments
+                {
+                    new LineSegment { Point = arcStart },
+                    new ArcSegment
+                    {
+                        Point = arcEnd,
+                        Size = new Size(menuRadius, menuRadius),
+                        IsLargeArc = sweepAngle >= 180.0,
+                        SweepDirection = SweepDirection.Clockwise
+                    }
+                }
             };
 
-            //  start angle line
-            Point arcStartPosition = MathsUtilities.PolarToCartesian(startingPoint, menuRadius, startAngle);
-
-            var lineToArc = new LineSegment { Point = arcStartPosition };
-
-            pathData.Segments?.Add(lineToArc);
-
-            // outer arc
-            Point arcEndPosition = MathsUtilities.PolarToCartesian(startingPoint, menuRadius, endAngle);
-
-            var arcSize = new Size(menuRadius, menuRadius);
-
-            var arc = new ArcSegment
-            {
-                IsLargeArc = angle >= 180.0,
-                Point = arcEndPosition,
-                Size = arcSize,
-                SweepDirection = SweepDirection.Clockwise
-            };
-
-            pathData.Segments?.Add(arc);
-
-            var pathGeometry = new PathGeometry { Figures = { pathData } };
-
-            segmentShape.Data = pathGeometry;
+            var geometry = new PathGeometry { Figures = new PathFigures { figure } };
+            segmentShape.Data = geometry;
             Children.Add(segmentShape);
 
-            double segmentIconSize = Math.Min(pathGeometry.Bounds.Width, pathGeometry.Bounds.Height);
-            var segmentIcon = new Image
+            Bitmap icon = LoadIcon(menuItem.IconName);
+
+            if (icon != null)
             {
-                Source = MenuItem.Visual?.ToBitmapImage(),
-                Stretch = Stretch.Fill,
-                Height = segmentIconSize * 0.7,
-                Width = segmentIconSize * 0.7
-            };
+                double iconSize = Math.Min(geometry.Bounds.Width, geometry.Bounds.Height) * 0.7;
+                var image = new Image { Source = icon, Stretch = Stretch.Fill, Width = iconSize, Height = iconSize };
+                RenderOptions.SetBitmapInterpolationMode(image, Avalonia.Media.Imaging.BitmapInterpolationMode.HighQuality);
 
-            // We don't want the scaled bitmap to look pixelated,
-            // and we don't really care about the performance of a context menu.
-            // This will set the icon's scaling logic to the best scaling technique.
-            RenderOptions.SetBitmapScalingMode(segmentIcon, BitmapScalingMode.Fant);
-
-            Children.Add(segmentIcon);
-
-            double midAngle = endAngle - angle / 2;
-
-            Point imagePosition = MathsUtilities.PolarToCartesian(startingPoint, menuRadius * 0.5, midAngle);
-
-            segmentIcon.SetCentreOnCanvas(imagePosition);
+                Point iconCentre = RadialMenuGeometry.PolarToCartesian(centre, menuRadius * 0.5, endAngle - sweepAngle / 2);
+                SetLeft(image, iconCentre.X - iconSize / 2);
+                SetTop(image, iconCentre.Y - iconSize / 2);
+                Children.Add(image);
+            }
 
             Unselect();
         }
 
-        /// <summary>
-        /// The <see cref="TMenuItem" /> this segment represents.
-        /// </summary>
         [NotNull]
         public TMenuItem MenuItem { get; }
 
-        /// <summary>
-        /// Whether this segment is selected.
-        /// </summary>
         public bool IsSelected { get; private set; }
 
-        /// <summary>
-        /// Determines if this segment intersects with other geometry.
-        /// </summary>
-        /// <param name="geometry">The other geometry to determine if it intersects.</param>
-        /// <returns>Whether this segment intersects with the other geometry.</returns>
-        public bool IntersectsWith(Geometry geometry)
+        public bool ContainsDirectionTo(Point cursor)
         {
-            return segmentShape.Data?.FillContainsWithDetail(geometry) != IntersectionDetail.Empty;
+            return RadialMenuGeometry.IsCursorInSegment(centre, cursor, startAngle, sweepAngle);
         }
 
-        /// <summary>
-        /// Select this segment.
-        /// </summary>
         public void Select()
         {
-            segmentShape.Fill = new SolidColorBrush(selectedColor);
+            segmentShape.Fill = SelectedBrush;
             IsSelected = true;
         }
 
-        /// <summary>
-        /// Unselect this segment.
-        /// </summary>
         public void Unselect()
         {
-            segmentShape.Fill = new SolidColorBrush(unselectedColor) { Opacity = 0.7 };
+            segmentShape.Fill = UnselectedBrush;
             IsSelected = false;
+        }
+
+        [CanBeNull]
+        private static Bitmap LoadIcon([CanBeNull] string iconName)
+        {
+            if (iconName == null)
+            {
+                return null;
+            }
+
+            if (!IconCache.TryGetValue(iconName, out Bitmap bitmap))
+            {
+                using (var stream = AssetLoader.Open(new Uri($"avares://Sequencer/Assets/{iconName}.png")))
+                {
+                    bitmap = new Bitmap(stream);
+                }
+
+                IconCache[iconName] = bitmap;
+            }
+
+            return bitmap;
         }
     }
 }

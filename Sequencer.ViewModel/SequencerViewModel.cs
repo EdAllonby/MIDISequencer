@@ -24,7 +24,7 @@ namespace Sequencer.ViewModel
         [NotNull] private IPosition currentPosition = new Position(1, 1, 1);
         [NotNull] private NoteAction noteAction = NoteAction.Create;
         [NotNull] private IEnumerable<Tone> selectedNotes = new List<Tone>();
-        [CanBeNull] private object selectedObject;
+        [CanBeNull] private SelectedNoteViewModel selectedNote;
         private PlayState sequencerPlayState;
 
         public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IUiDispatcher dispatcher)
@@ -77,12 +77,12 @@ namespace Sequencer.ViewModel
 
                 if (selectedNotes.Count() == 1)
                 {
-                    SelectedObject = SelectedNotes.FirstOrDefault();
+                    SelectedNote = new SelectedNoteViewModel(selectedNotes.First());
                     OnPropertyChanged(nameof(SelectedNotes));
                 }
                 else
                 {
-                    SelectedObject = null;
+                    SelectedNote = null;
                 }
             }
         }
@@ -121,13 +121,13 @@ namespace Sequencer.ViewModel
         }
 
         [CanBeNull]
-        public object SelectedObject
+        public SelectedNoteViewModel SelectedNote
         {
-            get => selectedObject;
-            set
+            get => selectedNote;
+            private set
             {
-                selectedObject = value;
-                OnPropertyChanged(nameof(SelectedObject));
+                selectedNote = value;
+                OnPropertyChanged(nameof(SelectedNote));
             }
         }
 

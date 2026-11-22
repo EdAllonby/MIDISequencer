@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+using Avalonia.Controls;
 using JetBrains.Annotations;
 using Sequencer.Visual;
 
@@ -14,18 +13,18 @@ namespace Sequencer.View.Drawing
             this.canvas = canvas;
         }
 
-        public void AddChild(UIElement child)
+        public void AddChild(Avalonia.Controls.Control child)
         {
             canvas.Children.Add(child);
         }
 
-        public void RemoveChild(UIElement child)
+        public void RemoveChild(Avalonia.Controls.Control child)
         {
             canvas.Children.Remove(child);
         }
 
-        public double Width => canvas.ActualWidth;
+        public double Width => canvas.Bounds.Width;
 
-        public double Height => canvas.ActualHeight;
+        public double Height => canvas.Bounds.Height;
     }
 }

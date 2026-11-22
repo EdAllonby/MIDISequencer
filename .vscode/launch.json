@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Sequencer",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/Sequencer.View/bin/Debug/net10.0/Sequencer.dll",
+      "cwd": "${workspaceFolder}/Sequencer.View/bin/Debug/net10.0",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}

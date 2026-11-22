@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
@@ -27,17 +26,17 @@ namespace Sequencer.View.Drawing
             this.sequencerHeaderCanvas = sequencerHeaderCanvas;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
 
-            var indicatorBrush = new SolidColorBrush(sequencerSettings.IndicatorColour);
+            var indicatorBrush = sequencerSettings.IndicatorColour.ToBrush();
 
             indicatorHeader = new Polygon
             {
-                Points = new PointCollection(new List<Point> { new Point(0, 0), new Point(IndicatorHeaderSize / 2.0, IndicatorHeaderSize), new Point(IndicatorHeaderSize, 0) }),
-                Fill = indicatorBrush
+                Points = new List<Point> { new Point(0, 0), new Point(IndicatorHeaderSize / 2.0, IndicatorHeaderSize), new Point(IndicatorHeaderSize, 0) },
+                Fill = indicatorBrush,
+                ZIndex = int.MaxValue
             };
 
             sequencerHeaderCanvas.AddChild(indicatorHeader);
 
-            Panel.SetZIndex(indicatorHeader, int.MaxValue);
 
             DrawPositionIndicator(CurrentPosition);
         }
@@ -47,7 +46,7 @@ namespace Sequencer.View.Drawing
 
         public void DrawPositionIndicator([NotNull] IPosition position)
         {
-            Log.Info($"New Indicator Header Position drawing: {position}");
+            Log.Debug($"New Indicator Header Position drawing: {position}");
 
             CurrentPosition = position;
             double noteStartLocation = sequencerDimensionsCalculator.GetPointFromPosition(position);

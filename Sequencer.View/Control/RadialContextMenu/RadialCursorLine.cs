@@ -1,71 +1,50 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using System;
+using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Avalonia.Threading;
 using JetBrains.Annotations;
 using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Control.RadialContextMenu
 {
     /// <summary>
-    /// A visual representation of a line with a fixed start point which follows a cursor for its end point.
+    /// The line from the menu's centre to the cursor.
     /// </summary>
     public class RadialCursorLine
     {
-        private const int FadeOutDuration = 200;
+        private static readonly TimeSpan FadeOutDuration = TimeSpan.FromMilliseconds(200);
+
         [NotNull] private readonly Line cursorLine;
         [NotNull] private readonly Canvas ownerCanvas;
 
-        /// <summary>
-        /// Create a cursor line with a fixed starting point to be displayed on a <see cref="Canvas" />.
-        /// </summary>
-        /// <param name="canvas">The canvas to display this cursor line on.</param>
-        /// <param name="startingPosition">The fixed starting point of this cursor line.</param>
         public RadialCursorLine([NotNull] Canvas canvas, [NotNull] IMousePoint startingPosition)
         {
             ownerCanvas = canvas;
-
             cursorLine = new Line
             {
-                Visibility = Visibility.Visible,
                 StrokeThickness = 1,
                 Stroke = Brushes.Black,
-                X1 = startingPosition.X,
-                Y1 = startingPosition.Y
+                StartPoint = startingPosition.Point,
+                EndPoint = startingPosition.Point,
+                ZIndex = 99,
+                Transitions = new Transitions { new DoubleTransition { Property = Avalonia.Visual.OpacityProperty, Duration = FadeOutDuration } }
             };
 
             canvas.Children.Add(cursorLine);
-            Panel.SetZIndex(cursorLine, 99);
         }
 
-        /// <summary>
-        /// Give the cursor line a new end point.
-        /// </summary>
-        /// <param name="endPosition">The new end point.</param>
         public void NewEndPoint([NotNull] IMousePoint endPosition)
         {
-            cursorLine.X2 = endPosition.X;
-            cursorLine.Y2 = endPosition.Y;
+            cursorLine.EndPoint = endPosition.Point;
         }
 
-        /// <summary>
-        /// Remove a cursor from the canvas with a fade effect.
-        /// </summary>
-        /// <param name="opacityProperty">Used for animating the removal.</param>
-        public void RemoveWithFade(DependencyProperty opacityProperty)
-        {
-            DoubleAnimation animation = DrawingUtilities.CreateFadeOutAnimation(FadeOutDuration);
-
-            animation.Completed += (s, a) => AfterRemoveAnimation();
-
-            cursorLine.BeginAnimation(opacityProperty, animation);
-        }
-
-        private void AfterRemoveAnimation()
+        public void RemoveWithFade()
         {
             cursorLine.Opacity = 0;
-            ownerCanvas.Children.Remove(cursorLine);
+            DispatcherTimer.RunOnce(() => ownerCanvas.Children.Remove(cursorLine), FadeOutDuration);
         }
     }
 }

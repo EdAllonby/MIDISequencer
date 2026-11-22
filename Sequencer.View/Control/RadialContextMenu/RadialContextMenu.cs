@@ -1,65 +1,60 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Data;
+using Avalonia.Media;
+using Avalonia.Threading;
 using JetBrains.Annotations;
 using Sequencer.Domain;
-using Sequencer.Utilities;
 using Sequencer.ViewModel;
 using Sequencer.Visual.Input;
 
 namespace Sequencer.View.Control.RadialContextMenu
 {
+    /// <summary>
+    /// A pie menu that opens around the cursor while the secondary button is held. Releasing over a slice
+    /// selects that item.
+    /// </summary>
     public class RadialContextMenu<TMenuItem> : Canvas where TMenuItem : VisualEnumerableType<TMenuItem>
     {
-        /// <summary>
-        /// The Items selected Dependency Property.
-        /// </summary>
-        [NotNull] public static readonly DependencyProperty SelectedMenuItemProperty =
-            DependencyProperty.Register(nameof(SelectedMenuItem), typeof(EnumerableType<TMenuItem>), typeof(RadialContextMenu<TMenuItem>),
-                new FrameworkPropertyMetadata(null));
+        public static readonly StyledProperty<TMenuItem> SelectedMenuItemProperty =
+            AvaloniaProperty.Register<RadialContextMenu<TMenuItem>, TMenuItem>(nameof(SelectedMenuItem), defaultBindingMode: BindingMode.TwoWay);
 
-        /// <summary>
-        /// The Items selected Dependency Property.
-        /// </summary>
-        [NotNull] public static readonly DependencyProperty MenuRadiusProperty =
-            DependencyProperty.Register(nameof(MenuRadius), typeof(double), typeof(RadialContextMenu<TMenuItem>),
-                new FrameworkPropertyMetadata(null));
+        public static readonly StyledProperty<double> MenuRadiusProperty =
+            AvaloniaProperty.Register<RadialContextMenu<TMenuItem>, double>(nameof(MenuRadius), 40);
 
-        [NotNull] [ItemNotNull] private readonly List<Line> menuSeperators = new List<Line>();
+        private static readonly TimeSpan FadeOutDuration = TimeSpan.FromMilliseconds(100);
+
+        [NotNull] [ItemNotNull] private readonly List<Line> menuSeparators = new List<Line>();
         [NotNull] [ItemNotNull] private readonly List<ContextMenuSegment<TMenuItem>> segments = new List<ContextMenuSegment<TMenuItem>>();
-
-        private IMousePoint centre;
         private bool isActive;
-
         [CanBeNull] private RadialCursorLine radialCursorLine;
 
-
-        public EnumerableType<TMenuItem> SelectedMenuItem
+        public RadialContextMenu()
         {
-            get => (EnumerableType<TMenuItem>) GetValue(SelectedMenuItemProperty);
+            // The menu only draws; the window routes pointer input to it.
+            IsHitTestVisible = false;
+        }
+
+        public TMenuItem SelectedMenuItem
+        {
+            get => GetValue(SelectedMenuItemProperty);
             set => SetValue(SelectedMenuItemProperty, value);
         }
 
         public double MenuRadius
         {
-            private get
-            {
-                object value = GetValue(MenuRadiusProperty);
-                if (value == null)
-                {
-                    return 0;
-                }
-
-                return (double) value;
-            }
+            get => GetValue(MenuRadiusProperty);
             set => SetValue(MenuRadiusProperty, value);
         }
 
-        private static double AngleSize => (double) 360 / EnumerableType<TMenuItem>.Count(x => x.CanView);
+        private static double AngleSize => 360.0 / EnumerableType<TMenuItem>.Count(x => x.CanView);
+
+        public bool IsOpen => isActive;
 
         public void SetCursorPosition([NotNull] IMousePoint point)
         {
@@ -70,17 +65,15 @@ namespace Sequencer.View.Control.RadialContextMenu
 
             radialCursorLine?.NewEndPoint(point);
 
-            foreach (ContextMenuSegment<TMenuItem> contextMenuSegment in segments)
+            foreach (ContextMenuSegment<TMenuItem> segment in segments)
             {
-                var segment = new LineGeometry(centre?.Point ?? new Point(), point.Point);
-
-                if (contextMenuSegment.IntersectsWith(segment))
+                if (segment.ContainsDirectionTo(point.Point))
                 {
-                    contextMenuSegment.Select();
+                    segment.Select();
                 }
                 else
                 {
-                    contextMenuSegment.Unselect();
+                    segment.Unselect();
                 }
             }
         }
@@ -88,31 +81,34 @@ namespace Sequencer.View.Control.RadialContextMenu
         public void BuildPopup([NotNull] IMousePoint point)
         {
             isActive = true;
-            centre = point;
             radialCursorLine = new RadialCursorLine(this, point);
 
             foreach (TMenuItem menuItem in EnumerableType<TMenuItem>.All.Where(x => x.CanView))
             {
                 double angle = AngleSize / 2 + AngleSize * menuItem.Value;
 
-                // We want to start calculating where the azimuth is on the Y axis.
-                // So, we tranlate all angles by -90 degrees to rotate from X to Y.
+                // Rotate by -90 degrees so the first slice is measured from the vertical.
                 double startAngle = angle - 90;
-                Point lineEndPoint = MathsUtilities.PolarToCartesian(point.Point, MenuRadius, startAngle);
-
-                Line seperatorLine = CreateSeperatorLine(point.Point, lineEndPoint);
+                Point lineEndPoint = RadialMenuGeometry.PolarToCartesian(point.Point, MenuRadius, startAngle);
 
                 segments.Add(new ContextMenuSegment<TMenuItem>(menuItem, point.Point, MenuRadius, startAngle, AngleSize));
-
-                menuSeperators.Add(seperatorLine);
+                menuSeparators.Add(CreateSeparatorLine(point.Point, lineEndPoint));
             }
 
-            AddElementsToCanvas(segments);
-            AddElementsToCanvas(menuSeperators);
+            foreach (Avalonia.Controls.Control element in segments.Cast<Avalonia.Controls.Control>().Concat(menuSeparators))
+            {
+                element.Transitions = new Transitions { new DoubleTransition { Property = OpacityProperty, Duration = FadeOutDuration } };
+                Children.Add(element);
+            }
         }
 
         public void ClosePopup()
         {
+            if (!isActive)
+            {
+                return;
+            }
+
             TMenuItem selectedMenuItem = segments.FirstOrDefault(item => item.IsSelected)?.MenuItem;
 
             if (selectedMenuItem != null)
@@ -120,66 +116,38 @@ namespace Sequencer.View.Control.RadialContextMenu
                 SelectedMenuItem = selectedMenuItem;
             }
 
-            DoubleAnimation animation = DrawingUtilities.CreateFadeOutAnimation(100);
+            // Fade out, then remove exactly these elements, so a menu reopened during the fade is unaffected.
+            List<Avalonia.Controls.Control> closing = segments.Cast<Avalonia.Controls.Control>().Concat(menuSeparators).ToList();
 
-            animation.Completed += (s, a) => AfterRemoveAnimation();
-
-            foreach (Line menuSeperator in menuSeperators)
+            foreach (Avalonia.Controls.Control element in closing)
             {
-                menuSeperator.BeginAnimation(OpacityProperty, animation);
+                element.Opacity = 0;
             }
 
-            foreach (ContextMenuSegment<TMenuItem> segment in segments)
+            DispatcherTimer.RunOnce(() =>
             {
-                segment.BeginAnimation(OpacityProperty, animation);
-            }
-
-            radialCursorLine?.RemoveWithFade(OpacityProperty);
-
-            isActive = false;
-        }
-
-        private void AddElementsToCanvas([NotNull] [ItemNotNull] IEnumerable<FrameworkElement> elements)
-        {
-            foreach (FrameworkElement element in elements)
-            {
-                if (!Children.Contains(element))
-                {
-                    Children.Add(element);
-                }
-            }
-        }
-
-        private void RemoveElementToCanvas([NotNull] [ItemNotNull] IEnumerable<FrameworkElement> elements)
-        {
-            foreach (FrameworkElement element in elements.ToList())
-            {
-                if (Children.Contains(element))
+                foreach (Avalonia.Controls.Control element in closing)
                 {
                     Children.Remove(element);
                 }
-            }
-        }
+            }, FadeOutDuration);
 
-        private void AfterRemoveAnimation()
-        {
-            RemoveElementToCanvas(menuSeperators);
-            RemoveElementToCanvas(segments);
-
-            menuSeperators.Clear();
+            radialCursorLine?.RemoveWithFade();
+            radialCursorLine = null;
             segments.Clear();
+            menuSeparators.Clear();
+            isActive = false;
         }
 
-        private static Line CreateSeperatorLine(Point point, Point lineEndPoint)
+        [NotNull]
+        private static Line CreateSeparatorLine(Point centre, Point lineEndPoint)
         {
             return new Line
             {
                 StrokeThickness = 1,
                 Stroke = Brushes.DimGray,
-                X1 = point.X,
-                Y1 = point.Y,
-                X2 = lineEndPoint.X,
-                Y2 = lineEndPoint.Y
+                StartPoint = centre,
+                EndPoint = lineEndPoint
             };
         }
     }

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Windows.Media;
+using System;
+using Avalonia;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
@@ -97,9 +97,9 @@ namespace Sequencer.Visual
         /// </summary>
         /// <param name="geometry">The rectangle to check if this visual note intersects.</param>
         /// <returns>If this visual note intersects with the rectangle.</returns>
-        public bool IntersectsWith(Geometry geometry)
+        public bool IntersectsWith(Rect rectangle)
         {
-            return noteDrawer.IntersectsWith(geometry.Bounds);
+            return noteDrawer.IntersectsWith(rectangle);
         }
 
         /// <summary>

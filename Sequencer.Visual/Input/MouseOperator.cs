@@ -1,19 +1,20 @@
-﻿using System.Windows.Input;
-using JetBrains.Annotations;
-
 namespace Sequencer.Visual.Input
 {
-    public class MouseOperator : IMouseOperator
+    /// <summary>
+    /// The mouse buttons currently held. Avalonia has no global mouse state, so this is kept up to date
+    /// from pointer events.
+    /// </summary>
+    public sealed class MouseOperator : IMouseOperator
     {
-        [NotNull] private readonly IMouseStateProcessor mouseStateProcessor;
+        public bool IsLeftButtonPressed { get; set; }
 
-        public MouseOperator([NotNull] IMouseStateProcessor mouseStateProcessor)
-        {
-            this.mouseStateProcessor = mouseStateProcessor;
-        }
+        /// <summary>
+        /// The secondary button: right-click, a two-finger trackpad click, or Ctrl-click on macOS.
+        /// </summary>
+        public bool IsContextButtonPressed { get; set; }
 
-        public bool CanModifyNote => mouseStateProcessor.IsButtonPressed(Mouse.LeftButton);
+        public bool CanModifyNote => IsLeftButtonPressed && !IsContextButtonPressed;
 
-        public bool CanModifyContextMenu => mouseStateProcessor.IsButtonPressed(Mouse.RightButton);
+        public bool CanModifyContextMenu => IsContextButtonPressed;
     }
 }
