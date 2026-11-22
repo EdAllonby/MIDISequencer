@@ -40,7 +40,16 @@ namespace Sequencer.View
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = container.Resolve<MainWindow>();
-                desktop.ShutdownRequested += (sender, args) => container.Dispose();
+                desktop.ShutdownRequested += (sender, args) =>
+                {
+                    if (container.Resolve<IAudioOutput>() is PortAudioOutput output)
+                    {
+                        // Underflows are dropouts. Clipped counts samples beyond ±1 after the limiter, so it should stay 0.
+                        LogManager.GetLogger(typeof(App)).Info($"Audio: {output.Statistics}");
+                    }
+
+                    container.Dispose();
+                };
             }
 
             base.OnFrameworkInitializationCompleted();
