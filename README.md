@@ -99,6 +99,18 @@ noise ────────┘          ↑          ↑
 
 <img src="docs/images/synth.png" alt="The synth panel with the Acid Bass preset" width="290">
 
+### Saving, exporting and undo
+
+The **File** menu (the menu bar on macOS) has New (⌘N), Open (⌘O), Save (⌘S) and Save As (⇧⌘S). Songs are
+saved as readable JSON (`.sequencer`) with the tempo, every track's sound, effects, clips and arrangement.
+The title bar shows "Edited" while there are unsaved changes, and you're asked before they'd be lost.
+
+**Export MIDI File** writes a Standard MIDI File for GarageBand, Logic or any DAW (drums on channel 10 with
+General MIDI notes). **Export Audio (WAV)** renders the whole song, effects included.
+
+**Edit → Undo** (⌘Z) and **Redo** (⇧⌘Z) cover every change: notes, drums, sounds, effects, the arrangement
+and the tempo. A slider drag is one step.
+
 ### Effects
 
 Every track has its own effects, under **Effects** in the side panel. **Add** puts one at the end of the

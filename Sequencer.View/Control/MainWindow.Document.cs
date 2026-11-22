@@ -64,6 +64,7 @@ namespace Sequencer.View.Control
 
             Closing += OnWindowClosing;
             BuildFileMenu();
+            ResetHistory();
             SetUnsavedChanges(false);
         }
 
@@ -74,6 +75,7 @@ namespace Sequencer.View.Control
         {
             ReplaceSong(Song.CreateDefault(), 120);
             documentPath = null;
+            ResetHistory();
             SetUnsavedChanges(false);
         }
 
@@ -96,44 +98,36 @@ namespace Sequencer.View.Control
 
             ReplaceSong(loaded.Song, loaded.BeatsPerMinute);
             documentPath = path;
+            ResetHistory();
             SetUnsavedChanges(false);
             Log.Info($"Opened {path}");
         }
 
         internal void SaveSong([NotNull] string path)
         {
-            // The open note clip lives in the editor; make sure the file gets its latest notes.
-            openNoteClip?.Close();
-
+            // An open clip reads the editor's notes, so the file gets the latest without closing it.
             using (FileStream stream = File.Create(path))
             {
                 SongFile.Save(song, viewModel.BeatsPerMinute, stream);
             }
 
-            ReopenSelectedClip();
             documentPath = path;
+            MarkSaved();
             SetUnsavedChanges(false);
             Log.Info($"Saved {path}");
         }
 
         internal void ExportMidi([NotNull] string path)
         {
-            openNoteClip?.Close();
-
             using (FileStream stream = File.Create(path))
             {
                 midiFileWriter?.Write(song, viewModel.BeatsPerMinute, stream);
             }
-
-            ReopenSelectedClip();
         }
 
         internal double ExportWav([NotNull] string path)
         {
-            openNoteClip?.Close();
-            double seconds = wavExporter?.Export(song, viewModel.BeatsPerMinute, mixerSettings ?? new MixerSettings(), path) ?? 0;
-            ReopenSelectedClip();
-            return seconds;
+            return wavExporter?.Export(song, viewModel.BeatsPerMinute, mixerSettings ?? new MixerSettings(), path) ?? 0;
         }
 
         private void ReplaceSong([NotNull] Song replacement, int beatsPerMinute)
@@ -158,21 +152,12 @@ namespace Sequencer.View.Control
             }
         }
 
-        private void ReopenSelectedClip()
-        {
-            if (arrangement.SelectedTrack != null)
-            {
-                suppressEdits++;
-                Select(arrangement.SelectedTrack, arrangement.SelectedSection);
-                suppressEdits--;
-            }
-        }
-
         private void MarkEdited()
         {
             if (suppressEdits == 0)
             {
                 SetUnsavedChanges(true);
+                ScheduleRecord();
             }
         }
 
@@ -222,6 +207,7 @@ namespace Sequencer.View.Control
 
             var menu = new NativeMenu();
             menu.Items.Add(new NativeMenuItem("File") { Menu = file });
+            AddEditMenu(menu);
             NativeMenu.SetMenu(this, menu);
         }
 
