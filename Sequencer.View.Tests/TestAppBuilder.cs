@@ -1,7 +1,8 @@
+using System;
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Styling;
-using Avalonia.Themes.Fluent;
+using Avalonia.Markup.Xaml.Styling;
 
 [assembly: AvaloniaTestApplication(typeof(Sequencer.View.Tests.TestAppBuilder))]
 
@@ -26,8 +27,11 @@ namespace Sequencer.View.Tests
     {
         public override void Initialize()
         {
-            RequestedThemeVariant = ThemeVariant.Light;
-            Styles.Add(new FluentTheme());
+            // The app's real theme, so rendered frames look like the app.
+            // Load the app's assembly first: avares:// lookups only search assemblies already loaded.
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(App).TypeHandle);
+            RequestedThemeVariant = ThemeVariant.Dark;
+            Styles.Add(new StyleInclude(new Uri("avares://Sequencer.View.Tests/")) { Source = new Uri("avares://Sequencer/Theme.axaml") });
         }
     }
 }

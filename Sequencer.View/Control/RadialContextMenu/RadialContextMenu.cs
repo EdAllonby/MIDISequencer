@@ -25,7 +25,7 @@ namespace Sequencer.View.Control.RadialContextMenu
             AvaloniaProperty.Register<RadialContextMenu<TMenuItem>, TMenuItem>(nameof(SelectedMenuItem), defaultBindingMode: BindingMode.TwoWay);
 
         public static readonly StyledProperty<double> MenuRadiusProperty =
-            AvaloniaProperty.Register<RadialContextMenu<TMenuItem>, double>(nameof(MenuRadius), 40);
+            AvaloniaProperty.Register<RadialContextMenu<TMenuItem>, double>(nameof(MenuRadius), 52);
 
         private static readonly TimeSpan FadeOutDuration = TimeSpan.FromMilliseconds(100);
 
@@ -144,8 +144,9 @@ namespace Sequencer.View.Control.RadialContextMenu
         {
             return new Line
             {
-                StrokeThickness = 1,
-                Stroke = Brushes.DimGray,
+                // Gaps between the slices, in the window colour.
+                StrokeThickness = 2,
+                Stroke = new SolidColorBrush(Color.Parse("#16171A")),
                 StartPoint = centre,
                 EndPoint = lineEndPoint
             };

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
@@ -9,14 +10,18 @@ using Sequencer.Visual;
 
 namespace Sequencer.View.Drawing
 {
+    /// <summary>
+    /// Draws the ruler: bar numbers, with ticks for bars, beats and sixteenths at decreasing heights.
+    /// </summary>
     public class SequencerHeaderDrawer
     {
         [NotNull] [ItemNotNull] private readonly List<Avalonia.Controls.Control> elementCache = new List<Avalonia.Controls.Control>();
         [NotNull] private readonly ISequencerDimensionsCalculator sequencerDimensionsCalculator;
-        private readonly ISequencerCanvasWrapper sequencerHeaderCanvas;
+        [NotNull] private readonly ISequencerCanvasWrapper sequencerHeaderCanvas;
         [NotNull] private readonly SequencerSettings sequencerSettings;
 
-        public SequencerHeaderDrawer(ISequencerCanvasWrapper sequencerHeaderCanvas, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator, [NotNull] SequencerSettings sequencerSettings)
+        public SequencerHeaderDrawer([NotNull] ISequencerCanvasWrapper sequencerHeaderCanvas, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
+            [NotNull] SequencerSettings sequencerSettings)
         {
             this.sequencerHeaderCanvas = sequencerHeaderCanvas;
             this.sequencerDimensionsCalculator = sequencerDimensionsCalculator;
@@ -26,93 +31,67 @@ namespace Sequencer.View.Drawing
         public void RedrawHeader()
         {
             RemoveElements();
-            DrawVerticalSequencerLine();
+            DrawRuler();
             AddElements();
         }
 
-        private void DrawVerticalSequencerLine()
+        private void DrawRuler()
         {
-            var totalBeats = 0;
-            for (var measure = 0; measure < sequencerSettings.TotalMeasures; measure++)
+            double height = sequencerHeaderCanvas.Height;
+            IBrush tick = sequencerSettings.RulerTickColour.ToBrush();
+            IBrush text = sequencerSettings.RulerTextColour.ToBrush();
+            int sixteenthsPerBeat = 4;
+            int sixteenthsPerBar = sixteenthsPerBeat * sequencerSettings.TimeSignature.BeatsPerBar;
+            int totalSixteenths = sixteenthsPerBar * sequencerSettings.TimeSignature.BarsPerMeasure * sequencerSettings.TotalMeasures;
+
+            for (var step = 0; step < totalSixteenths; step++)
             {
-                double currentMeasurePosition = sequencerDimensionsCalculator.MeasureWidth * measure;
+                double x = SequencerDrawer.Snap(step * sequencerDimensionsCalculator.SixteenthNoteWidth);
+                bool isBar = step % sixteenthsPerBar == 0;
+                bool isBeat = step % sixteenthsPerBeat == 0;
+                double tickHeight = isBar ? height : isBeat ? height * 0.35 : height * 0.18;
 
-                if (measure != 0)
+                elementCache.Add(new Line
                 {
-                    DrawVerticalSequencerLine(currentMeasurePosition, 1);
-                }
+                    StartPoint = new Point(x, height - tickHeight),
+                    EndPoint = new Point(x, height),
+                    StrokeThickness = 1,
+                    Stroke = tick
+                });
 
-                for (var bar = 0; bar < sequencerSettings.TimeSignature.BarsPerMeasure; bar++)
+                if (isBar)
                 {
-                    double currentBarPosition = currentMeasurePosition + sequencerDimensionsCalculator.BarWidth * bar;
-
-                    if (bar != 0)
+                    var barNumber = new TextBlock
                     {
-                        DrawVerticalSequencerLine(currentBarPosition, 1);
-                    }
-
-                    for (var beat = 0; beat < sequencerSettings.TimeSignature.BeatsPerBar; beat++)
-                    {
-                        totalBeats++;
-                        double currentBeatPosition = currentBarPosition + sequencerDimensionsCalculator.BeatWidth * beat;
-
-                        if (beat != 0)
-                        {
-                            DrawVerticalSequencerLine(currentBeatPosition, 1);
-                        }
-
-                        DrawBeatNumber(currentBeatPosition, totalBeats);
-
-                        for (var sixteenthNote = 0; sixteenthNote < 4; sixteenthNote++)
-                        {
-                            double currentEighthNotePosition = currentBeatPosition + sequencerDimensionsCalculator.SixteenthNoteWidth * sixteenthNote;
-
-                            if (sixteenthNote != 0)
-                            {
-                                DrawVerticalSequencerLine(currentEighthNotePosition, 2);
-                            }
-                        }
-                    }
+                        Text = (step / sixteenthsPerBar + 1).ToString(),
+                        FontSize = 11,
+                        FontWeight = FontWeight.SemiBold,
+                        Foreground = text
+                    };
+                    Canvas.SetLeft(barNumber, x + 5);
+                    Canvas.SetTop(barNumber, Math.Max(0, height / 2 - 12));
+                    elementCache.Add(barNumber);
                 }
             }
-        }
 
-        private void DrawBeatNumber(double currentPosition, int currentBeat)
-        {
-            var textBlock = new TextBlock { Text = currentBeat.ToString(), FontSize = 11, Foreground = Brushes.Black };
-
-            Canvas.SetLeft(textBlock, currentPosition + 2);
-            Canvas.SetTop(textBlock, 0);
-
-            elementCache.Add(textBlock);
-        }
-
-        private void DrawVerticalSequencerLine(double currentPosition, double heightModifier)
-        {
-            var sequencerLine = new Line
-            {
-                StartPoint = new Point(currentPosition, sequencerHeaderCanvas.Height - sequencerHeaderCanvas.Height / heightModifier),
-                EndPoint = new Point(currentPosition, sequencerHeaderCanvas.Height),
-                StrokeThickness = 1,
-                Stroke = sequencerSettings.LineColour.ToBrush()
-            };
-
-            elementCache.Add(sequencerLine);
+            // A hairline along the bottom separates the ruler from the grid.
+            double bottom = SequencerDrawer.Snap(height - 1);
+            elementCache.Add(new Line { StartPoint = new Point(0, bottom), EndPoint = new Point(sequencerHeaderCanvas.Width, bottom), StrokeThickness = 1, Stroke = tick });
         }
 
         private void AddElements()
         {
-            foreach (Avalonia.Controls.Control uiElement in elementCache)
+            foreach (Avalonia.Controls.Control element in elementCache)
             {
-                sequencerHeaderCanvas.AddChild(uiElement);
+                sequencerHeaderCanvas.AddChild(element);
             }
         }
 
         private void RemoveElements()
         {
-            foreach (Avalonia.Controls.Control uiElement in elementCache)
+            foreach (Avalonia.Controls.Control element in elementCache)
             {
-                sequencerHeaderCanvas.RemoveChild(uiElement);
+                sequencerHeaderCanvas.RemoveChild(element);
             }
 
             elementCache.Clear();

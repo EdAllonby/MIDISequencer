@@ -2,127 +2,247 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:control="using:Sequencer.View.Control"
         xmlns:radial="using:Sequencer.View.Control.RadialContextMenu"
+        xmlns:view="using:Sequencer.View"
         xmlns:vm="using:Sequencer.ViewModel"
         x:Class="Sequencer.View.Control.MainWindow"
         x:DataType="vm:SequencerViewModel"
         Icon="/Assets/AppIcon.png"
-        Title="Sequencer" Width="1200" Height="500" MinWidth="600" MinHeight="300">
+        Title="Sequencer" Width="1280" Height="760" MinWidth="960" MinHeight="560">
 
-    <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto,300">
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto,280">
 
-        <!-- Editor and transport -->
-        <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*,Auto">
-            <Grid Grid.Row="0">
-                <DockPanel>
-                    <!-- The keyboard column and the ruler's spacer share one width so lanes and beats line up. -->
-                    <Grid DockPanel.Dock="Top" Height="30" ColumnDefinitions="56,*">
-                        <control:SequencerHeaderControl x:Name="Header" Grid.Column="1"
-                                                        CurrentPosition="{Binding CurrentPosition}" />
-                    </Grid>
-                    <ScrollViewer x:Name="EditorScrollViewer"
-                                  HorizontalScrollBarVisibility="Disabled"
-                                  VerticalScrollBarVisibility="Auto"
-                                  Focusable="False">
-                        <Grid ColumnDefinitions="56,*" MinHeight="800">
-                            <control:PianoKeyboardControl x:Name="Keyboard" Grid.Column="0" />
-                            <control:SequencerControl x:Name="Editor" Grid.Column="1"
-                                                      NoteAction="{Binding NoteAction}"
-                                                      SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
-                                                      CurrentPosition="{Binding CurrentPosition}" />
-                        </Grid>
-                    </ScrollViewer>
-                </DockPanel>
+        <!-- Toolbar: transport and position on the left, tools on the right. -->
+        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
+                BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,0,1" Padding="12,9">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                    <Button x:Name="PlayPauseButton" Classes="icon" Classes.playing="{Binding IsPlaying}" Focusable="False"
+                            Command="{Binding ToggleSequencer}" ToolTip.Tip="Play / pause (Space)">
+                        <Panel>
+                            <Path Data="{x:Static view:Icons.Play}" Fill="{Binding $parent[Button].Foreground}" Width="14" Height="14"
+                                  Stretch="Uniform" IsVisible="{Binding !IsPlaying}" />
+                            <Path Data="{x:Static view:Icons.Pause}" Fill="{Binding $parent[Button].Foreground}" Width="14" Height="14"
+                                  Stretch="Uniform" IsVisible="{Binding IsPlaying}" />
+                        </Panel>
+                    </Button>
+                    <Button x:Name="StopButton" Classes="icon" Focusable="False" Command="{Binding StopSequencer}"
+                            ToolTip.Tip="Stop and return to the start (Return)">
+                        <Path Data="{x:Static view:Icons.Stop}" Fill="{Binding $parent[Button].Foreground}" Width="12" Height="12" Stretch="Uniform" />
+                    </Button>
+                </StackPanel>
 
-                <radial:NoteActionRadialContextMenuWrapper x:Name="NoteActionMenu"
-                                                           SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
-                                                           MenuRadius="40" />
+                <Border Grid.Column="1" Margin="12,0,0,0" Background="{StaticResource FieldBrush}" CornerRadius="7" Padding="12,4"
+                        MinWidth="96" VerticalAlignment="Center" ToolTip.Tip="Playback position (bar . beat . sixteenth)">
+                    <TextBlock x:Name="PositionReadout" Classes="readout" Text="{Binding PositionText}" HorizontalAlignment="Center" />
+                </Border>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="20,0,0,0" VerticalAlignment="Center">
+                    <NumericUpDown x:Name="TempoBox" Classes="tempo" Width="64" Minimum="30" Maximum="300" Increment="1" FormatString="0"
+                                   ShowButtonSpinner="False" HorizontalContentAlignment="Center"
+                                   Value="{Binding BeatsPerMinute}" ToolTip.Tip="Tempo in beats per minute: type a value, or use ↑ ↓" />
+                    <TextBlock Classes="label" Text="BPM" VerticalAlignment="Center" />
+                    <Button x:Name="TapButton" Classes="quiet" Content="Tap" Focusable="False" Command="{Binding TapTempo}"
+                            ToolTip.Tip="Tap in time to set the tempo" />
+                </StackPanel>
+
+                <Border Grid.Column="4" Classes="segmented" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <ToggleButton Classes="segment" x:Name="SelectToolButton" Focusable="False" IsChecked="{Binding IsSelectTool}"
+                                      ToolTip.Tip="Select, move and resize notes (V)">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="stroke-icon" Data="{x:Static view:Icons.Select}" Width="14" Height="14" />
+                                <TextBlock Text="Select" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ToggleButton>
+                        <ToggleButton Classes="segment" x:Name="DrawToolButton" Focusable="False" IsChecked="{Binding IsDrawTool}"
+                                      ToolTip.Tip="Draw notes (D)">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="stroke-icon" Data="{x:Static view:Icons.Draw}" Width="14" Height="14" />
+                                <TextBlock Text="Draw" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ToggleButton>
+                        <ToggleButton Classes="segment" x:Name="EraseToolButton" Focusable="False" IsChecked="{Binding IsEraseTool}"
+                                      ToolTip.Tip="Erase notes (E)">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="stroke-icon" Data="{x:Static view:Icons.Erase}" Width="14" Height="14" />
+                                <TextBlock Text="Erase" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </ToggleButton>
+                    </StackPanel>
+                </Border>
             </Grid>
+        </Border>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" Margin="6">
-                <Button Content="▶" Width="36" Focusable="False" Command="{Binding PlaySequencer}" ToolTip.Tip="Play (Space)" />
-                <Button Content="❚❚" Width="36" Focusable="False" Command="{Binding PauseSequencer}" ToolTip.Tip="Pause (Space)" />
-                <Button Content="■" Width="36" Focusable="False" Command="{Binding StopSequencer}" ToolTip.Tip="Stop (Return)" />
-                <Separator Width="12" Background="Transparent" />
-                <NumericUpDown x:Name="TempoBox" Width="120" Minimum="30" Maximum="300" Increment="1" FormatString="0"
-                               Value="{Binding BeatsPerMinute}" ToolTip.Tip="Tempo (beats per minute)" />
-                <TextBlock Text="BPM" VerticalAlignment="Center" />
-                <Button Content="Tap" Focusable="False" Command="{Binding TapTempo}" ToolTip.Tip="Tap repeatedly to set the tempo" />
-            </StackPanel>
+        <!-- Editor: ruler above, keyboard beside, grid in the middle. -->
+        <Grid Grid.Row="1" Grid.Column="0">
+            <DockPanel>
+                <!-- The keyboard column and the ruler's spacer share one width so lanes and beats line up. -->
+                <Grid DockPanel.Dock="Top" Height="28" ColumnDefinitions="56,*" Background="{StaticResource PanelBrush}">
+                    <control:SequencerHeaderControl x:Name="Header" Grid.Column="1"
+                                                    CurrentPosition="{Binding CurrentPosition}" />
+                </Grid>
+                <ScrollViewer x:Name="EditorScrollViewer"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              Focusable="False">
+                    <Grid ColumnDefinitions="56,*" MinHeight="800">
+                        <control:PianoKeyboardControl x:Name="Keyboard" Grid.Column="0" />
+                        <control:SequencerControl x:Name="Editor" Grid.Column="1"
+                                                  NoteAction="{Binding NoteAction}"
+                                                  SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                                  CurrentPosition="{Binding CurrentPosition}" />
+                    </Grid>
+                </ScrollViewer>
+            </DockPanel>
+
+            <!-- Shown on an empty grid with the Draw tool, so the first step is obvious. -->
+            <Border x:Name="EmptyHint" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Margin="56,28,0,0" Background="{StaticResource ToolbarBrush}" CornerRadius="8" Padding="16,10"
+                    BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1">
+                <StackPanel Spacing="2">
+                    <TextBlock Text="Click anywhere in the grid to draw a note" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                    <TextBlock Classes="label" Text="Then press Space to play it" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <radial:NoteActionRadialContextMenuWrapper x:Name="NoteActionMenu"
+                                                       SelectedMenuItem="{Binding NoteAction, Mode=TwoWay}"
+                                                       MenuRadius="52" />
         </Grid>
 
-        <GridSplitter Grid.Row="0" Grid.Column="1" Width="5" ResizeDirection="Columns" />
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="4" ResizeDirection="Columns" Background="Transparent" />
 
-        <!-- Note inspector and synth -->
-        <Border Grid.Row="0" Grid.Column="2" Padding="12,12,12,0" Background="#F5F5F5">
+        <!-- Side panel: the selected note, then the synth. -->
+        <Border Grid.Row="1" Grid.Column="2" Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1,0,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-            <StackPanel Spacing="8" Margin="0,0,0,12">
-                <TextBlock Text="Selected note" FontWeight="SemiBold" />
-                <TextBlock Text="Select a single note to see its details."
-                           TextWrapping="Wrap" Foreground="Gray"
-                           IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNull}}" />
-                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="12"
-                      IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Pitch" Foreground="Gray" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedNote.Pitch, FallbackValue=''}" />
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Velocity" Foreground="Gray" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedNote.Velocity, FallbackValue=''}" />
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Start" Foreground="Gray" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedNote.Start, FallbackValue=''}" TextWrapping="Wrap" />
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="End" Foreground="Gray" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedNote.End, FallbackValue=''}" TextWrapping="Wrap" />
-                </Grid>
+                <StackPanel Margin="16,14,16,16" Spacing="12">
 
-                <Separator Margin="0,8" />
+                    <TextBlock Classes="section" Text="NOTE" />
+                    <StackPanel Spacing="2" IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNull}}">
+                        <TextBlock Text="No note selected" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Classes="label" Foreground="{StaticResource TextTertiaryBrush}" TextWrapping="Wrap"
+                                   Text="Select a single note to see its details." />
+                    </StackPanel>
+                    <StackPanel x:Name="NoteDetails" Spacing="10"
+                                IsVisible="{Binding SelectedNote, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock x:Name="SelectedPitch" Text="{Binding SelectedNote.Pitch, FallbackValue=''}" FontSize="24" FontWeight="SemiBold" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Classes="label" Text="Start" />
+                                <TextBlock x:Name="SelectedStart" Classes="value" Text="{Binding SelectedNote.Start, FallbackValue=''}" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1">
+                                <TextBlock Classes="label" Text="Length" />
+                                <TextBlock x:Name="SelectedLength" Classes="value" Text="{Binding SelectedNote.Length, FallbackValue=''}" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="0">
+                                <TextBlock Classes="label" Text="End" />
+                                <TextBlock Classes="value" Text="{Binding SelectedNote.End, FallbackValue=''}" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="3">
+                                <TextBlock Classes="label" Text="Velocity" />
+                                <TextBlock x:Name="SelectedVelocity" Classes="value" Text="{Binding SelectedNote.Velocity, FallbackValue=''}" />
+                                <ProgressBar Height="3" MinHeight="3" MinWidth="0" Minimum="0" Maximum="100" CornerRadius="1.5"
+                                             Value="{Binding SelectedNote.VelocityPercent, FallbackValue=0}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
 
-                <!-- Synth -->
-                <StackPanel x:Name="SynthPanel" x:DataType="vm:SynthViewModel" Spacing="6">
-                    <TextBlock Text="Synth" FontWeight="SemiBold" />
-                    <Grid ColumnDefinitions="64,*">
-                        <TextBlock Grid.Column="0" Text="Wave" Foreground="Gray" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="1" x:Name="WaveformBox" HorizontalAlignment="Stretch"
-                                  ItemsSource="{Binding Waveforms}" SelectedItem="{Binding Waveform}" />
-                    </Grid>
-                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="How long a note takes to reach full volume">
-                        <TextBlock Grid.Column="0" Text="Attack" Foreground="Gray" VerticalAlignment="Center" />
-                        <Slider Grid.Column="1" x:Name="AttackMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
-                                Value="{Binding AttackMilliseconds}" />
-                        <TextBlock Grid.Column="2" Text="{Binding AttackMilliseconds, StringFormat='{}{0} ms'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    </Grid>
-                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="How long it then takes to fall to the sustain level">
-                        <TextBlock Grid.Column="0" Text="Decay" Foreground="Gray" VerticalAlignment="Center" />
-                        <Slider Grid.Column="1" x:Name="DecayMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
-                                Value="{Binding DecayMilliseconds}" />
-                        <TextBlock Grid.Column="2" Text="{Binding DecayMilliseconds, StringFormat='{}{0} ms'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    </Grid>
-                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="The level a held note settles at">
-                        <TextBlock Grid.Column="0" Text="Sustain" Foreground="Gray" VerticalAlignment="Center" />
-                        <Slider Grid.Column="1" x:Name="SustainPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
-                                Value="{Binding SustainPercent}" />
-                        <TextBlock Grid.Column="2" Text="{Binding SustainPercent, StringFormat='{}{0} %'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    </Grid>
-                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="How long a note takes to fade after it ends">
-                        <TextBlock Grid.Column="0" Text="Release" Foreground="Gray" VerticalAlignment="Center" />
-                        <Slider Grid.Column="1" x:Name="ReleaseMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
-                                Value="{Binding ReleaseMilliseconds}" />
-                        <TextBlock Grid.Column="2" Text="{Binding ReleaseMilliseconds, StringFormat='{}{0} ms'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    </Grid>
-                    <Grid ColumnDefinitions="64,*,60" ToolTip.Tip="Master volume">
-                        <TextBlock Grid.Column="0" Text="Volume" Foreground="Gray" VerticalAlignment="Center" />
-                        <Slider Grid.Column="1" x:Name="VolumePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
-                                Value="{Binding VolumePercent}" />
-                        <TextBlock Grid.Column="2" Text="{Binding VolumePercent, StringFormat='{}{0} %'}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                    </Grid>
-                    <CheckBox x:Name="PreviewOnEditBox" Content="Play notes while editing" Focusable="False"
-                              IsChecked="{Binding PreviewOnEdit}" />
-                    <TextBlock Text="Sound changes apply to the next note played." FontSize="11" Foreground="Gray" TextWrapping="Wrap" />
+                    <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,6" />
+
+                    <StackPanel x:Name="SynthPanel" x:DataType="vm:SynthViewModel" Spacing="12">
+                        <TextBlock Classes="section" Text="SYNTH" />
+
+                        <Border Classes="segmented">
+                            <UniformGrid Columns="4">
+                                    <ToggleButton Classes="segment" x:Name="SawtoothWaveButton" Focusable="False" ToolTip.Tip="Sawtooth: bright and buzzy"
+                                                  IsChecked="{Binding IsSawtooth}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Sawtooth}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                    <ToggleButton Classes="segment" x:Name="SquareWaveButton" Focusable="False" ToolTip.Tip="Square: hollow, like a clarinet"
+                                                  IsChecked="{Binding IsSquare}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Square}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                    <ToggleButton Classes="segment" x:Name="TriangleWaveButton" Focusable="False" ToolTip.Tip="Triangle: soft, like a flute"
+                                                  IsChecked="{Binding IsTriangle}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Triangle}" Width="20" Height="14" />
+                                    </ToggleButton>
+                                    <ToggleButton Classes="segment" x:Name="SineWaveButton" Focusable="False" ToolTip.Tip="Sine: pure tone"
+                                                  IsChecked="{Binding IsSine}">
+                                        <Path Classes="stroke-icon" Data="{x:Static view:Icons.Sine}" Width="20" Height="14" />
+                                    </ToggleButton>
+                            </UniformGrid>
+                        </Border>
+
+                        <Border Background="{StaticResource FieldBrush}" CornerRadius="7" Height="64" Padding="6"
+                                ToolTip.Tip="How each note's volume changes over time">
+                            <control:EnvelopeGraph x:Name="Envelope" Stroke="{StaticResource AccentBrush}"
+                                                   AttackMilliseconds="{Binding AttackMilliseconds}"
+                                                   DecayMilliseconds="{Binding DecayMilliseconds}"
+                                                   SustainPercent="{Binding SustainPercent}"
+                                                   ReleaseMilliseconds="{Binding ReleaseMilliseconds}" />
+                        </Border>
+
+                            <StackPanel Spacing="2" ToolTip.Tip="How long a note takes to reach full volume">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Attack" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding AttackMilliseconds, StringFormat='{}{0} ms'}" />
+                                </Grid>
+                                <Slider x:Name="AttackMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding AttackMilliseconds}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How long it then takes to fall to the sustain level">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Decay" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding DecayMilliseconds, StringFormat='{}{0} ms'}" />
+                                </Grid>
+                                <Slider x:Name="DecayMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding DecayMilliseconds}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="The level a held note settles at">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Sustain" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding SustainPercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="SustainPercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding SustainPercent}" />
+                            </StackPanel>
+                            <StackPanel Spacing="2" ToolTip.Tip="How long a note takes to fade after it ends">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Release" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding ReleaseMilliseconds, StringFormat='{}{0} ms'}" />
+                                </Grid>
+                                <Slider x:Name="ReleaseMillisecondsSlider" Minimum="1" Maximum="2000" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding ReleaseMilliseconds}" />
+                            </StackPanel>
+
+                        <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,2" />
+
+                            <StackPanel Spacing="2" ToolTip.Tip="Master volume">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="label" Text="Volume" />
+                                    <TextBlock Grid.Column="1" Classes="value" Text="{Binding VolumePercent, StringFormat='{}{0} %'}" />
+                                </Grid>
+                                <Slider x:Name="VolumePercentSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Focusable="False" Margin="0,-6,0,-4" Value="{Binding VolumePercent}" />
+                            </StackPanel>
+
+                        <CheckBox x:Name="PreviewOnEditBox" Content="Play notes while editing" Focusable="False" FontSize="12"
+                                  IsChecked="{Binding PreviewOnEdit}" />
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
             </ScrollViewer>
         </Border>
 
-        <!-- Status bar -->
-        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Padding="8,4" Background="#EAEAEA">
-            <TextBlock HorizontalAlignment="Right" Text="{Binding Information}" />
+        <!-- Hint bar: what the current tool does, and the main shortcuts. -->
+        <Border Grid.Row="2" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
+                BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,1,0,0" Padding="12,5">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="ToolHintText" Classes="label" Text="{Binding ToolHint}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="1" Classes="label" Foreground="{StaticResource TextTertiaryBrush}" Margin="16,0,0,0"
+                           Text="Space play / pause  ·  Return stop  ·  V D E tools  ·  Right-drag for the tool wheel" />
+            </Grid>
         </Border>
     </Grid>
 </Window>

@@ -24,6 +24,11 @@ namespace Sequencer.Visual
         event EventHandler<SelectedNotesEventArgs> SelectedNotesChanged;
 
         /// <summary>
+        /// Raised when a note is added or deleted.
+        /// </summary>
+        event EventHandler NotesChanged;
+
+        /// <summary>
         /// Draw all the sequencewr notes on the screen.
         /// </summary>
         void DrawNotes();

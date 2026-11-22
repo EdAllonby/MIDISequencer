@@ -27,7 +27,39 @@ namespace Sequencer.ViewModel
         public Waveform Waveform
         {
             get => settings.Waveform;
-            set => SetSetting(settings.Waveform, value, v => settings.Waveform = v);
+            set
+            {
+                SetSetting(settings.Waveform, value, v => settings.Waveform = v);
+                OnPropertyChanged(nameof(IsSawtooth));
+                OnPropertyChanged(nameof(IsSquare));
+                OnPropertyChanged(nameof(IsTriangle));
+                OnPropertyChanged(nameof(IsSine));
+            }
+        }
+
+        // One toggle per waveform, for a segmented control.
+        public bool IsSawtooth
+        {
+            get => Waveform == Waveform.Sawtooth;
+            set => SelectWaveformIf(value, Waveform.Sawtooth);
+        }
+
+        public bool IsSquare
+        {
+            get => Waveform == Waveform.Square;
+            set => SelectWaveformIf(value, Waveform.Square);
+        }
+
+        public bool IsTriangle
+        {
+            get => Waveform == Waveform.Triangle;
+            set => SelectWaveformIf(value, Waveform.Triangle);
+        }
+
+        public bool IsSine
+        {
+            get => Waveform == Waveform.Sine;
+            set => SelectWaveformIf(value, Waveform.Sine);
         }
 
         public bool PreviewOnEdit
@@ -64,6 +96,22 @@ namespace Sequencer.ViewModel
         {
             get => ToPercent(settings.MasterVolume);
             set => SetSetting(VolumePercent, value, v => settings.MasterVolume = v / 100.0);
+        }
+
+        private void SelectWaveformIf(bool selected, Waveform waveform)
+        {
+            if (selected)
+            {
+                Waveform = waveform;
+            }
+            else
+            {
+                // One waveform is always selected: unchecking the current one re-checks it.
+                OnPropertyChanged(nameof(IsSawtooth));
+                OnPropertyChanged(nameof(IsSquare));
+                OnPropertyChanged(nameof(IsTriangle));
+                OnPropertyChanged(nameof(IsSine));
+            }
         }
 
         private static int ToMilliseconds(double seconds) => (int) Math.Round(seconds * 1000);

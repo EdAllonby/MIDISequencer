@@ -1,0 +1,161 @@
+<!-- The app's look: colour tokens, the Fluent dark theme with the accent, and shared styles.
+     Included by App.axaml and by the UI tests, so test renders match the app. -->
+<Styles xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+    <!-- Surfaces, darkest to lightest. The editor canvas has its own palette in SequencerSettings. -->
+    <SolidColorBrush x:Key="WindowBrush" Color="#16171A" />
+    <SolidColorBrush x:Key="FieldBrush" Color="#121316" />
+    <SolidColorBrush x:Key="PanelBrush" Color="#1C1E22" />
+    <SolidColorBrush x:Key="ToolbarBrush" Color="#1F2125" />
+    <SolidColorBrush x:Key="RaisedBrush" Color="#2A2D33" />
+    <SolidColorBrush x:Key="RaisedHoverBrush" Color="#33363D" />
+    <SolidColorBrush x:Key="HairlineBrush" Color="#2C2F35" />
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E6E7E9" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#9A9EA5" />
+    <SolidColorBrush x:Key="TextTertiaryBrush" Color="#6A6E75" />
+
+    <!-- One accent: notes, playback, and the sliders' fill. -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#E8A33D" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#E8A33D" Opacity="0.16" />
+    </Styles.Resources>
+
+    <FluentTheme>
+        <FluentTheme.Palettes>
+            <ColorPaletteResources x:Key="Dark" Accent="#E8A33D" RegionColor="#16171A" />
+        </FluentTheme.Palettes>
+    </FluentTheme>
+
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{StaticResource WindowBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- Section labels in the side panel. -->
+    <Style Selector="TextBlock.section">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LetterSpacing" Value="0.8" />
+        <Setter Property="Foreground" Value="{StaticResource TextTertiaryBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    </Style>
+
+    <!-- Numbers that change while you watch: tabular figures so they don't jitter. -->
+    <Style Selector="TextBlock.value">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontFeatures" Value="+tnum" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.readout">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontFeatures" Value="+tnum" />
+    </Style>
+
+    <!-- The tempo field: a recessed readout you can type into. -->
+    <Style Selector="NumericUpDown.tempo">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontFeatures" Value="+tnum" />
+        <Setter Property="Background" Value="{StaticResource FieldBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="7" />
+        <Setter Property="MinHeight" Value="30" />
+    </Style>
+
+    <!-- Icon buttons in the toolbar. -->
+    <Style Selector="Button.icon">
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Height" Value="34" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="7" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedBrush}" />
+    </Style>
+    <Style Selector="Button.icon:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedHoverBrush}" />
+    </Style>
+    <Style Selector="Button.icon.playing">
+        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button.icon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.icon:disabled Path">
+        <Setter Property="Opacity" Value="0.35" />
+    </Style>
+
+    <!-- Quiet text buttons (such as Tap). -->
+    <Style Selector="Button.quiet">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Background" Value="{StaticResource RaisedBrush}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.quiet:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedHoverBrush}" />
+    </Style>
+
+    <!-- Segmented controls: a recessed track with one raised, selected segment. -->
+    <Style Selector="Border.segmented">
+        <Setter Property="Background" Value="{StaticResource FieldBrush}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+    <Style Selector="ToggleButton.segment">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToggleButton.segment /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.segment:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource PanelBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.segment:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedHoverBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.segment:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedHoverBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.segment:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource RaisedBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.segment Path">
+        <Setter Property="Stroke" Value="{Binding $parent[ToggleButton].Foreground}" />
+    </Style>
+    <Style Selector="ToggleButton.segment:checked Path">
+        <Setter Property="Stroke" Value="{StaticResource AccentBrush}" />
+    </Style>
+
+    <!-- Stroked icons: round caps and joins, consistent weight. -->
+    <Style Selector="Path.stroke-icon">
+        <Setter Property="StrokeThickness" Value="1.5" />
+        <Setter Property="StrokeLineCap" Value="Round" />
+        <Setter Property="StrokeJoin" Value="Round" />
+        <Setter Property="Stretch" Value="Uniform" />
+    </Style>
+</Styles>

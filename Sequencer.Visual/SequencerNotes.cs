@@ -27,6 +27,8 @@ namespace Sequencer.Visual
 
         public event EventHandler<SelectedNotesEventArgs> SelectedNotesChanged;
 
+        public event EventHandler NotesChanged;
+
         public IEnumerable<IVisualNote> SelectedNotes => Snapshot(note => note.NoteState == NoteState.Selected);
 
         public IEnumerable<IVisualNote> AllNotes => Snapshot(note => true);
@@ -57,6 +59,8 @@ namespace Sequencer.Visual
             {
                 notes.Add(note);
             }
+
+            NotesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void DeleteNote(IVisualNote noteToDelete)
@@ -67,6 +71,8 @@ namespace Sequencer.Visual
             {
                 notes.Remove(noteToDelete);
             }
+
+            NotesChanged?.Invoke(this, EventArgs.Empty);
 
             Log.Info($"Visual note [{noteToDelete}] has been deleted.");
         }

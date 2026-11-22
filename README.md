@@ -3,6 +3,8 @@
 A piano-roll step sequencer written in C#. Draw notes on a one-measure grid and it loops them through a
 built-in synthesiser, with a piano keyboard for trying out notes.
 
+![The sequencer playing a melody and bassline, with a note selected in the inspector](docs/images/screenshot.png)
+
 It started in 2015 as a WPF app for Windows. It now runs on .NET 10 with an [Avalonia](https://avaloniaui.net)
 UI, so it runs natively on Apple Silicon Macs as well as Windows and Linux. The port is described in
 [docs/macos-port-plan.md](docs/macos-port-plan.md).
@@ -42,7 +44,7 @@ dotnet test
 ```
 
 `Sequencer.View.Tests` includes UI tests that drive the real main window with Avalonia's headless
-platform, so they need no display. `Window_RendersTheEditor` saves a screenshot to the test output folder.
+platform, so they need no display. `Window_RendersTheEditor` saves a screenshot to the test output folder. `dotnet test --filter Screenshot_ForTheReadme` renders the screenshot above; copy it from the test output folder to `docs/images/screenshot.png`.
 
 ## Using the sequencer
 
@@ -50,12 +52,12 @@ On macOS, ⌘ is the command key; on Windows and Linux it is Ctrl.
 
 | Action | Mouse / keys |
 |---|---|
-| Switch tool (Create, Select, Delete) | Hold right-click (or two-finger click, or Ctrl-click on macOS), move towards a slice of the radial menu, release |
-| Create a note | Create tool: click; drag to lengthen |
+| Switch tool (Select, Draw, Erase) | The toolbar buttons, the keys V / D / E, or hold right-click (or two-finger click, or Ctrl-click on macOS) and release over a slice of the tool wheel |
+| Draw a note | Draw tool: click; drag to lengthen |
 | Select notes | Select tool: click, drag a box, or ⌘-click to add or remove |
 | Move selected notes | Select tool: drag a note (hold Shift to keep the pitch), or use the arrow keys |
 | Resize a note | Select tool: drag its left or right edge |
-| Delete notes | Delete tool: click; or select and press Delete / Backspace |
+| Erase notes | Erase tool: click; or select and press Delete / Backspace |
 | Velocity | `+`/`=` and `-` (main keyboard or numeric keypad) |
 | Select all / deselect | ⌘A / Esc |
 | Play / pause | Space |

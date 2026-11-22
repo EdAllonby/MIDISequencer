@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Sequencer.View.App"
              Name="Sequencer"
-             RequestedThemeVariant="Light">
+             RequestedThemeVariant="Dark">
     <Application.Styles>
-        <FluentTheme />
+        <StyleInclude Source="avares://Sequencer/Theme.axaml" />
     </Application.Styles>
 </Application>
