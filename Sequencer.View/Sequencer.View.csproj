@@ -5,7 +5,6 @@
     <AssemblyName>Sequencer</AssemblyName>
     <RootNamespace>Sequencer.View</RootNamespace>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <ApplicationIcon />
   </PropertyGroup>
 
   <ItemGroup>

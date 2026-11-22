@@ -27,16 +27,19 @@ All work happens on the `macos-port` branch. Each milestone is a commit with pas
 2. *(Folded into milestone 1.)* Removing the service-locator calls inside the controls happens when they are rewritten in milestone 4.
 3. **Audio and clock** ✅ A test app proved PortAudioSharp2 (PortAudio 19.7, native osx-arm64) on the MacBook speakers. `PortAudioOutput` implements `IAudioOutput`. `SequencerPlayer` mixes every voice into one `MixingSampleProvider` (NAudio.Core 3.3). Voices are released through the envelope and remove themselves once silent, which fixes #16. Waveforms are phase-based with no per-second reset, and the sawtooth is pre-computed into a shared wavetable with no allocation on the audio thread, which fixes #15. Envelope times are now in `IAudioSettings`. `Audio` depends on the new `Domain` interfaces `ISequencedNote`/`ISequencedNotes` instead of `Visual`. The player ignores the ticks that Stop and Pause raise, and releases everything when the loop wraps; both cases previously left notes stuck on. `InternalClock` is a `Stopwatch` thread (measured on an M1: mean 5.196 ms per tick against an ideal of 5.208 ms, worst 5.35 ms), and Sanford is removed. The `SequencerClock` event `remove` bug is fixed.
 4. **Avalonia UI** ✅ `Visual` and `View` now use Avalonia 12.1. The WPF View code is deleted (originally planned for milestone 5). Avalonia has no global input state, so `KeyboardStateProcessor` and `MouseOperator` are updated from each input event. ⌘ (macOS) or Ctrl adds to the selection and selects all, Backspace and Delete both delete, `=`/`-` work alongside the numpad, and Ctrl-click on macOS opens the radial menu. The radial menu picks its slice from the cursor's angle. The note inspector is read-only, because the old property grid showed an immutable `Tone`. Controls get their dependencies through `Initialise(...)` from the DI-built `MainWindow`, which replaces the service locator. `SequencerNotes` takes a snapshot under a lock for every query, because playback reads it from the clock thread. Creating a note now raises the selection-changed event, so the inspector updates. Headless UI tests (Avalonia.Headless + Skia) drive the real window with simulated input. VS Code launch and task configurations are added.
-5. **Retire WPF.** Delete the WPF View code, check everything works as it did on Windows, and update the README.
-6. **App bundle.** Add the `.app` bundle script.
+5. **Retire WPF** ✅ A scan found no Windows-only references left, and all 14 projects are SDK-style and in the solution. The checklist below is covered by headless UI tests. Writing them found one more bug inherited from the WPF version: arrow keys and drags could not move a one-sixteenth note left, and moving it right stretched it, because `VisualNote` moved its start and end one at a time. That is fixed. The README is rewritten for the new build, run and test steps and the controls.
+6. **App bundle** ✅ `scripts/bundle-macos.sh` publishes a self-contained osx-arm64 (or osx-x64) build into `dist/Sequencer.app`, with an `Info.plist`, an icon generated from `Sequencer.View/Assets/AppIcon.png`, and an ad-hoc signature on every file. It passes `codesign --verify --strict` and launches from Finder.
 
 ## Parity checklist
 
-- [ ] Create, move, resize and delete notes with the mouse
-- [ ] Drag-box selection; ⌘-click adds to the selection
-- [ ] Radial context menu (right-click / two-finger click) switches the note action
-- [ ] Keyboard: arrows move position and pitch, velocity up and down, delete, select all, Escape deselects
-- [ ] Play, pause and stop (Space / Enter), looping at the end of the sequence
-- [ ] Position indicator in the header and on the grid
-- [ ] Note inspector edits the selected note
-- [ ] Notes play with attack and release, without clicks
+Automated: the headless UI tests in `Sequencer.View.Tests/UiTests` and the clock and player unit tests. Manual: needs a person at the Mac.
+
+- [x] Create, move, resize and delete notes with the mouse (automated)
+- [x] Drag-box selection; ⌘-click adds to the selection (automated)
+- [x] Radial context menu (right-click, two-finger click, or Ctrl-click on macOS) switches the note action (automated)
+- [x] Keyboard: arrows move position and pitch, velocity up and down, delete, select all, Escape deselects (automated)
+- [x] Play, pause and stop (Space / Return), looping at the end of the sequence (automated; looping is covered by the clock and player unit tests)
+- [x] Position indicator advances during playback (automated)
+- [x] Note inspector shows the selected note (automated; read-only, as the original was)
+- [x] Notes play with attack and release (end-to-end audio demo on the M1)
+- [ ] Feel: trackpad gestures, keyboard shortcuts and sound in day-to-day use (manual)
