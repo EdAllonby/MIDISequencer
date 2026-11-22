@@ -25,5 +25,11 @@ namespace Sequencer.Audio
         /// Starts the envelope's release stage. Safe to call from any thread.
         /// </summary>
         void NoteOff();
+
+        /// <summary>
+        /// Releases the note by itself once this many samples have played. Call before the voice is handed
+        /// to the mixer.
+        /// </summary>
+        void ReleaseAfter(int sampleCount);
     }
 }

@@ -29,13 +29,16 @@ namespace Sequencer.View.Tests.UiTests
         private ISequencerNotes notes;
         private SequencerViewModel viewModel;
         private RawInputModifiers commandModifier;
+        private RecordingNotePreviewer previewer;
 
         private static readonly Point EditorPoint = new Point(120, 230);
 
         [SetUp]
         public void SetUp()
         {
-            container = App.BuildContainer();
+            // Record previews instead of opening the real audio device.
+            previewer = new RecordingNotePreviewer();
+            container = App.BuildContainer(builder => builder.RegisterInstance(previewer).As<Domain.INotePreviewer>());
             window = container.Resolve<MainWindow>();
             notes = container.Resolve<ISequencerNotes>();
             viewModel = container.Resolve<SequencerViewModel>();
@@ -284,11 +287,58 @@ namespace Sequencer.View.Tests.UiTests
             int lengthBefore = TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition);
             viewModel.NoteAction = NoteAction.Select;
 
-            window.MouseDown(EditorPoint, MouseButton.Left);
-            window.MouseMove(EditorPoint + new Point(56, 0));
-            window.MouseUp(EditorPoint + new Point(56, 0), MouseButton.Left);
+            // Grab the note's right edge.
+            Point edge = NoteEdgeInWindow(note) - new Point(1, 0);
+            window.MouseDown(edge, MouseButton.Left);
+            window.MouseMove(edge + new Point(56, 0));
+            window.MouseUp(edge + new Point(56, 0), MouseButton.Left);
 
             Assert.That(TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition), Is.GreaterThan(lengthBefore));
+        }
+
+        [AvaloniaTest]
+        public void SelectMode_DraggingAShortNotesMiddle_MovesItInsteadOfResizing()
+        {
+            Click(EditorPoint);
+            IVisualNote note = notes.AllNotes.Single();
+            int length = TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition);
+            string pitch = note.Pitch.ToString();
+            viewModel.NoteAction = NoteAction.Select;
+
+            Point middle = NoteEdgeInWindow(note) - new Point(EditorWidth() / 64 / 2, 0);
+            window.MouseDown(middle, MouseButton.Left);
+            window.MouseMove(middle + new Point(0, -30));
+            window.MouseUp(middle + new Point(0, -30), MouseButton.Left);
+
+            Assert.That(TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition), Is.EqualTo(length));
+            Assert.That(note.Pitch.ToString(), Is.Not.EqualTo(pitch));
+        }
+
+        [AvaloniaTest]
+        public void ClickingTheRightHalfOfAShortNote_SelectsIt()
+        {
+            Click(EditorPoint);
+            IVisualNote note = notes.AllNotes.Single();
+            Press(Key.Escape);
+            viewModel.NoteAction = NoteAction.Select;
+
+            Click(NoteEdgeInWindow(note) - new Point(3, 0));
+
+            Assert.That(note.NoteState, Is.EqualTo(NoteState.Selected));
+        }
+
+        private double EditorWidth() => window.FindControl<SequencerControl>("Editor").Bounds.Width;
+
+        /// <summary>
+        /// The window coordinates of the note's right edge, halfway down its lane.
+        /// </summary>
+        private Point NoteEdgeInWindow(IVisualNote note)
+        {
+            var editor = window.FindControl<SequencerControl>("Editor");
+            double ticksAcross = 16 * 96;
+            double x = TotalTicks(note.EndPosition) * editor.Bounds.Width / ticksAcross;
+            Point origin = editor.TranslatePoint(new Point(0, 0), window) ?? default;
+            return new Point(origin.X + x, EditorPoint.Y);
         }
 
         [AvaloniaTest]
@@ -371,6 +421,54 @@ namespace Sequencer.View.Tests.UiTests
         }
 
         [AvaloniaTest]
+        public void CreatingANote_PreviewsIt()
+        {
+            Click(EditorPoint);
+
+            Assert.That(previewer.Pitches, Is.EqualTo(new[] { notes.AllNotes.Single().Pitch.ToString() }));
+        }
+
+        [AvaloniaTest]
+        public void ChangingANotesPitch_PreviewsTheNewPitch()
+        {
+            Click(EditorPoint);
+
+            Press(Key.Up);
+            Press(Key.Right);
+
+            Assert.That(previewer.Pitches.Count, Is.EqualTo(2), "Moving in time does not preview.");
+            Assert.That(previewer.Pitches.Last(), Is.EqualTo(notes.AllNotes.Single().Pitch.ToString()));
+        }
+
+        [AvaloniaTest]
+        public void DraggingANoteUpAndDown_PreviewsEachNewPitch()
+        {
+            Click(EditorPoint);
+            viewModel.NoteAction = NoteAction.Select;
+            previewer.Pitches.Clear();
+
+            // Lanes are 12.5 px tall: grab the middle of the note and drag up three semitones.
+            Point grab = NoteEdgeInWindow(notes.AllNotes.Single()) - new Point(EditorWidth() / 64 / 2, 0);
+            window.MouseDown(grab, MouseButton.Left);
+            window.MouseMove(grab + new Point(0, -13));
+            window.MouseMove(grab + new Point(0, -26));
+            window.MouseMove(grab + new Point(0, -38));
+            window.MouseUp(grab + new Point(0, -38), MouseButton.Left);
+
+            Assert.That(previewer.Pitches.Count, Is.EqualTo(3));
+        }
+
+        [AvaloniaTest]
+        public void PreviewCheckbox_IsBoundToTheSetting()
+        {
+            var settings = container.Resolve<Domain.Settings.SynthSettings>();
+
+            window.FindControl<CheckBox>("PreviewOnEditBox").IsChecked = false;
+
+            Assert.That(settings.PreviewOnEdit, Is.False);
+        }
+
+        [AvaloniaTest]
         public void Space_TogglesPlayAndPause_AndReturnStops()
         {
             Press(Key.Space);
@@ -381,6 +479,13 @@ namespace Sequencer.View.Tests.UiTests
 
             Press(Key.Enter);
             Assert.That(viewModel.SequencerPlayState, Is.EqualTo(PlayState.Stop));
+        }
+
+        private sealed class RecordingNotePreviewer : Domain.INotePreviewer
+        {
+            public System.Collections.Generic.List<string> Pitches { get; } = new System.Collections.Generic.List<string>();
+
+            public void Preview(Domain.Tone tone) => Pitches.Add(tone.Pitch.ToString());
         }
     }
 }

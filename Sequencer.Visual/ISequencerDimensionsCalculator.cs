@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Visual.Input;
 
@@ -27,11 +27,10 @@ namespace Sequencer.Visual
 
         bool IsPointInsideNote([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
 
-        [CanBeNull]
-        IVisualNote NoteAtEndingPoint([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
-
-        [CanBeNull]
-        IVisualNote NoteAtStartingPoint([NotNull] ISequencerNotes notes, [NotNull] IMousePoint mouseDownPoint);
+        /// <summary>
+        /// Whether the point is on the note's start edge, end edge, or neither.
+        /// </summary>
+        NoteEdge EdgeAtPoint([NotNull] IVisualNote note, [NotNull] IMousePoint point);
 
         double GetPointFromPosition([NotNull] IPosition position);
 

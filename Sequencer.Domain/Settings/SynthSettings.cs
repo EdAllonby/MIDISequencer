@@ -21,6 +21,11 @@ namespace Sequencer.Domain.Settings
 
         public Waveform Waveform { get; set; } = Waveform.Sawtooth;
 
+        /// <summary>
+        /// Play a short preview when a note is created or its pitch changes.
+        /// </summary>
+        public bool PreviewOnEdit { get; set; } = true;
+
         public double AttackSeconds
         {
             get => attackSeconds;

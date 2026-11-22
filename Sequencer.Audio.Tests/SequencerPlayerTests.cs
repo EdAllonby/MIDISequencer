@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NAudio.Wave;
 using NUnit.Framework;
@@ -189,6 +190,34 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
+        public void Preview_PlaysAShortSelfReleasingNote()
+        {
+            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+
+            player.Preview(tone);
+
+            FakeVoice voice = voices.Values.Single();
+            Assert.That(voice.NoteOnCount, Is.EqualTo(1));
+            Assert.That(voice.ReleaseAfterSamples, Is.EqualTo((int) (0.15 * SampleRate)));
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void NotePreviewer_OnlyPreviewsWhenSwitchedOn()
+        {
+            var settings = new SynthSettings { PreviewOnEdit = false };
+            var previewer = new NotePreviewer(player, settings);
+            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+
+            previewer.Preview(tone);
+            Assert.That(voices, Is.Empty);
+
+            settings.PreviewOnEdit = true;
+            previewer.Preview(tone);
+            Assert.That(voices.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void Dispose_DisposesTheOutput()
         {
             player.Dispose();
@@ -217,6 +246,10 @@ namespace Sequencer.Audio.Tests
             public void NoteOn() => NoteOnCount++;
 
             public void NoteOff() => NoteOffCount++;
+
+            public int? ReleaseAfterSamples { get; private set; }
+
+            public void ReleaseAfter(int sampleCount) => ReleaseAfterSamples = sampleCount;
 
             public int Read(Span<float> buffer)
             {

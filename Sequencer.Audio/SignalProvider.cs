@@ -22,6 +22,9 @@ namespace Sequencer.Audio
         private bool released;
         private volatile bool finished;
 
+        // Samples left before an automatic release, or -1 for none.
+        private int autoReleaseSamplesRemaining = -1;
+
         public SignalProvider([NotNull] IWaveformCalculator waveformCalculator, [NotNull] IAudioSettings audioSettings)
         {
             this.waveformCalculator = waveformCalculator;
@@ -75,12 +78,29 @@ namespace Sequencer.Audio
             releaseRequested = true;
         }
 
+        public void ReleaseAfter(int sampleCount)
+        {
+            autoReleaseSamplesRemaining = sampleCount;
+        }
+
         public int Read(System.Span<float> buffer)
         {
             if (finished)
             {
                 // Returning fewer samples than requested tells the mixer to drop this voice.
                 return 0;
+            }
+
+            if (autoReleaseSamplesRemaining >= 0)
+            {
+                // Counted per buffer, so the release can start up to one buffer (a few ms) early.
+                autoReleaseSamplesRemaining -= buffer.Length;
+
+                if (autoReleaseSamplesRemaining <= 0)
+                {
+                    autoReleaseSamplesRemaining = -1;
+                    releaseRequested = true;
+                }
             }
 
             if (releaseRequested && !released)

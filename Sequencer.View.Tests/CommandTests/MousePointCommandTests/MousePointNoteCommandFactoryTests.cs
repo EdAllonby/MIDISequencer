@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Sequencer.Domain.Settings;
 using Sequencer.View.Command.MousePointCommand;
@@ -20,7 +20,7 @@ namespace Sequencer.View.Tests.CommandTests.MousePointCommandTests
             var mockSequencerCalculator = new Mock<ISequencerDimensionsCalculator>();
             var mockMouseOperator = new Mock<IMouseOperator>();
             var mockNoteStateCommandFactory = new Mock<INoteStateCommandFactory>();
-            factory = new MousePointNoteCommandFactory(mockVisualNoteFactory.Object, mockMouseOperator.Object, keyboardStateStub.Object, mockSequencerNotes.Object, new SequencerSettings(), mockSequencerCalculator.Object, mockNoteStateCommandFactory.Object);
+            factory = new MousePointNoteCommandFactory(mockVisualNoteFactory.Object, mockMouseOperator.Object, keyboardStateStub.Object, mockSequencerNotes.Object, new SequencerSettings(), mockSequencerCalculator.Object, mockNoteStateCommandFactory.Object, new Mock<Domain.INotePreviewer>().Object);
         }
 
         private MousePointNoteCommandFactory factory;

@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Annotations;
+using Sequencer.Domain;
 using Sequencer.Domain.Settings;
 using Sequencer.View.Command.NotesCommand;
 using Sequencer.ViewModel;
@@ -15,11 +16,11 @@ namespace Sequencer.View.Command.MousePointCommand
         public MousePointNoteCommandFactory([NotNull] IVisualNoteFactory visualNoteFactory, [NotNull] IMouseOperator mouseOperator,
             [NotNull] IKeyboardStateProcessor keyboardStateProcessor, [NotNull] ISequencerNotes sequencerNotes,
             [NotNull] SequencerSettings sequencerSettings, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
-            [NotNull] INoteStateCommandFactory noteStateCommandFactory)
+            [NotNull] INoteStateCommandFactory noteStateCommandFactory, [NotNull] INotePreviewer notePreviewer)
         {
             noteCommandRegistry = new Dictionary<NoteAction, IMousePointNoteCommand>
             {
-                { NoteAction.Create, new CreateNoteFromPointCommand(visualNoteFactory, sequencerNotes, sequencerSettings, mouseOperator, sequencerDimensionsCalculator) },
+                { NoteAction.Create, new CreateNoteFromPointCommand(visualNoteFactory, sequencerNotes, sequencerSettings, mouseOperator, sequencerDimensionsCalculator, notePreviewer) },
                 { NoteAction.Select, new UpdateNoteStateFromPointCommand(sequencerNotes, mouseOperator, keyboardStateProcessor, sequencerDimensionsCalculator, noteStateCommandFactory) },
                 { NoteAction.Delete, new DeleteNoteFromPointCommand(sequencerNotes, sequencerDimensionsCalculator, new DeleteNotesCommand(sequencerNotes)) }
             };

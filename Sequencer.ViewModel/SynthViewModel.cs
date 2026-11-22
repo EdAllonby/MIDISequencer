@@ -30,6 +30,12 @@ namespace Sequencer.ViewModel
             set => SetSetting(settings.Waveform, value, v => settings.Waveform = v);
         }
 
+        public bool PreviewOnEdit
+        {
+            get => settings.PreviewOnEdit;
+            set => SetSetting(settings.PreviewOnEdit, value, v => settings.PreviewOnEdit = v);
+        }
+
         public int AttackMilliseconds
         {
             get => ToMilliseconds(settings.AttackSeconds);
