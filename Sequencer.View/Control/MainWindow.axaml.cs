@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -21,6 +23,7 @@ namespace Sequencer.View.Control
         private readonly KeyboardStateProcessor keyboardState;
         private readonly MouseOperator mouseOperator;
         private readonly SequencerViewModel viewModel;
+        private readonly ISequencerNotes notes;
 
         // The button that opened the radial menu: right, or left with Ctrl on macOS.
         private MouseButton? contextMenuButton;
@@ -41,6 +44,7 @@ namespace Sequencer.View.Control
             InitializeComponent();
 
             this.viewModel = viewModel;
+            this.notes = notes;
             this.keyboardState = keyboardState;
             this.mouseOperator = mouseOperator;
             DataContext = viewModel;
@@ -48,6 +52,9 @@ namespace Sequencer.View.Control
 
             Header.Initialise(pitchAndPositionCalculator, protocol, settings);
             Editor.Initialise(notes, pitchAndPositionCalculator, protocol, settings, keyboardState, mouseOperator, keyboardState.CommandModifier, notePreviewer);
+
+            Keyboard.Initialise(protocol, settings, notePreviewer);
+            viewModel.PropertyChanged += OnViewModelPropertyChanged;
 
             Editor.PointerPressed += OnEditorPointerPressed;
             Editor.PointerMoved += OnEditorPointerMoved;
@@ -59,6 +66,31 @@ namespace Sequencer.View.Control
             AddHandler(KeyUpEvent, (sender, args) => keyboardState.CurrentModifiers = args.KeyModifiers, RoutingStrategies.Tunnel);
 
             Log.Info("Main window loaded");
+        }
+
+        private void OnViewModelPropertyChanged(object sender, [NotNull] PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SequencerViewModel.CurrentPosition) || e.PropertyName == nameof(SequencerViewModel.SequencerPlayState))
+            {
+                UpdatePlayingKeys();
+            }
+        }
+
+        /// <summary>
+        /// Lights the keyboard keys for the notes sounding at the playback position.
+        /// </summary>
+        private void UpdatePlayingKeys()
+        {
+            if (viewModel.SequencerPlayState != PlayState.Play)
+            {
+                Keyboard.SetActivePitches(Enumerable.Empty<Pitch>());
+                return;
+            }
+
+            Domain.IPosition position = viewModel.CurrentPosition;
+            Keyboard.SetActivePitches(notes.AllNotes
+                .Where(note => note.StartPosition.IsLessThanOrEqual(position) && note.EndPosition.IsGreaterThan(position))
+                .Select(note => note.Pitch));
         }
 
         private void OnEditorPointerPressed(object sender, [NotNull] PointerPressedEventArgs e)

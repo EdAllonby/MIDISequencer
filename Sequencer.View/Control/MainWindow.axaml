@@ -14,16 +14,22 @@
         <Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*,Auto">
             <Grid Grid.Row="0">
                 <DockPanel>
-                    <control:SequencerHeaderControl x:Name="Header" DockPanel.Dock="Top" Height="30"
-                                                    CurrentPosition="{Binding CurrentPosition}" />
+                    <!-- The keyboard column and the ruler's spacer share one width so lanes and beats line up. -->
+                    <Grid DockPanel.Dock="Top" Height="30" ColumnDefinitions="56,*">
+                        <control:SequencerHeaderControl x:Name="Header" Grid.Column="1"
+                                                        CurrentPosition="{Binding CurrentPosition}" />
+                    </Grid>
                     <ScrollViewer x:Name="EditorScrollViewer"
                                   HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto"
                                   Focusable="False">
-                        <control:SequencerControl x:Name="Editor" MinHeight="800"
-                                                  NoteAction="{Binding NoteAction}"
-                                                  SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
-                                                  CurrentPosition="{Binding CurrentPosition}" />
+                        <Grid ColumnDefinitions="56,*" MinHeight="800">
+                            <control:PianoKeyboardControl x:Name="Keyboard" Grid.Column="0" />
+                            <control:SequencerControl x:Name="Editor" Grid.Column="1"
+                                                      NoteAction="{Binding NoteAction}"
+                                                      SelectedNotes="{Binding SelectedNotes, Mode=TwoWay}"
+                                                      CurrentPosition="{Binding CurrentPosition}" />
+                        </Grid>
                     </ScrollViewer>
                 </DockPanel>
 

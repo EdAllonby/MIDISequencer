@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
@@ -24,6 +25,11 @@ namespace Sequencer.Audio
             {
                 player.Preview(tone);
             }
+        }
+
+        public IDisposable Hold(Tone tone)
+        {
+            return player.Hold(tone);
         }
     }
 }

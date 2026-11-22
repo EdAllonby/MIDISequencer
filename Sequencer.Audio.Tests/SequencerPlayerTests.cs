@@ -203,6 +203,32 @@ namespace Sequencer.Audio.Tests
         }
 
         [Test]
+        public void Hold_PlaysUntilTheHandleIsDisposed()
+        {
+            var tone = new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end);
+
+            IDisposable held = player.Hold(tone);
+            FakeVoice voice = voices.Values.Single();
+            Assert.That(voice.NoteOnCount, Is.EqualTo(1));
+            Assert.That(voice.ReleaseAfterSamples, Is.Null, "Held notes do not release by themselves.");
+            Assert.That(voice.NoteOffCount, Is.EqualTo(0));
+
+            held.Dispose();
+
+            Assert.That(voice.NoteOffCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void NotePreviewer_HoldPlaysEvenWithPreviewsSwitchedOff()
+        {
+            var previewer = new NotePreviewer(player, new SynthSettings { PreviewOnEdit = false });
+
+            previewer.Hold(new Tone(new Pitch(Note.C, 4), new Velocity(100), start, end));
+
+            Assert.That(voices.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void NotePreviewer_OnlyPreviewsWhenSwitchedOn()
         {
             var settings = new SynthSettings { PreviewOnEdit = false };

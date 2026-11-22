@@ -68,6 +68,18 @@ namespace Sequencer.Audio
             mixer.AddMixerInput(voice);
         }
 
+        /// <summary>
+        /// Starts a note that plays until the returned handle is disposed. Safe to call from the UI thread.
+        /// </summary>
+        [NotNull]
+        public IDisposable Hold([NotNull] Tone tone)
+        {
+            ISignalProvider voice = signalProviderFactory.CreateSignalProvider(new PreviewNote(tone));
+            voice.NoteOn();
+            mixer.AddMixerInput(voice);
+            return new HeldNote(voice);
+        }
+
         public void Dispose()
         {
             clock.Tick -= OnTick;
@@ -158,6 +170,21 @@ namespace Sequencer.Audio
                     voice.NoteOff();
                     voices.Remove(note);
                 }
+            }
+        }
+
+        private sealed class HeldNote : IDisposable
+        {
+            [NotNull] private readonly ISignalProvider voice;
+
+            public HeldNote([NotNull] ISignalProvider voice)
+            {
+                this.voice = voice;
+            }
+
+            public void Dispose()
+            {
+                voice.NoteOff();
             }
         }
 

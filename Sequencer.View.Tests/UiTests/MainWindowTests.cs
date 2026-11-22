@@ -468,6 +468,73 @@ namespace Sequencer.View.Tests.UiTests
             Assert.That(settings.PreviewOnEdit, Is.False);
         }
 
+        private PianoKeyboardControl Keyboard => window.FindControl<PianoKeyboardControl>("Keyboard");
+
+        private string PitchName(int noteNumber) => container.Resolve<Midi.IDigitalAudioProtocol>().CreatePitchFromProtocolNumber(noteNumber).ToString();
+
+        private int NoteNumber(Domain.Pitch pitch) => container.Resolve<Midi.IDigitalAudioProtocol>().ProtocolNoteNumber(pitch);
+
+        [AvaloniaTest]
+        public void PressingAKey_HoldsItsNoteUntilReleased()
+        {
+            var settings = container.Resolve<Domain.Settings.SequencerSettings>();
+            int highest = NoteNumber(settings.LowestPitch) + settings.TotalNotes - 1;
+
+            // The top key, halfway across the keyboard column, just below the ruler.
+            window.MouseDown(new Point(28, 36), MouseButton.Left);
+            Assert.That(previewer.Held, Is.EqualTo(new[] { PitchName(highest) }));
+            Assert.That(Keyboard.PressedNote, Is.EqualTo(highest));
+            Assert.That(previewer.Released, Is.EqualTo(0));
+
+            window.MouseUp(new Point(28, 36), MouseButton.Left);
+            Assert.That(previewer.Released, Is.EqualTo(1));
+            Assert.That(Keyboard.PressedNote, Is.Null);
+        }
+
+        [AvaloniaTest]
+        public void DraggingAcrossTheKeys_PlaysEachInTurn()
+        {
+            window.MouseDown(new Point(28, 36), MouseButton.Left);
+            window.MouseMove(new Point(28, 49));
+            window.MouseMove(new Point(28, 62));
+            window.MouseUp(new Point(28, 62), MouseButton.Left);
+
+            Assert.That(previewer.Held.Count, Is.EqualTo(3));
+            Assert.That(previewer.Held.Distinct().Count(), Is.EqualTo(3));
+            Assert.That(previewer.Released, Is.EqualTo(3), "Each key is released when the next is played.");
+        }
+
+        [AvaloniaTest]
+        public void PlayingKeys_LightUpDuringPlayback()
+        {
+            // A note in the first cell of the grid, which sounds as soon as playback starts.
+            Point firstCell = (window.FindControl<SequencerControl>("Editor").TranslatePoint(new Point(4, 0), window) ?? default)
+                .WithY(EditorPoint.Y);
+            Click(firstCell);
+            int noteNumber = NoteNumber(notes.AllNotes.Single().Pitch);
+
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(60);
+            Dispatcher.UIThread.RunJobs();
+            Assert.That(Keyboard.ActiveNotes, Is.EquivalentTo(new[] { noteNumber }));
+
+            Press(Key.Enter);
+            Assert.That(Keyboard.ActiveNotes, Is.Empty);
+        }
+
+        [AvaloniaTest]
+        public void Ruler_LinesUpWithTheGrid()
+        {
+            var header = window.FindControl<SequencerHeaderControl>("Header");
+            var editor = window.FindControl<SequencerControl>("Editor");
+
+            Point headerOrigin = header.TranslatePoint(new Point(0, 0), window) ?? default;
+            Point editorOrigin = editor.TranslatePoint(new Point(0, 0), window) ?? default;
+
+            Assert.That(headerOrigin.X, Is.EqualTo(editorOrigin.X));
+            Assert.That(header.Bounds.Width, Is.EqualTo(editor.Bounds.Width).Within(1));
+        }
+
         [AvaloniaTest]
         public void Space_TogglesPlayAndPause_AndReturnStops()
         {
@@ -485,7 +552,26 @@ namespace Sequencer.View.Tests.UiTests
         {
             public System.Collections.Generic.List<string> Pitches { get; } = new System.Collections.Generic.List<string>();
 
+            public System.Collections.Generic.List<string> Held { get; } = new System.Collections.Generic.List<string>();
+
+            public int Released { get; private set; }
+
             public void Preview(Domain.Tone tone) => Pitches.Add(tone.Pitch.ToString());
+
+            public IDisposable Hold(Domain.Tone tone)
+            {
+                Held.Add(tone.Pitch.ToString());
+                return new Release(() => Released++);
+            }
+
+            private sealed class Release : IDisposable
+            {
+                private readonly Action onDispose;
+
+                public Release(Action onDispose) => this.onDispose = onDispose;
+
+                public void Dispose() => onDispose();
+            }
         }
     }
 }
