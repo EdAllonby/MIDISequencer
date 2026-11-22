@@ -80,6 +80,9 @@ namespace Sequencer.View
             builder.RegisterType<PortAudioOutput>().As<IAudioOutput>().SingleInstance();
             builder.RegisterType<SequencerNotes>().As<ISequencerNotes, ISequencedNotes>().SingleInstance();
             builder.RegisterType<SequencerPlayer>().SingleInstance();
+            builder.RegisterType<OfflineRenderer>().SingleInstance();
+            builder.RegisterType<WavExporter>().SingleInstance();
+            builder.RegisterType<MidiFileWriter>().SingleInstance();
             builder.RegisterType<NotePreviewer>().As<INotePreviewer>().SingleInstance();
             builder.RegisterType<KeyboardStateProcessor>().AsSelf().As<IKeyboardStateProcessor>().SingleInstance();
             builder.RegisterType<MouseOperator>().AsSelf().As<IMouseOperator>().SingleInstance();

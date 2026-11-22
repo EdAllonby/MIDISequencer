@@ -117,6 +117,21 @@ namespace Sequencer.Domain.Arrangement
         }
 
         /// <summary>
+        /// Replaces every track with another song's: how a new or loaded song takes over the one the app is
+        /// playing, so everything holding this song sees the change.
+        /// </summary>
+        public void ReplaceWith([NotNull] Song other)
+        {
+            ReplaceTracks(other.Tracks);
+        }
+
+        internal void ReplaceTracks([NotNull] [ItemNotNull] IEnumerable<Track> replacement)
+        {
+            tracks = replacement.Take(MaximumTracks).ToArray();
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// Lets views redraw after a clip's contents change.
         /// </summary>
         public void NotifyClipEdited()

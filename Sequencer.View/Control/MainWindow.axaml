@@ -9,10 +9,13 @@
         Icon="/Assets/AppIcon.png"
         Title="Sequencer" Width="1280" Height="860" MinWidth="960" MinHeight="640">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" ColumnDefinitions="*,Auto,280">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" ColumnDefinitions="*,Auto,280">
+
+        <!-- The File menu: in the menu bar on macOS, drawn here on Windows and Linux. -->
+        <NativeMenuBar Grid.Row="0" Grid.ColumnSpan="3" />
 
         <!-- Toolbar: transport and position on the left, tools on the right. -->
-        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
+        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,0,1" Padding="12,9">
             <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
@@ -85,7 +88,7 @@
         </Border>
 
         <!-- Arrangement: tracks of clips across four-bar sections. -->
-        <Border Grid.Row="1" Grid.ColumnSpan="3" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,0,1">
+        <Border Grid.Row="2" Grid.ColumnSpan="3" BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,0,1">
             <ScrollViewer x:Name="ArrangementScrollViewer" MaxHeight="290" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled" Focusable="False">
                 <control:ArrangementControl x:Name="Arrangement" />
@@ -93,7 +96,7 @@
         </Border>
 
         <!-- Editor: the clip's title, the ruler, then the piano roll or the drum grid. -->
-        <Grid Grid.Row="2" Grid.Column="0">
+        <Grid Grid.Row="3" Grid.Column="0">
             <DockPanel>
                 <!-- Which track is being edited, and its presets. -->
                 <Border DockPanel.Dock="Top" Background="{StaticResource ToolbarBrush}" BorderBrush="{StaticResource HairlineBrush}"
@@ -175,10 +178,10 @@
                                                        MenuRadius="52" />
         </Grid>
 
-        <GridSplitter Grid.Row="2" Grid.Column="1" Width="4" ResizeDirection="Columns" Background="Transparent" />
+        <GridSplitter Grid.Row="3" Grid.Column="1" Width="4" ResizeDirection="Columns" Background="Transparent" />
 
         <!-- Side panel: the selected note, then the synth. -->
-        <Border Grid.Row="2" Grid.Column="2" Background="{StaticResource PanelBrush}"
+        <Border Grid.Row="3" Grid.Column="2" Background="{StaticResource PanelBrush}"
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="1,0,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
                 <StackPanel Margin="16,14,16,16" Spacing="12">
@@ -512,7 +515,7 @@
         </Border>
 
         <!-- Hint bar: what the current tool does, and the main shortcuts. -->
-        <Border Grid.Row="3" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
+        <Border Grid.Row="4" Grid.ColumnSpan="3" Background="{StaticResource ToolbarBrush}"
                 BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,1,0,0" Padding="12,5">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock x:Name="ToolHintText" Classes="label" Text="{Binding ToolHint}" TextTrimming="CharacterEllipsis" />

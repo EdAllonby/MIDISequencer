@@ -1106,6 +1106,97 @@ namespace Sequencer.View.Tests.UiTests
             Assert.That(window.FindControl<Slider>("ResonancePercentSlider").Value, Is.EqualTo(25), "The first track kept its Lead patch.");
         }
 
+        private string TempSongPath() => Path.Combine(Path.GetTempPath(), $"sequencer-ui-{System.Guid.NewGuid():N}.sequencer");
+
+        [AvaloniaTest]
+        public void ANewWindow_IsAnUntitledUnchangedSong()
+        {
+            Assert.That(window.Title, Is.EqualTo("Untitled"));
+            Assert.That(window.HasUnsavedChanges, Is.False);
+        }
+
+        [AvaloniaTest]
+        public void Editing_MarksTheSongEdited_ButSelectingDoesNot()
+        {
+            Click(CellInWindow(DrumTrack, 0));
+            Click(CellInWindow(SynthTrack, 0));
+            Assert.That(window.HasUnsavedChanges, Is.False, "Moving between clips isn't an edit.");
+
+            Click(EditorPoint);
+
+            Assert.That(window.HasUnsavedChanges, Is.True);
+            Assert.That(window.Title, Is.EqualTo("Untitled — Edited"));
+        }
+
+        [AvaloniaTest]
+        public void SavingAndOpening_RestoresTheSong()
+        {
+            string path = TempSongPath();
+
+            try
+            {
+                Click(EditorPoint);
+                viewModel.BeatsPerMinute = 97;
+                window.SaveSong(path);
+                Assert.That(window.HasUnsavedChanges, Is.False);
+                Assert.That(window.Title, Is.EqualTo(Path.GetFileNameWithoutExtension(path)));
+
+                window.NewSong();
+                Assert.That(notes.AllNotes, Is.Empty);
+                Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(120));
+
+                window.OpenSong(path);
+
+                Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+                Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(97));
+                Assert.That(window.HasUnsavedChanges, Is.False);
+                Assert.That(window.DocumentPath, Is.EqualTo(path));
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [AvaloniaTest]
+        public void OpeningSomethingThatIsntASong_Fails_WithoutChangingTheSong()
+        {
+            string path = TempSongPath();
+            File.WriteAllText(path, "hello");
+            Click(EditorPoint);
+
+            try
+            {
+                Assert.Throws<System.FormatException>(() => window.OpenSong(path));
+                Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [AvaloniaTest]
+        public void ExportingMidi_WritesAMidiFile()
+        {
+            string path = Path.ChangeExtension(TempSongPath(), "mid");
+            Click(EditorPoint);
+
+            try
+            {
+                window.ExportMidi(path);
+
+                byte[] bytes = File.ReadAllBytes(path);
+                Assert.That(System.Text.Encoding.ASCII.GetString(bytes, 0, 4), Is.EqualTo("MThd"));
+                Assert.That(window.HasUnsavedChanges, Is.True, "Exporting isn't saving.");
+                Assert.That(notes.AllNotes.Count(), Is.EqualTo(1), "The open clip is still open after export.");
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
         [AvaloniaTest]
         public void Space_TogglesPlayAndPause_AndReturnStops()
         {
