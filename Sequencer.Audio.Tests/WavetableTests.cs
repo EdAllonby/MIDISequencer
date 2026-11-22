@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Audio.Tests
 {
@@ -13,10 +14,10 @@ namespace Sequencer.Audio.Tests
 
             var wavetable = new Wavetable(samples);
 
-            Assert.AreEqual(1, wavetable.SampleAtPosition(0));
-            Assert.AreEqual(2, wavetable.SampleAtPosition(1));
-            Assert.AreEqual(3, wavetable.SampleAtPosition(2));
-            Assert.AreEqual(4, wavetable.SampleAtPosition(3));
+            ClassicAssert.AreEqual(1, wavetable.SampleAtPosition(0));
+            ClassicAssert.AreEqual(2, wavetable.SampleAtPosition(1));
+            ClassicAssert.AreEqual(3, wavetable.SampleAtPosition(2));
+            ClassicAssert.AreEqual(4, wavetable.SampleAtPosition(3));
         }
 
         [Test]
@@ -26,11 +27,11 @@ namespace Sequencer.Audio.Tests
 
             var wavetable = new Wavetable(samples);
 
-            Assert.AreEqual(1, wavetable.SampleAtPosition(4));
-            Assert.AreEqual(2, wavetable.SampleAtPosition(5));
-            Assert.AreEqual(3, wavetable.SampleAtPosition(6));
-            Assert.AreEqual(4, wavetable.SampleAtPosition(7));
-            Assert.AreEqual(1, wavetable.SampleAtPosition(8));
+            ClassicAssert.AreEqual(1, wavetable.SampleAtPosition(4));
+            ClassicAssert.AreEqual(2, wavetable.SampleAtPosition(5));
+            ClassicAssert.AreEqual(3, wavetable.SampleAtPosition(6));
+            ClassicAssert.AreEqual(4, wavetable.SampleAtPosition(7));
+            ClassicAssert.AreEqual(1, wavetable.SampleAtPosition(8));
         }
 
         [Test]
@@ -40,7 +41,7 @@ namespace Sequencer.Audio.Tests
 
             var wavetable = new Wavetable(samples);
 
-            Assert.AreEqual(4, wavetable.Size);
+            ClassicAssert.AreEqual(4, wavetable.Size);
         }
     }
 }

@@ -1,88 +1,148 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using Sequencer.Domain;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
-using Sequencer.Visual;
 
 namespace Sequencer.Audio
 {
+    /// <summary>
+    /// Turns clock ticks into note-on and note-off events. Every sounding note is a voice in a single
+    /// mixer, which plays through one output stream.
+    /// </summary>
     [UsedImplicitly]
-    public sealed class SequencerPlayer
+    public sealed class SequencerPlayer : IDisposable
     {
-        [NotNull] private readonly Dictionary<IVisualNote, WaveOut> currentWaveOuts = new Dictionary<IVisualNote, WaveOut>();
-        [NotNull] private readonly IMusicalSettings musicalSettings;
-        [NotNull] private readonly ISequencerNotes sequencerNotes;
+        [NotNull] private readonly ISequencerClock clock;
+        [NotNull] private readonly MixingSampleProvider mixer;
+        [NotNull] private readonly IAudioOutput output;
+        [NotNull] private readonly ISequencedNotes sequencedNotes;
         [NotNull] private readonly ISignalProviderFactory signalProviderFactory;
+        [NotNull] private readonly ITickCalculator tickCalculator;
 
-        public SequencerPlayer([NotNull] ISignalProviderFactory signalProviderFactory,
-            [NotNull] ISequencerNotes sequencerNotes, [NotNull] ISequencerClock sequencerClock,
-            [NotNull] IMusicalSettings musicalSettings)
+        // Ticks arrive on the clock thread; Stopped can be raised from the UI thread.
+        [NotNull] private readonly object voicesLock = new object();
+        [NotNull] private readonly Dictionary<ISequencedNote, ISignalProvider> voices = new Dictionary<ISequencedNote, ISignalProvider>();
+        private volatile bool isRunning;
+
+        public SequencerPlayer([NotNull] ISignalProviderFactory signalProviderFactory, [NotNull] ISequencedNotes sequencedNotes,
+            [NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IAudioSettings audioSettings,
+            [NotNull] IAudioOutput output)
         {
             this.signalProviderFactory = signalProviderFactory;
-            this.sequencerNotes = sequencerNotes;
-            this.musicalSettings = musicalSettings;
+            this.sequencedNotes = sequencedNotes;
+            this.clock = clock;
+            this.tickCalculator = tickCalculator;
+            this.output = output;
 
-            sequencerClock.Tick += OnTick;
-            sequencerClock.Stopped += OnClockStopped;
+            // ReadFully keeps the stream running with silence when no notes are playing.
+            mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(audioSettings.SampleRate, 1)) { ReadFully = true };
+            output.Play(mixer);
+
+            clock.Tick += OnTick;
+            clock.Started += OnClockStarted;
+            clock.Stopped += OnClockStopped;
+        }
+
+        /// <summary>
+        /// The number of notes currently sounding, including ones in their release stage.
+        /// </summary>
+        public int ActiveVoiceCount => mixer.MixerInputs.Count();
+
+        public void Dispose()
+        {
+            clock.Tick -= OnTick;
+            clock.Started -= OnClockStarted;
+            clock.Stopped -= OnClockStopped;
+            output.Dispose();
+        }
+
+        private void OnClockStarted(object sender, EventArgs e)
+        {
+            isRunning = true;
         }
 
         private void OnClockStopped(object sender, EventArgs e)
         {
-            foreach (IVisualNote note in sequencerNotes.AllNotes)
-            {
-                StopNote(note);
-            }
+            isRunning = false;
+            ReleaseAllNotes();
         }
 
         private void OnTick(object sender, [NotNull] TickEventArgs e)
         {
-            var positionFromTick = new TickCalculator(musicalSettings);
-            IPosition currentPosition = positionFromTick.CalculatePositionFromTick(e.CurrentTick);
+            // Stop and Pause also raise a tick to update the position display. Those must not start notes.
+            if (!isRunning)
+            {
+                return;
+            }
 
-            PlayNotes(currentPosition);
-            StopNotes(currentPosition);
+            if (e.CurrentTick == 0)
+            {
+                // The loop has wrapped. A note ending exactly at the end of the sequence never sees its
+                // ending tick, because that tick is reported as 0, so release everything still sounding.
+                ReleaseAllNotes();
+            }
+
+            IPosition currentPosition = tickCalculator.CalculatePositionFromTick(e.CurrentTick);
+
+            StartNotes(currentPosition);
+            ReleaseNotes(currentPosition);
         }
 
-        private void PlayNotes([NotNull] IPosition currentPosition)
+        private void StartNotes([NotNull] IPosition currentPosition)
         {
-            IEnumerable<IVisualNote> notesAtStartPosition = sequencerNotes.FindNotesFromStartingPosition(currentPosition);
-
-            foreach (IVisualNote noteAtStartPosition in notesAtStartPosition)
+            foreach (ISequencedNote note in sequencedNotes.FindNotesFromStartingPosition(currentPosition))
             {
-                ISignalProvider signalProvider = signalProviderFactory.CreateSignalProvider(noteAtStartPosition);
-                signalProvider.NoteState = true;
-
-                if (!currentWaveOuts.ContainsKey(noteAtStartPosition))
+                lock (voicesLock)
                 {
-                    var waveOut = new WaveOut();
-                    waveOut.Init(signalProvider);
-                    waveOut.Play();
-                    currentWaveOuts.Add(noteAtStartPosition, waveOut);
+                    if (voices.ContainsKey(note))
+                    {
+                        continue;
+                    }
+
+                    ISignalProvider voice = signalProviderFactory.CreateSignalProvider(note);
+                    voice.NoteOn();
+                    voices.Add(note, voice);
+                    mixer.AddMixerInput(voice);
                 }
             }
         }
 
-        private void StopNotes([NotNull] IPosition currentPosition)
+        private void ReleaseNotes([NotNull] IPosition currentPosition)
         {
-            IEnumerable<IVisualNote> notesAtEndPosition = sequencerNotes.FindNotesFromEndingPosition(currentPosition);
-
-            foreach (IVisualNote noteAtEndPosition in notesAtEndPosition)
+            foreach (ISequencedNote note in sequencedNotes.FindNotesFromEndingPosition(currentPosition))
             {
-                StopNote(noteAtEndPosition);
+                ReleaseNote(note);
             }
         }
 
-        private void StopNote([NotNull] IVisualNote noteAtEndPosition)
+        private void ReleaseAllNotes()
         {
-            bool didFind = currentWaveOuts.TryGetValue(noteAtEndPosition, out WaveOut value);
-
-            if (didFind)
+            lock (voicesLock)
             {
-                value.Stop();
-                currentWaveOuts.Remove(noteAtEndPosition);
+                foreach (ISignalProvider voice in voices.Values)
+                {
+                    voice.NoteOff();
+                }
+
+                voices.Clear();
+            }
+        }
+
+        private void ReleaseNote([NotNull] ISequencedNote note)
+        {
+            lock (voicesLock)
+            {
+                if (voices.TryGetValue(note, out ISignalProvider voice))
+                {
+                    // The voice stays in the mixer through its release stage and removes itself once silent.
+                    voice.NoteOff();
+                    voices.Remove(note);
+                }
             }
         }
     }

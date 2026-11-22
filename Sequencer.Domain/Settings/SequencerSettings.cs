@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 namespace Sequencer.Domain.Settings
 {
@@ -9,6 +9,13 @@ namespace Sequencer.Domain.Settings
     {
         // Audio definitions
         public int SampleRate => 44100;
+
+        // Envelope values match the original Windows build. Its release stage never ran (issue #16), so
+        // the one-second release tail is new.
+        public double AttackSeconds => 1.0;
+        public double DecaySeconds => 1.0;
+        public double SustainLevel => 0.5;
+        public double ReleaseSeconds => 1.0;
 
         // Colour definitions
         public Color AccidentalKeyColour => Color.Gray;

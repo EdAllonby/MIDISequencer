@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Annotations;
 using Sequencer.Domain.Settings;
 
@@ -66,13 +66,13 @@ namespace Sequencer.Midi
         public event EventHandler Started
         {
             add => clock.Started += value;
-            remove => clock.Started += value;
+            remove => clock.Started -= value;
         }
 
         public event EventHandler Stopped
         {
             add => clock.Stopped += value;
-            remove => clock.Stopped += value;
+            remove => clock.Stopped -= value;
         }
 
         public event EventHandler<TickEventArgs> Tick;

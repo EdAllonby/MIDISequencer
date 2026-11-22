@@ -1,68 +1,205 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using JetBrains.Annotations;
-using Sanford.Multimedia.Midi;
 
 namespace Sequencer.Midi
 {
-    public class InternalClock : IInternalClock
+    /// <summary>
+    /// A tempo clock that raises <see cref="Tick"/> once per tick on a dedicated background thread,
+    /// timed with <see cref="Stopwatch"/>. Replaces Sanford's Windows-only multimedia-timer clock.
+    /// </summary>
+    /// <remarks>
+    /// Behaviour matches the Sanford clock that <see cref="SequencerClock"/> was written against:
+    /// <see cref="Tick"/> is raised before the tick count advances, <see cref="Start"/> resets the count to
+    /// zero but does nothing if the clock is already running, and <see cref="Continue"/> resumes from the
+    /// current count. <see cref="Started"/> is raised whenever the clock begins running, from either method.
+    /// </remarks>
+    public sealed class InternalClock : IInternalClock
     {
-        [NotNull] private readonly MidiInternalClock internalClockImplementation = new MidiInternalClock();
+        /// <summary>
+        /// Microseconds per quarter note at 120 BPM, Sanford's default.
+        /// </summary>
+        private const int DefaultTempo = 500000;
 
-        public void Dispose()
+        // Sleep until this close to the next tick, then spin, because Thread.Sleep can overshoot by a millisecond or more.
+        private const double SpinThresholdSeconds = 0.002;
+
+        [NotNull] private readonly Func<long> timestamp;
+        private readonly long timestampFrequency;
+        [NotNull] private readonly object stateLock = new object();
+        [CanBeNull] private readonly Thread thread;
+
+        private volatile bool disposed;
+        private volatile bool running;
+        private int ticks;
+        private int ppqn = 24;
+        private long nextTickTimestamp;
+
+        public InternalClock() : this(Stopwatch.GetTimestamp, Stopwatch.Frequency, true)
         {
-            internalClockImplementation.Dispose();
         }
 
-        public event EventHandler Tick
+        /// <summary>
+        /// Creates a clock with its own time source. Without a background thread, call
+        /// <see cref="ProcessDueTicks"/> to raise ticks; tests use this to control time.
+        /// </summary>
+        internal InternalClock([NotNull] Func<long> timestamp, long timestampFrequency, bool useBackgroundThread)
         {
-            add => internalClockImplementation.Tick += value;
-            remove => internalClockImplementation.Tick -= value;
+            this.timestamp = timestamp;
+            this.timestampFrequency = timestampFrequency;
+
+            if (useBackgroundThread)
+            {
+                thread = new Thread(Run) { IsBackground = true, Name = "Sequencer clock", Priority = ThreadPriority.Highest };
+                thread.Start();
+            }
         }
 
-        public int Tempo => internalClockImplementation.Tempo;
+        public event EventHandler Tick;
+
+        public event EventHandler Started;
+
+        public event EventHandler Stopped;
+
+        public int Tempo => DefaultTempo;
+
+        public bool IsRunning => running;
 
         public int Ticks
         {
-            get => internalClockImplementation.Ticks;
-            set => internalClockImplementation.SetTicks(value);
+            get => Volatile.Read(ref ticks);
+            set => Volatile.Write(ref ticks, value);
         }
 
         public int Ppqn
         {
-            get => internalClockImplementation.Ppqn;
-            set => internalClockImplementation.Ppqn = value;
+            get => ppqn;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "Ticks per quarter note must be positive.");
+                }
+
+                ppqn = value;
+            }
+        }
+
+        private long TimestampsPerTick => (long) ((double) Tempo / 1000000 * timestampFrequency / Ppqn);
+
+        public void Start()
+        {
+            lock (stateLock)
+            {
+                if (running)
+                {
+                    return;
+                }
+
+                Ticks = 0;
+                BeginRunning();
+            }
+
+            Started?.Invoke(this, EventArgs.Empty);
         }
 
         public void Continue()
         {
-            internalClockImplementation.Continue();
+            lock (stateLock)
+            {
+                if (running)
+                {
+                    return;
+                }
+
+                BeginRunning();
+            }
+
+            Started?.Invoke(this, EventArgs.Empty);
         }
 
         public void Stop()
         {
-            internalClockImplementation.Stop();
-        }
+            lock (stateLock)
+            {
+                if (!running)
+                {
+                    return;
+                }
 
-        public event EventHandler Started
-        {
-            add => internalClockImplementation.Started += value;
-            remove => internalClockImplementation.Started -= value;
-        }
+                running = false;
+            }
 
-        public event EventHandler Stopped
-        {
-            add => internalClockImplementation.Stopped += value;
-            remove => internalClockImplementation.Stopped -= value;
-        }
-
-        public void Start()
-        {
-            internalClockImplementation.Start();
+            Stopped?.Invoke(this, EventArgs.Empty);
         }
 
         public void SetTicks(int value)
         {
-            internalClockImplementation.SetTicks(value);
+            Ticks = value;
+        }
+
+        public void Dispose()
+        {
+            disposed = true;
+            running = false;
+            thread?.Join(TimeSpan.FromSeconds(1));
+        }
+
+        /// <summary>
+        /// Raises every tick whose time has arrived. Returns the time of the next tick, or null if stopped.
+        /// </summary>
+        internal long? ProcessDueTicks()
+        {
+            while (running)
+            {
+                long now = timestamp();
+
+                if (now < nextTickTimestamp)
+                {
+                    return nextTickTimestamp;
+                }
+
+                // Raise first, then advance, as Sanford's clock did. A handler may set Ticks (to loop).
+                Tick?.Invoke(this, EventArgs.Empty);
+                Interlocked.Increment(ref ticks);
+
+                // Schedule from the previous deadline, not from now, so timing errors do not accumulate.
+                nextTickTimestamp += TimestampsPerTick;
+            }
+
+            return null;
+        }
+
+        private void BeginRunning()
+        {
+            nextTickTimestamp = timestamp();
+            running = true;
+        }
+
+        private void Run()
+        {
+            while (!disposed)
+            {
+                long? next = ProcessDueTicks();
+
+                if (next == null)
+                {
+                    Thread.Sleep(1);
+                    continue;
+                }
+
+                double secondsUntilNext = (double) (next.Value - timestamp()) / timestampFrequency;
+
+                if (secondsUntilNext > SpinThresholdSeconds)
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(secondsUntilNext - SpinThresholdSeconds));
+                }
+                else
+                {
+                    Thread.SpinWait(50);
+                }
+            }
         }
     }
 }

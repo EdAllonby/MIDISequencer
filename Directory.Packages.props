@@ -6,7 +6,8 @@
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
     <PackageVersion Include="log4net" Version="3.6.0" />
-    <PackageVersion Include="Sanford.Multimedia.Midi" Version="6.7.3" />
+    <PackageVersion Include="NAudio.Core" Version="3.3.0" />
+    <PackageVersion Include="PortAudioSharp2" Version="1.0.6" />
 
     <!-- Tests -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
