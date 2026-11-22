@@ -70,7 +70,7 @@ namespace Sequencer.View.Tests.UiTests
         public void Window_RendersTheEditor()
         {
             string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "main-window.png");
-            window.CaptureRenderedFrame()?.Save(path);
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
             TestContext.Out.WriteLine($"Rendered frame: {path}");
 
             Assert.That(File.Exists(path), Is.True);
@@ -87,7 +87,7 @@ namespace Sequencer.View.Tests.UiTests
             window.MouseMove(new Point(730, 300));
 
             string path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "notes-and-menu.png");
-            window.CaptureRenderedFrame()?.Save(path);
+            window.CaptureRenderedFrame()?.Save(path, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
             TestContext.Out.WriteLine($"Rendered frame: {path}");
             window.MouseUp(new Point(730, 300), MouseButton.Right);
 
@@ -242,6 +242,90 @@ namespace Sequencer.View.Tests.UiTests
 
             Assert.That(viewModel.SelectedNote, Is.Not.Null);
             Assert.That(viewModel.SelectedNote.Velocity, Is.EqualTo(64));
+        }
+
+        private int TotalTicks(Domain.IPosition position) => position.TotalTicks(Domain.TimeSignature.FourFour, 96);
+
+        private IVisualNote CreateLongNote()
+        {
+            // About 60 px wide: several sixteenth-note cells (each about 14 px).
+            window.MouseDown(EditorPoint, MouseButton.Left);
+            window.MouseMove(EditorPoint + new Point(60, 0));
+            window.MouseUp(EditorPoint + new Point(60, 0), MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+            return notes.AllNotes.Single();
+        }
+
+        [AvaloniaTest]
+        public void SelectMode_DraggingANote_MovesItWithoutChangingItsLength()
+        {
+            IVisualNote note = CreateLongNote();
+            int start = TotalTicks(note.StartPosition);
+            int length = TotalTicks(note.EndPosition) - start;
+            viewModel.NoteAction = NoteAction.Select;
+
+            // Grab the middle of the note and drag it right, holding Shift to keep the pitch.
+            Point grab = EditorPoint + new Point(25, 0);
+            window.MouseDown(grab, MouseButton.Left, RawInputModifiers.Shift);
+            window.MouseMove(grab + new Point(56, 0), RawInputModifiers.Shift);
+            window.MouseUp(grab + new Point(56, 0), MouseButton.Left, RawInputModifiers.Shift);
+
+            Assert.That(TotalTicks(note.StartPosition), Is.GreaterThan(start));
+            Assert.That(TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition), Is.EqualTo(length));
+        }
+
+        [AvaloniaTest]
+        public void SelectMode_DraggingANotesEnd_ResizesIt()
+        {
+            Click(EditorPoint);
+            IVisualNote note = notes.AllNotes.Single();
+            int lengthBefore = TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition);
+            viewModel.NoteAction = NoteAction.Select;
+
+            window.MouseDown(EditorPoint, MouseButton.Left);
+            window.MouseMove(EditorPoint + new Point(56, 0));
+            window.MouseUp(EditorPoint + new Point(56, 0), MouseButton.Left);
+
+            Assert.That(TotalTicks(note.EndPosition) - TotalTicks(note.StartPosition), Is.GreaterThan(lengthBefore));
+        }
+
+        [AvaloniaTest]
+        public void DeleteMode_ClickingANote_DeletesIt()
+        {
+            Click(EditorPoint);
+            viewModel.NoteAction = NoteAction.Delete;
+
+            Click(EditorPoint);
+
+            Assert.That(notes.AllNotes, Is.Empty);
+        }
+
+        [AvaloniaTest]
+        public void LeftAndRightArrows_MoveTheSelectedNoteBySixteenths()
+        {
+            Click(EditorPoint);
+            IVisualNote note = notes.AllNotes.Single();
+            int start = TotalTicks(note.StartPosition);
+
+            Press(Key.Right);
+            Assert.That(TotalTicks(note.StartPosition), Is.EqualTo(start + 24));
+
+            Press(Key.Left);
+            Press(Key.Left);
+            Assert.That(TotalTicks(note.StartPosition), Is.EqualTo(start - 24));
+        }
+
+        [AvaloniaTest]
+        public void Playing_AdvancesThePlaybackPosition()
+        {
+            Press(Key.Space);
+            System.Threading.Thread.Sleep(400);
+            Dispatcher.UIThread.RunJobs();
+            Domain.IPosition playing = viewModel.CurrentPosition;
+            Press(Key.Enter);
+
+            Assert.That(TotalTicks(playing), Is.GreaterThan(0));
+            Assert.That(TotalTicks(viewModel.CurrentPosition), Is.EqualTo(0), "Stop returns to the start.");
         }
 
         [AvaloniaTest]

@@ -12,7 +12,6 @@ namespace Sequencer.Visual
         [NotNull] private readonly NoteDrawer noteDrawer;
         [NotNull] private readonly IDigitalAudioProtocol protocol;
         [NotNull] private readonly SequencerSettings sequencerSettings;
-        private bool canDraw = true;
         private NoteState noteState = NoteState.Selected;
 
         public VisualNote([NotNull] IDigitalAudioProtocol protocol, [NotNull] ISequencerDimensionsCalculator sequencerDimensionsCalculator,
@@ -55,7 +54,8 @@ namespace Sequencer.Visual
             get => Tone.StartPosition;
             set
             {
-                if (Tone.StartPosition.NextPosition(sequencerSettings.NoteResolution, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote).IsLessThan(Tone.EndPosition))
+                // The note must keep a positive length.
+                if (value.IsLessThan(Tone.EndPosition))
                 {
                     Tone = new Tone(Tone.Pitch, Tone.Velocity, value, Tone.EndPosition);
                     Draw();
@@ -107,10 +107,7 @@ namespace Sequencer.Visual
         /// </summary>
         public void Draw()
         {
-            if (canDraw)
-            {
-                noteDrawer.DrawNote(Pitch, Velocity, StartPosition, EndPosition, noteState);
-            }
+            noteDrawer.DrawNote(Pitch, Velocity, StartPosition, EndPosition, noteState);
         }
 
         /// <summary>
@@ -127,11 +124,12 @@ namespace Sequencer.Visual
         /// <param name="ticksToMove">How many beats to move this visual note.</param>
         public void MovePositionRelativeTo(int ticksToMove)
         {
-            DelayedDraw(() =>
-            {
-                StartPosition = StartPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
-                EndPosition = EndPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
-            });
+            // Move both ends together. Setting them one at a time trips each setter's length check, which
+            // stretched or stuck one-sixteenth notes.
+            IPosition newStart = StartPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            IPosition newEnd = EndPosition.PositionRelativeByTicks(ticksToMove, sequencerSettings.TimeSignature, sequencerSettings.TicksPerQuarterNote);
+            Tone = new Tone(Tone.Pitch, Tone.Velocity, newStart, newEnd);
+            Draw();
         }
 
         /// <summary>
@@ -149,12 +147,5 @@ namespace Sequencer.Visual
             return $"Pitch: {Pitch}, Start IPosition: {StartPosition}, End IPosition: {EndPosition}";
         }
 
-        private void DelayedDraw([NotNull] Action action)
-        {
-            canDraw = false;
-            action();
-            canDraw = true;
-            Draw();
-        }
     }
 }
