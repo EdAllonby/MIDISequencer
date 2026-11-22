@@ -5,6 +5,7 @@
         xmlns:vm="using:Sequencer.ViewModel"
         x:Class="Sequencer.View.Control.MainWindow"
         x:DataType="vm:SequencerViewModel"
+        Icon="/Assets/AppIcon.png"
         Title="Sequencer" Width="1200" Height="500" MinWidth="600" MinHeight="300">
 
     <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto,300">
