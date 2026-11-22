@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Domain.Tests
 {
@@ -11,7 +12,7 @@ namespace Sequencer.Domain.Tests
             var velocity = new Velocity(20);
             Velocity newVelocity = velocity + 200;
 
-            Assert.AreEqual(1, newVelocity.Volume);
+            ClassicAssert.AreEqual(1, newVelocity.Volume);
         }
 
         [Test]
@@ -35,7 +36,7 @@ namespace Sequencer.Domain.Tests
         {
             var velocity = new Velocity(127 / 2);
 
-            Assert.IsFalse(velocity.Equals(null));
+            ClassicAssert.IsFalse(velocity.Equals(null));
         }
 
         [Test]
@@ -43,7 +44,7 @@ namespace Sequencer.Domain.Tests
         {
             var velocity = new Velocity(127 / 2);
 
-            Assert.IsFalse(velocity.Equals((object) null));
+            ClassicAssert.IsFalse(velocity.Equals((object) null));
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace Sequencer.Domain.Tests
             var velocity = new Velocity(20);
             Velocity newVelocity = velocity - 200;
 
-            Assert.AreEqual(0, newVelocity.Volume);
+            ClassicAssert.AreEqual(0, newVelocity.Volume);
         }
 
         [Test]
@@ -70,8 +71,8 @@ namespace Sequencer.Domain.Tests
             var velocity = new Velocity(127 / 2);
             var velocity2 = new Velocity(127 / 2);
 
-            Assert.AreEqual(velocity, velocity2);
-            Assert.AreEqual(velocity.GetHashCode(), velocity2.GetHashCode());
+            ClassicAssert.AreEqual(velocity, velocity2);
+            ClassicAssert.AreEqual(velocity.GetHashCode(), velocity2.GetHashCode());
         }
 
         [Test]
@@ -80,8 +81,8 @@ namespace Sequencer.Domain.Tests
             var velocity = new Velocity(127 / 2);
             var velocity2 = new Velocity(127 / 3);
 
-            Assert.AreNotEqual(velocity, velocity2);
-            Assert.AreNotEqual(velocity.GetHashCode(), velocity2.GetHashCode());
+            ClassicAssert.AreNotEqual(velocity, velocity2);
+            ClassicAssert.AreNotEqual(velocity.GetHashCode(), velocity2.GetHashCode());
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace Sequencer.Domain.Tests
         {
             var velocity = new Velocity(127 / 2);
 
-            Assert.IsTrue(velocity.Equals(velocity));
+            ClassicAssert.IsTrue(velocity.Equals(velocity));
         }
 
         [Test]
@@ -97,21 +98,21 @@ namespace Sequencer.Domain.Tests
         {
             var velocity = new Velocity(127 / 2);
 
-            Assert.IsTrue(velocity.Equals((object) velocity));
+            ClassicAssert.IsTrue(velocity.Equals((object) velocity));
         }
 
         [Test]
         public void VelocityIsClampedAt0()
         {
             var velocity = new Velocity(-10);
-            Assert.AreEqual(0, velocity.Volume);
+            ClassicAssert.AreEqual(0, velocity.Volume);
         }
 
         [Test]
         public void VelocityIsClampedAt1()
         {
             var velocity = new Velocity(1000);
-            Assert.AreEqual(1, velocity.Volume);
+            ClassicAssert.AreEqual(1, velocity.Volume);
         }
 
         [Test]
@@ -119,7 +120,7 @@ namespace Sequencer.Domain.Tests
         {
             const int value = 63;
             var velocity = new Velocity(value);
-            Assert.AreEqual(value.ToString(), velocity.ToString());
+            ClassicAssert.AreEqual(value.ToString(), velocity.ToString());
         }
     }
 }

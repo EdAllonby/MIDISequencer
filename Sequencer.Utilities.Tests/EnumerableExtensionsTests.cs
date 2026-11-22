@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Utilities.Tests
 {
@@ -19,7 +20,7 @@ namespace Sequencer.Utilities.Tests
         {
             IEnumerable<T> actual = thing.Yield();
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
     }
 }

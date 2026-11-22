@@ -1,6 +1,7 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Domain.Tests
 {
@@ -22,7 +23,7 @@ namespace Sequencer.Domain.Tests
         {
             int actualTicks = NoteResolutionCalculator.GetTicksForResolution(noteResolution, tick);
 
-            Assert.AreEqual(expectedTicks, actualTicks);
+            ClassicAssert.AreEqual(expectedTicks, actualTicks);
         }
 
         [Test]

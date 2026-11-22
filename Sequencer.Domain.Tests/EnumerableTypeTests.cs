@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Domain.Tests
 {
@@ -36,7 +37,7 @@ namespace Sequencer.Domain.Tests
             catch (Exception e)
             {
                 // Because we're running the constructor via reflection, we need to get the true exception.
-                Assert.IsInstanceOf<ArgumentException>(e.InnerException);
+                ClassicAssert.IsInstanceOf<ArgumentException>(e.InnerException);
             }
         }
 
@@ -61,7 +62,7 @@ namespace Sequencer.Domain.Tests
         {
             int count = EnumerableTypeTestClass.Count(x => x.Value % 2 == 0);
 
-            Assert.AreEqual(2, count);
+            ClassicAssert.AreEqual(2, count);
         }
 
         [Test]
@@ -69,7 +70,7 @@ namespace Sequencer.Domain.Tests
         {
             int count = EnumerableTypeTestClass.Count();
 
-            Assert.AreEqual(4, count);
+            ClassicAssert.AreEqual(4, count);
         }
 
         [Test]

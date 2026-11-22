@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows;
+using System.Drawing;
 using JetBrains.Annotations;
 
 namespace Sequencer.Utilities
@@ -29,14 +29,14 @@ namespace Sequencer.Utilities
         /// <param name="degrees">The angle of the point in radians.</param>
         /// <returns>The point in cartesian coordinates.</returns>
         [Pure]
-        public static Point PolarToCartesian(Point origin, double radius, double degrees)
+        public static PointF PolarToCartesian(PointF origin, double radius, double degrees)
         {
             double degreesInRadians = ToRadians(degrees);
 
             double x = origin.X + radius * Math.Cos(degreesInRadians);
             double y = origin.Y + radius * Math.Sin(degreesInRadians);
 
-            return new Point(x, y);
+            return new PointF((float) x, (float) y);
         }
 
         /// <summary>

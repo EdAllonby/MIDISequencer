@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Sequencer.Domain.Settings;
 using Sequencer.Midi;
 
@@ -27,7 +28,7 @@ namespace Sequencer.Domain.Tests
         public void AssertMidiNumberFromPitch(Pitch pitch, int expectedMidiNumber)
         {
             int midiNoteNumber = protocol.ProtocolNoteNumber(pitch);
-            Assert.AreEqual(expectedMidiNumber, midiNoteNumber);
+            ClassicAssert.AreEqual(expectedMidiNumber, midiNoteNumber);
         }
 
         [Test]
@@ -35,7 +36,7 @@ namespace Sequencer.Domain.Tests
         public void MidiNote0ShouldReturnC0(Pitch expectedPitch, int midiNumber)
         {
             Pitch actualPitch = protocol.CreatePitchFromProtocolNumber(midiNumber);
-            Assert.AreEqual(expectedPitch, actualPitch);
+            ClassicAssert.AreEqual(expectedPitch, actualPitch);
         }
     }
 }

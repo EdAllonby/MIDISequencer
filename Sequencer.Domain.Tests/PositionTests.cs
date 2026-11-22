@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Domain.Tests
 {
@@ -108,7 +109,7 @@ namespace Sequencer.Domain.Tests
             int tick = (beat - 1) * ticksPerQuarterNote;
 
             IPosition actualPosition = Position.PositionFromTick(tick, standardTimeSignature, ticksPerQuarterNote);
-            Assert.AreEqual(expectedPosition, actualPosition);
+            ClassicAssert.AreEqual(expectedPosition, actualPosition);
         }
 
         [Test]
@@ -117,7 +118,7 @@ namespace Sequencer.Domain.Tests
         {
             int actual = first.CompareTo(second);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -126,7 +127,7 @@ namespace Sequencer.Domain.Tests
         {
             bool actual = first.IsGreaterThanOrEqual(second);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -135,7 +136,7 @@ namespace Sequencer.Domain.Tests
         {
             bool actual = first.IsGreaterThan(second);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -144,7 +145,7 @@ namespace Sequencer.Domain.Tests
         {
             bool actual = first.IsLessThanOrEqual(second);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -153,7 +154,7 @@ namespace Sequencer.Domain.Tests
         {
             bool actual = first.IsLessThan(second);
 
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -162,7 +163,7 @@ namespace Sequencer.Domain.Tests
         {
             IPosition actualNextPosition = initialPosition.NextPosition(NoteResolution.Quarter, standardTimeSignature, 96);
 
-            Assert.AreEqual(expectedNextPosition, actualNextPosition);
+            ClassicAssert.AreEqual(expectedNextPosition, actualNextPosition);
         }
 
         [Test]
@@ -170,8 +171,8 @@ namespace Sequencer.Domain.Tests
         {
             var firstPosition = new Position(9, 1, 2, 21);
 
-            Assert.IsFalse(firstPosition.Equals(null));
-            Assert.AreNotEqual(firstPosition.GetHashCode(), null);
+            ClassicAssert.IsFalse(firstPosition.Equals(null));
+            ClassicAssert.AreNotEqual(firstPosition.GetHashCode(), null);
         }
 
         [Test]
@@ -179,8 +180,8 @@ namespace Sequencer.Domain.Tests
         {
             var firstPosition = new Position(9, 1, 2, 21);
 
-            Assert.IsFalse(firstPosition.Equals((object) null));
-            Assert.AreNotEqual(firstPosition.GetHashCode(), null);
+            ClassicAssert.IsFalse(firstPosition.Equals((object) null));
+            ClassicAssert.AreNotEqual(firstPosition.GetHashCode(), null);
         }
 
         [Test]
@@ -189,7 +190,7 @@ namespace Sequencer.Domain.Tests
             var smallerPosition = new Position(1, 1, 1);
             var largerPosition = new Position(1, 1, 2);
 
-            Assert.IsTrue(smallerPosition < largerPosition);
+            ClassicAssert.IsTrue(smallerPosition < largerPosition);
         }
 
         [Test]
@@ -198,7 +199,7 @@ namespace Sequencer.Domain.Tests
             var largerPosition = new Position(1, 3, 4);
             var smallerPosition = new Position(1, 2, 1);
 
-            Assert.IsFalse(smallerPosition >= largerPosition);
+            ClassicAssert.IsFalse(smallerPosition >= largerPosition);
         }
 
         [Test]
@@ -207,7 +208,7 @@ namespace Sequencer.Domain.Tests
             var largerPosition = new Position(2, 4, 1);
             var smallerPosition = new Position(1, 2, 4);
 
-            Assert.IsFalse(smallerPosition >= largerPosition);
+            ClassicAssert.IsFalse(smallerPosition >= largerPosition);
         }
 
         [Test]
@@ -216,7 +217,7 @@ namespace Sequencer.Domain.Tests
             var smallerPosition = new Position(1, 2, 4);
             var largerPosition = new Position(2, 3, 4);
 
-            Assert.IsTrue(smallerPosition <= largerPosition);
+            ClassicAssert.IsTrue(smallerPosition <= largerPosition);
         }
 
 
@@ -226,7 +227,7 @@ namespace Sequencer.Domain.Tests
             var firstPosition = new Position(2, 1, 4, 93);
             var secondPosition = new Position(2, 1, 4, 94);
 
-            Assert.IsTrue(firstPosition < secondPosition);
+            ClassicAssert.IsTrue(firstPosition < secondPosition);
         }
 
         [Test]
@@ -235,7 +236,7 @@ namespace Sequencer.Domain.Tests
             var firstPosition = new Position(3, 3, 1);
             var secondPosition = new Position(3, 3, 1);
 
-            Assert.IsTrue(firstPosition.Equals(secondPosition));
+            ClassicAssert.IsTrue(firstPosition.Equals(secondPosition));
         }
 
         [Test]
@@ -244,7 +245,7 @@ namespace Sequencer.Domain.Tests
             var largerPosition = new Position(5, 2, 1);
             var smallerPosition = new Position(2, 2, 2);
 
-            Assert.IsTrue(largerPosition > smallerPosition);
+            ClassicAssert.IsTrue(largerPosition > smallerPosition);
         }
 
         [Test]
@@ -253,7 +254,7 @@ namespace Sequencer.Domain.Tests
             var firstPosition = new Position(5, 2, 2);
             var secondPosition = new Position(5, 2, 2);
 
-            Assert.IsTrue(firstPosition >= secondPosition);
+            ClassicAssert.IsTrue(firstPosition >= secondPosition);
         }
 
         [Test]
@@ -262,8 +263,8 @@ namespace Sequencer.Domain.Tests
             var firstPosition = new Position(9, 1, 2, 21);
             var secondPosition = new Position(9, 1, 2, 21);
 
-            Assert.IsTrue(firstPosition.Equals(secondPosition));
-            Assert.AreEqual(firstPosition.GetHashCode(), secondPosition.GetHashCode());
+            ClassicAssert.IsTrue(firstPosition.Equals(secondPosition));
+            ClassicAssert.AreEqual(firstPosition.GetHashCode(), secondPosition.GetHashCode());
         }
 
         [Test]
@@ -271,7 +272,7 @@ namespace Sequencer.Domain.Tests
         public void PositionShouldReturnCorrectSummedBeat(IPosition position, int expectedSum)
         {
             int actual = position.SummedBeat(standardTimeSignature);
-            Assert.AreEqual(expectedSum, actual);
+            ClassicAssert.AreEqual(expectedSum, actual);
         }
 
         [Test]
@@ -280,7 +281,7 @@ namespace Sequencer.Domain.Tests
         {
             IPosition actualPreviousPosition = initialPosition.PreviousPosition(NoteResolution.Quarter, standardTimeSignature, 96);
 
-            Assert.AreEqual(expectedPreviousPosition, actualPreviousPosition);
+            ClassicAssert.AreEqual(expectedPreviousPosition, actualPreviousPosition);
         }
 
         [Test]
@@ -288,8 +289,8 @@ namespace Sequencer.Domain.Tests
         {
             var firstPosition = new Position(9, 1, 2, 21);
 
-            Assert.IsTrue(firstPosition.Equals(firstPosition));
-            Assert.AreEqual(firstPosition.GetHashCode(), firstPosition.GetHashCode());
+            ClassicAssert.IsTrue(firstPosition.Equals(firstPosition));
+            ClassicAssert.AreEqual(firstPosition.GetHashCode(), firstPosition.GetHashCode());
         }
 
 
@@ -298,7 +299,7 @@ namespace Sequencer.Domain.Tests
         {
             var firstPosition = new Position(9, 1, 2, 21);
 
-            Assert.IsTrue(firstPosition.Equals((object) firstPosition));
+            ClassicAssert.IsTrue(firstPosition.Equals((object) firstPosition));
         }
     }
 }

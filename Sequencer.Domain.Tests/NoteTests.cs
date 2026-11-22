@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Sequencer.Domain.Tests
 {
@@ -10,7 +11,7 @@ namespace Sequencer.Domain.Tests
         {
             bool isPitchAccidental = Note.ASharp.IsAccidental;
 
-            Assert.IsTrue(isPitchAccidental);
+            ClassicAssert.IsTrue(isPitchAccidental);
         }
 
         [Test]
@@ -20,7 +21,7 @@ namespace Sequencer.Domain.Tests
 
             Note noteA = Note.FromDisplayName(displayName);
 
-            Assert.AreEqual(noteA.DisplayName, displayName);
+            ClassicAssert.AreEqual(noteA.DisplayName, displayName);
         }
 
         [Test]
@@ -32,7 +33,7 @@ namespace Sequencer.Domain.Tests
 
             Note expectedNote = Note.ASharp;
 
-            Assert.AreEqual(expectedNote, nextPitch);
+            ClassicAssert.AreEqual(expectedNote, nextPitch);
         }
     }
 }

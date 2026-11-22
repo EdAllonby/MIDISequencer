@@ -1,4 +1,4 @@
-﻿using System.Windows.Media;
+﻿using System.Drawing;
 
 namespace Sequencer.Domain.Settings
 {
@@ -11,14 +11,14 @@ namespace Sequencer.Domain.Settings
         public int SampleRate => 44100;
 
         // Colour definitions
-        public Color AccidentalKeyColour => Colors.Gray;
+        public Color AccidentalKeyColour => Color.Gray;
 
-        public Color KeyColour => Colors.DarkGray;
-        public Color LineColour => Colors.Black;
-        public Color SelectedNoteColour => Colors.DarkRed;
-        public Color UnselectedNoteColour => Colors.Crimson;
+        public Color KeyColour => Color.DarkGray;
+        public Color LineColour => Color.Black;
+        public Color SelectedNoteColour => Color.DarkRed;
+        public Color UnselectedNoteColour => Color.Crimson;
 
-        public Color IndicatorColour => Colors.BurlyWood;
+        public Color IndicatorColour => Color.BurlyWood;
 
         // Musical definitions
         public int TotalNotes => 64;

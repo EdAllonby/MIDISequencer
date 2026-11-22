@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using JetBrains.Annotations;
 using log4net;
 using Sequencer.Domain;
@@ -11,11 +11,15 @@ using Sequencer.Utilities;
 
 namespace Sequencer.ViewModel
 {
-    public sealed class SequencerViewModel : ViewModelBase
+    public sealed class SequencerViewModel : ObservableObject
     {
         [NotNull] private static readonly ILog Log = LogExtensions.GetLoggerSafe(typeof(SequencerViewModel));
         [NotNull] private readonly ISequencerClock clock;
-        [NotNull] private readonly IWpfDispatcher dispatcher;
+        [NotNull] private readonly IUiDispatcher dispatcher;
+        [NotNull] private readonly RelayCommand playCommand;
+        [NotNull] private readonly RelayCommand pauseCommand;
+        [NotNull] private readonly RelayCommand stopCommand;
+        [NotNull] private readonly RelayCommand toggleCommand;
         [NotNull] private readonly ITickCalculator tickCalculator;
         [NotNull] private IPosition currentPosition = new Position(1, 1, 1);
         [NotNull] private NoteAction noteAction = NoteAction.Create;
@@ -23,12 +27,17 @@ namespace Sequencer.ViewModel
         [CanBeNull] private object selectedObject;
         private PlayState sequencerPlayState;
 
-
-        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IWpfDispatcher dispatcher)
+        public SequencerViewModel([NotNull] ISequencerClock clock, [NotNull] ITickCalculator tickCalculator, [NotNull] IUiDispatcher dispatcher)
         {
             this.clock = clock;
             this.tickCalculator = tickCalculator;
             this.dispatcher = dispatcher;
+
+            playCommand = new RelayCommand(ExecutePlayCommand, CanExecutePlayCommand);
+            pauseCommand = new RelayCommand(ExecutePauseCommand, CanExecutePauseCommand);
+            stopCommand = new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
+            toggleCommand = new RelayCommand(ExecuteToggleSequencerCommand);
+
             CurrentPosition = new Position(1, 1, 1);
             SequencerPlayState = PlayState.Stop;
 
@@ -44,8 +53,8 @@ namespace Sequencer.ViewModel
             set
             {
                 noteAction = value;
-                RaisePropertyChanged(nameof(NoteAction));
-                RaisePropertyChanged(nameof(Information));
+                OnPropertyChanged(nameof(NoteAction));
+                OnPropertyChanged(nameof(Information));
 
                 Log.Info($"Note action set to {NoteAction}");
             }
@@ -69,7 +78,7 @@ namespace Sequencer.ViewModel
                 if (selectedNotes.Count() == 1)
                 {
                     SelectedObject = SelectedNotes.FirstOrDefault();
-                    RaisePropertyChanged(nameof(SelectedNotes));
+                    OnPropertyChanged(nameof(SelectedNotes));
                 }
                 else
                 {
@@ -85,8 +94,13 @@ namespace Sequencer.ViewModel
             set
             {
                 sequencerPlayState = value;
-                RaisePropertyChanged(nameof(SequencerPlayState));
-                RaisePropertyChanged(nameof(Information));
+                OnPropertyChanged(nameof(SequencerPlayState));
+                OnPropertyChanged(nameof(Information));
+
+                // Unlike WPF's CommandManager, nothing re-queries CanExecute automatically.
+                playCommand.NotifyCanExecuteChanged();
+                pauseCommand.NotifyCanExecuteChanged();
+                stopCommand.NotifyCanExecuteChanged();
 
                 Log.Info($"Sequencer play state set to {SequencerPlayState}");
             }
@@ -100,7 +114,7 @@ namespace Sequencer.ViewModel
             private set
             {
                 currentPosition = value;
-                RaisePropertyChanged(nameof(CurrentPosition));
+                OnPropertyChanged(nameof(CurrentPosition));
 
                 Log.Info($"Sequencer current position set to {CurrentPosition}");
             }
@@ -113,24 +127,24 @@ namespace Sequencer.ViewModel
             set
             {
                 selectedObject = value;
-                RaisePropertyChanged(nameof(SelectedObject));
+                OnPropertyChanged(nameof(SelectedObject));
             }
         }
 
-        public ICommand PlaySequencer => new RelayCommand(ExecutePlayCommand, CanExecutePlayCommand);
+        public ICommand PlaySequencer => playCommand;
 
-        public ICommand PauseSequencer => new RelayCommand(ExecutePauseCommand, CanExecutePauseCommand);
+        public ICommand PauseSequencer => pauseCommand;
 
-        public ICommand StopSequencer => new RelayCommand(ExecuteStopCommand, CanExecuteStopCommand);
+        public ICommand StopSequencer => stopCommand;
 
-        public ICommand ToggleSequencer => new RelayCommand(ExecuteToggleSequencerCommand, () => true);
+        public ICommand ToggleSequencer => toggleCommand;
 
         private void OnTick(object sender, [NotNull] TickEventArgs e)
         {
             if (e.CurrentTick % (clock.TicksPerQuarterNote / 4) == 0)
             {
                 IPosition positionAtTick = tickCalculator.CalculatePositionFromTick(e.CurrentTick);
-                dispatcher.DispatchToWpf(() => CurrentPosition = positionAtTick);
+                dispatcher.Dispatch(() => CurrentPosition = positionAtTick);
             }
         }
 

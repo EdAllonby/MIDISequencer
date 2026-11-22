@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Sequencer.Domain;
 using Sequencer.Midi;
 
@@ -13,59 +14,59 @@ namespace Sequencer.ViewModel.Tests
         [Test]
         public void ExecutingPlayCommand_SetsPlayState_ToTrue()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Stop };
 
             ICommand playCommand = viewModel.PlaySequencer;
 
             playCommand.Execute(null);
 
-            Assert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
+            ClassicAssert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
         }
 
         [Test]
         public void ExecutingStopCommand_SetsPlayState_ToFalse()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Play };
 
             ICommand stopCommand = viewModel.StopSequencer;
 
             stopCommand.Execute(null);
 
-            Assert.AreEqual(PlayState.Stop, viewModel.SequencerPlayState);
+            ClassicAssert.AreEqual(PlayState.Stop, viewModel.SequencerPlayState);
         }
 
         [Test]
         public void ExecutingToggleSerquencerCommand_WhenPaused_SetsPlayStateToPause()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Play };
 
             ICommand toggleSequencerCommand = viewModel.ToggleSequencer;
 
             toggleSequencerCommand.Execute(null);
 
-            Assert.AreEqual(PlayState.Pause, viewModel.SequencerPlayState);
+            ClassicAssert.AreEqual(PlayState.Pause, viewModel.SequencerPlayState);
         }
 
         [Test]
         public void ExecutingToggleSerquencerCommand_WhenPaused_SetsPlayStateToTrue()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Pause };
 
             ICommand toggleSequencerCommand = viewModel.ToggleSequencer;
 
             toggleSequencerCommand.Execute(null);
 
-            Assert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
+            ClassicAssert.AreEqual(PlayState.Play, viewModel.SequencerPlayState);
         }
 
         [Test]
         public void Information_ShowsNoteActionAndPlayState()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
             {
                 SequencerPlayState = PlayState.Stop,
                 NoteAction = NoteAction.Select
@@ -75,7 +76,7 @@ namespace Sequencer.ViewModel.Tests
 
             const string expectedInformation = "Note Action Select, Pause";
 
-            Assert.AreEqual(expectedInformation, viewModel.Information);
+            ClassicAssert.AreEqual(expectedInformation, viewModel.Information);
         }
 
         [Test]
@@ -89,13 +90,13 @@ namespace Sequencer.ViewModel.Tests
             var mockTickCalculator = new Mock<ITickCalculator>();
             mockTickCalculator.Setup(x => x.CalculatePositionFromTick(currentTick)).Returns(It.IsAny<IPosition>());
 
-            var mockDispatcher = new Mock<IWpfDispatcher>();
+            var mockDispatcher = new Mock<IUiDispatcher>();
 
             var unused = new SequencerViewModel(mockClock.Object, mockTickCalculator.Object, mockDispatcher.Object);
 
             mockClock.Raise(x => x.Tick += null, new TickEventArgs(currentTick));
 
-            mockDispatcher.Verify(x => x.DispatchToWpf(It.IsAny<Action>()), Times.Once);
+            mockDispatcher.Verify(x => x.Dispatch(It.IsAny<Action>()), Times.Once);
         }
 
         [Test]
@@ -110,14 +111,14 @@ namespace Sequencer.ViewModel.Tests
             var mockTickCalculator = new Mock<ITickCalculator>();
             mockTickCalculator.Setup(x => x.CalculatePositionFromTick(currentTick)).Returns(expectedPosition);
 
-            var dispatcher = new Mock<IWpfDispatcher>();
-            dispatcher.Setup(x => x.DispatchToWpf(It.IsAny<Action>())).Callback<Action>(wpfDispatcherCallback => wpfDispatcherCallback());
+            var dispatcher = new Mock<IUiDispatcher>();
+            dispatcher.Setup(x => x.Dispatch(It.IsAny<Action>())).Callback<Action>(dispatcherCallback => dispatcherCallback());
 
             var viewModel = new SequencerViewModel(mockClock.Object, mockTickCalculator.Object, dispatcher.Object);
 
             mockClock.Raise(x => x.Tick += null, new TickEventArgs(currentTick));
 
-            Assert.AreEqual(viewModel.CurrentPosition, expectedPosition);
+            ClassicAssert.AreEqual(viewModel.CurrentPosition, expectedPosition);
         }
 
         [Test]
@@ -129,57 +130,57 @@ namespace Sequencer.ViewModel.Tests
             mockClock.Setup(x => x.TicksPerQuarterNote).Returns(16);
 
             var mockTickCalculator = new Mock<ITickCalculator>();
-            var mockDispatcher = new Mock<IWpfDispatcher>();
+            var mockDispatcher = new Mock<IUiDispatcher>();
 
             var unused = new SequencerViewModel(mockClock.Object, mockTickCalculator.Object, mockDispatcher.Object);
 
             mockClock.Raise(x => x.Tick += null, new TickEventArgs(currentTick));
 
-            mockDispatcher.Verify(x => x.DispatchToWpf(It.IsAny<Action>()), Times.Never);
+            mockDispatcher.Verify(x => x.Dispatch(It.IsAny<Action>()), Times.Never);
         }
 
         [Test]
         public void SequencerInStartState_CanExecuteStop()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Play };
 
             ICommand stopCommand = viewModel.StopSequencer;
 
-            Assert.IsTrue(stopCommand.CanExecute(null));
+            ClassicAssert.IsTrue(stopCommand.CanExecute(null));
         }
 
         [Test]
         public void SequencerInStartState_CannotExecuteStart()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Play };
 
             ICommand playCommand = viewModel.PlaySequencer;
 
-            Assert.IsFalse(playCommand.CanExecute(null));
+            ClassicAssert.IsFalse(playCommand.CanExecute(null));
         }
 
         [Test]
         public void SequencerInStopState_CanExecuteStart()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Stop };
 
             ICommand playCommand = viewModel.PlaySequencer;
 
-            Assert.IsTrue(playCommand.CanExecute(null));
+            ClassicAssert.IsTrue(playCommand.CanExecute(null));
         }
 
         [Test]
         public void SequencerInStopState_CannotExecuteStop()
         {
-            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(new Mock<ISequencerClock>().Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Stop };
 
             ICommand stopCommand = viewModel.StopSequencer;
 
-            Assert.IsFalse(stopCommand.CanExecute(null));
+            ClassicAssert.IsFalse(stopCommand.CanExecute(null));
         }
 
         [Test]
@@ -187,7 +188,7 @@ namespace Sequencer.ViewModel.Tests
         {
             var mockClock = new Mock<ISequencerClock>();
 
-            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Play };
 
             ICommand pauseCommand = viewModel.PauseSequencer;
@@ -201,7 +202,7 @@ namespace Sequencer.ViewModel.Tests
         {
             var mockClock = new Mock<ISequencerClock>();
 
-            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Stop };
 
             ICommand playCommand = viewModel.PlaySequencer;
@@ -215,7 +216,7 @@ namespace Sequencer.ViewModel.Tests
         {
             var mockClock = new Mock<ISequencerClock>();
 
-            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<ITickCalculator>().Object, new Mock<IWpfDispatcher>().Object)
+            var viewModel = new SequencerViewModel(mockClock.Object, new Mock<ITickCalculator>().Object, new Mock<IUiDispatcher>().Object)
                 { SequencerPlayState = PlayState.Play };
 
             ICommand stopCommand = viewModel.StopSequencer;
