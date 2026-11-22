@@ -73,11 +73,14 @@ namespace Sequencer.View
             builder.RegisterType<PortAudioOutput>().As<IAudioOutput>().SingleInstance();
             builder.RegisterType<SequencerNotes>().As<ISequencerNotes, ISequencedNotes>().SingleInstance();
             builder.RegisterType<SequencerPlayer>().SingleInstance();
+            builder.RegisterType<Sequencer.Domain.Drums.DrumPattern>().SingleInstance();
+            builder.RegisterType<Sequencer.Domain.Drums.DrumKitSettings>().SingleInstance();
             builder.RegisterType<NotePreviewer>().As<INotePreviewer>().SingleInstance();
             builder.RegisterType<KeyboardStateProcessor>().AsSelf().As<IKeyboardStateProcessor>().SingleInstance();
             builder.RegisterType<MouseOperator>().AsSelf().As<IMouseOperator>().SingleInstance();
             builder.RegisterType<SequencerViewModel>().SingleInstance();
             builder.RegisterType<SynthViewModel>().SingleInstance();
+            builder.RegisterType<DrumKitViewModel>().SingleInstance();
             builder.RegisterType<MainWindow>().SingleInstance();
 
             overrides?.Invoke(builder);

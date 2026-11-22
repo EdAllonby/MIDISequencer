@@ -1,6 +1,7 @@
 using System;
 using JetBrains.Annotations;
 using Sequencer.Domain;
+using Sequencer.Domain.Drums;
 using Sequencer.Domain.Settings;
 
 namespace Sequencer.Audio
@@ -30,6 +31,19 @@ namespace Sequencer.Audio
         public IDisposable Hold(Tone tone)
         {
             return player.Hold(tone);
+        }
+
+        public void PreviewDrum(DrumSound sound, byte velocity)
+        {
+            if (settings.PreviewOnEdit)
+            {
+                player.PreviewDrum(sound, velocity);
+            }
+        }
+
+        public void PlayDrum(DrumSound sound, byte velocity)
+        {
+            player.PreviewDrum(sound, velocity);
         }
     }
 }

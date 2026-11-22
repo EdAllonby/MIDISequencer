@@ -1,5 +1,6 @@
 using System;
 using JetBrains.Annotations;
+using Sequencer.Domain.Drums;
 
 namespace Sequencer.Domain
 {
@@ -18,5 +19,15 @@ namespace Sequencer.Domain
         /// </summary>
         [NotNull]
         IDisposable Hold([NotNull] Tone tone);
+
+        /// <summary>
+        /// A drum hit while editing, if the user has editing previews switched on.
+        /// </summary>
+        void PreviewDrum(DrumSound sound, byte velocity);
+
+        /// <summary>
+        /// A drum hit the user asked to hear. Always plays.
+        /// </summary>
+        void PlayDrum(DrumSound sound, byte velocity);
     }
 }

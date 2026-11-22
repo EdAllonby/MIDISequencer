@@ -21,6 +21,7 @@ namespace Sequencer.Audio.Tests
         private Mock<ITickCalculator> tickCalculator;
         private Dictionary<ISequencedNote, FakeVoice> voices;
         private SequencerPlayer player;
+        private Domain.Drums.DrumPattern drums;
         private ISampleProvider playedSource;
         private double masterVolume = 1.0;
 
@@ -56,7 +57,9 @@ namespace Sequencer.Audio.Tests
             audioSettings.Setup(x => x.SampleRate).Returns(SampleRate);
             audioSettings.Setup(x => x.MasterVolume).Returns(() => masterVolume);
 
-            player = new SequencerPlayer(factory.Object, notes.Object, clock.Object, tickCalculator.Object, audioSettings.Object, output.Object);
+            drums = new Domain.Drums.DrumPattern();
+            player = new SequencerPlayer(factory.Object, notes.Object, clock.Object, tickCalculator.Object, audioSettings.Object, output.Object,
+                drums, new Domain.Drums.DrumKitSettings());
         }
 
         [TearDown]
@@ -241,6 +244,53 @@ namespace Sequencer.Audio.Tests
             settings.PreviewOnEdit = true;
             previewer.Preview(tone);
             Assert.That(voices.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void DrumHits_PlayOnTheirSteps()
+        {
+            // The mock clock has no ticks per quarter note, so every tick is a step.
+            drums.SetVelocity(Domain.Drums.DrumSound.Kick, 0, 96);
+            drums.SetVelocity(Domain.Drums.DrumSound.Snare, 2, 96);
+            RaiseStarted();
+
+            RaiseTick(0);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1));
+
+            RaiseTick(1);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1), "Nothing on step 1.");
+
+            RaiseTick(2);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void DrumHits_DoNotPlayWhenStopped()
+        {
+            drums.SetVelocity(Domain.Drums.DrumSound.Kick, 0, 96);
+
+            RaiseTick(0);
+
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ClosedHat_ChokesARingingOpenHat()
+        {
+            drums.SetVelocity(Domain.Drums.DrumSound.OpenHat, 0, 96);
+            drums.SetVelocity(Domain.Drums.DrumSound.ClosedHat, 1, 96);
+            RaiseStarted();
+            RaiseTick(0);
+            playedSource.Read(new float[256]);
+
+            RaiseTick(1);
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(2));
+
+            // 1000 samples is about 23 ms: long enough for the choke, shorter than the closed hat.
+            playedSource.Read(new float[1000]);
+            playedSource.Read(new float[16]);
+
+            Assert.That(player.ActiveVoiceCount, Is.EqualTo(1), "Only the closed hat is left.");
         }
 
         [Test]
