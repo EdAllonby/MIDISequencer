@@ -1317,7 +1317,107 @@ namespace Sequencer.View.Tests.UiTests
             }
         }
 
-        [AvaloniaTest, Explicit("Writes a screenshot for the README.")]
+        [AvaloniaTest]
+        public void Undo_TakesBackANewNote_AndRedoRestoresIt()
+        {
+            Click(EditorPoint);
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+
+            Press(Key.Z, commandModifier);
+            Assert.That(notes.AllNotes, Is.Empty);
+            Assert.That(window.HasUnsavedChanges, Is.False, "Back to the song as it was.");
+
+            Press(Key.Z, commandModifier | RawInputModifiers.Shift);
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+            Assert.That(window.HasUnsavedChanges, Is.True);
+        }
+
+        [AvaloniaTest]
+        public void Undo_StepsBackOneEditAtATime()
+        {
+            Click(EditorPoint);
+            window.RecordPendingEdit();
+            Click(EditorPoint + new Point(200, 0));
+            window.RecordPendingEdit();
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(2));
+
+            window.Undo();
+            Assert.That(notes.AllNotes.Count(), Is.EqualTo(1));
+
+            window.Undo();
+            Assert.That(notes.AllNotes, Is.Empty);
+            Assert.That(window.CanUndo, Is.False);
+        }
+
+        [AvaloniaTest]
+        public void Undo_WorksForTheArrangementToo()
+        {
+            window.CreateClipAt(SynthTrack, 3);
+            Assert.That(SynthTrack.ClipAt(3), Is.Not.Null);
+
+            window.Undo();
+
+            Assert.That(SynthTrack.ClipAt(3), Is.Null);
+        }
+
+        [AvaloniaTest]
+        public void ADraggedSlider_IsOneUndoStep()
+        {
+            Effects.Add(EffectKind.Delay);
+            window.RecordPendingEdit();
+            Dispatcher.UIThread.RunJobs();
+            Slider feedback = Named<Slider>("DelayFeedbackSlider");
+
+            foreach (double value in new[] { 500.0, 600, 700, 800 })
+            {
+                feedback.Value = value;
+            }
+
+            window.Undo();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.That(SynthTrack.Effects.Single()["feedback"], Is.EqualTo(0.35).Within(1e-9), "Back to before the drag, in one step.");
+            Assert.That(Named<Slider>("DelayFeedbackSlider").Value, Is.EqualTo(0.35 / 0.9 * 1000).Within(0.01), "The panel shows it.");
+        }
+
+        [AvaloniaTest]
+        public void Undo_KeepsTheTrackYouAreOn_AndTheTempo()
+        {
+            window.Select(DrumTrack, 0);
+            viewModel.BeatsPerMinute = 90;
+            window.RecordPendingEdit();
+            Effects.Add(EffectKind.Reverb);
+
+            window.Undo();
+
+            Assert.That(Effects.Track, Is.SameAs(DrumTrack), "Still on the drums (the restored track).");
+            Assert.That(DrumTrack.Effects, Is.Empty);
+            Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(90));
+
+            window.Undo();
+            Assert.That(viewModel.BeatsPerMinute, Is.EqualTo(120));
+        }
+
+        [AvaloniaTest]
+        public void OpeningASong_StartsAFreshHistory()
+        {
+            string path = TempSongPath();
+
+            try
+            {
+                Click(EditorPoint);
+                window.SaveSong(path);
+                window.OpenSong(path);
+
+                Assert.That(window.CanUndo, Is.False);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+                [AvaloniaTest, Explicit("Writes a screenshot for the README.")]
         public void Screenshot_Effects()
         {
             window.Height = 1300;

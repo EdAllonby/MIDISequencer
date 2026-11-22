@@ -759,6 +759,11 @@ namespace Sequencer.View.Control
                 return;
             }
 
+            if (HandleUndoKeys(e))
+            {
+                return;
+            }
+
             if (e.Key == Key.D && e.KeyModifiers == keyboardState.CommandModifier)
             {
                 RepeatSelectedClip();
